@@ -1,17 +1,421 @@
+import Navbar from './components/Navbar'
+import ProjectCards3D from './components/ProjectCards3D'
+import ProjectsTable from './components/ProjectsTable'
+import ClientsMarquee from './components/ClientsMarquee'
+import SoftwareSection from './components/SoftwareSection'
+import CareersSection from './components/CareersSection'
+import ReservlySection from './components/ReservlySection'
+import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
+
 function App() {
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Navbar fixed */}
+      <Navbar />
+
       {/* Hero Section - 1920x1080 con sfondo nero */}
       <section
-        className="w-full flex-shrink-0 bg-black"
+        className="w-full min-h-screen bg-black flex items-center justify-center overflow-hidden"
         style={{
-          width: '100%',
-          maxWidth: '1920px',
-          height: '1080px',
-          margin: '0 auto'
+          aspectRatio: '1920 / 1080'
         }}
       >
+        <div className="flex flex-col items-center text-center px-4">
+          {/* Titolo principale - Inter SemiBold 75px */}
+          <div className="text-white font-semibold tracking-tight" style={{ fontSize: '75px', lineHeight: '1.1' }}>
+            <p>WEBWISE</p>
+            <p>TRANSFORMING DIGITAL PRESENCE</p>
+            <p>WITH AI-DRIVEN STRATEGIES AND</p>
+            <p>SCALABLE TECHNOLOGIES</p>
+          </div>
+
+          {/* Sezione inferiore con logo al centro */}
+          <div className="flex items-center justify-center gap-8 mt-12" style={{ fontSize: '30px' }}>
+            {/* Colonna sinistra */}
+            <div className="text-white font-semibold text-right tracking-wide" style={{ minWidth: '280px' }}>
+              <p style={{ whiteSpace: 'nowrap' }}>SMARTER SYSTEMS</p>
+              <p style={{ whiteSpace: 'nowrap' }}>BETTER<span style={{ marginLeft: '100px' }}>WORK</span></p>
+            </div>
+
+            {/* Logo centrale - 125x125px come da Figma */}
+            <div className="flex items-center justify-center flex-shrink-0">
+              <img
+                src={logoWebwiseCenter}
+                alt="Webwise Logo"
+                className="invert"
+                style={{ width: '125px', height: '125px' }}
+              />
+            </div>
+
+            {/* Colonna destra */}
+            <div className="text-white font-semibold text-left tracking-wide" style={{ minWidth: '280px' }}>
+              <p>EST. 2022</p>
+              <p style={{ paddingLeft: '60px', whiteSpace: 'nowrap' }}>→ EFFICENCY</p>
+            </div>
+          </div>
+        </div>
       </section>
+
+      {/* Sezione Servizi - 1920x1400 con sfondo nero */}
+      <section
+        id="servizi"
+        className="w-full bg-[#1a1a1a] relative py-20"
+        style={{
+          aspectRatio: '1920 / 1400'
+        }}
+      >
+        {/* Pattern di punti sullo sfondo */}
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: 'radial-gradient(circle, #444 1px, transparent 1px)',
+            backgroundSize: '20px 20px'
+          }}
+        />
+
+        <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Colonna sinistra - sticky */}
+          <div className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit">
+            {/* Badge */}
+            <span className="text-xs px-3 py-1 rounded-full border border-cyan-400/50 bg-cyan-400/10 text-cyan-400 w-fit">
+              Come possiamo aiutarti
+            </span>
+
+            {/* Titolo */}
+            <h2 className="text-white text-4xl font-semibold">Servizi</h2>
+
+            {/* Descrizione */}
+            <p className="text-gray-400 max-w-[450px] leading-relaxed">
+              Capire esattamente quello che ti serve è il nostro pane quotidiano.
+              Sviluppiamo soluzioni software personalizzate che si allineano
+              perfettamente ai tuoi obiettivi. Il nostro approccio è un mix ben
+              rodato di metodo e creatività, garantendo prodotti di qualità superiore
+              e senza compromessi.
+            </p>
+
+            {/* Bottoni */}
+            <div className="flex flex-wrap items-center gap-3 mt-6">
+              <a
+                href="#"
+                className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
+              >
+                <span>Leggi di più</span>
+                <span className="bg-black rounded-full p-1.5 group-hover:bg-cyan-500 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 7v14"></path>
+                    <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
+                  </svg>
+                </span>
+              </a>
+              <a
+                href="#contatti"
+                className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
+              >
+                <span>Contattaci</span>
+                <span className="bg-black rounded-full p-1.5 group-hover:bg-cyan-500 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                  </svg>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          {/* Colonna destra - card servizi */}
+          <div className="flex flex-col gap-4">
+            {/* Card Ecommerce */}
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-20">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="8" cy="21" r="1"></circle>
+                    <circle cx="19" cy="21" r="1"></circle>
+                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Ecommerce</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Shopify</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Integrazione gestionale</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Gestiamo un numero potenzialmente illimitato di prodotti, mantenendo la massima
+                flessibilità nel design. Sviluppiamo negozi online integrati e intelligenti, con la migliore
+                piattaforma sul mercato.
+              </p>
+            </div>
+
+            {/* Card Design */}
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-28">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="22" x2="2" y1="6" y2="6"></line>
+                    <line x1="22" x2="2" y1="18" y2="18"></line>
+                    <line x1="6" x2="6" y1="2" y2="22"></line>
+                    <line x1="18" x2="18" y1="2" y2="22"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Design</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Vendita omnicanale</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Cloud</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Creiamo esperienze straordinarie per i tuoi utenti e interfacce moderne, belle e
+                funzionali. Seguiamo un processo di UX/UI Design che rispetta i migliori standard e
+                siamo creativi.
+              </p>
+            </div>
+
+            {/* Card Custom Software */}
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-36">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect>
+                    <rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect>
+                    <line x1="6" x2="6.01" y1="6" y2="6"></line>
+                    <line x1="6" x2="6.01" y1="18" y2="18"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Custom Software</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Sicuro</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Personalizzato</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Con un metodo studiato nei dettagli, arriviamo al risultato progettando insieme e
+                sviluppando il software in cloud di cui hai bisogno. Quasi tutto è possibile.
+              </p>
+            </div>
+
+            {/* Card Blockchain & Web3 */}
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-44">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m16 18 6-6-6-6"></path>
+                    <path d="m8 6-6 6 6 6"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Blockchain & Web3</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Cryptovalute</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Tecnologie decentralizzate</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Sviluppiamo progetti direttamente su Blockchain o implementiamo in software
+                tradizionali funzionalità Web3.
+              </p>
+            </div>
+
+            {/* Card AI & Machine Learning */}
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-52">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 8V4H8"></path>
+                    <rect width="16" height="12" x="4" y="8" rx="2"></rect>
+                    <path d="M2 14h2"></path>
+                    <path d="M20 14h2"></path>
+                    <path d="M15 13v2"></path>
+                    <path d="M9 13v2"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">AI & Machine Learning</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Multipiattaforma</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">UX Design</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Soluzioni avanzate per automatizzare processi, analizzare dati e prendere decisioni
+                intelligenti, aiutando il tuo business a crescere con innovazione e precisione.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sezione Portfolio - 1920x2580 */}
+      <section
+        id="portfolio"
+        className="w-full bg-black relative"
+        style={{
+          aspectRatio: '1920 / 2580'
+        }}
+      >
+        {/* Sottosezione 1: I Nostri Clienti - 1920x1260 */}
+        <div
+          className="w-full relative flex flex-col items-center pt-16"
+          style={{
+            aspectRatio: '1920 / 1260'
+          }}
+        >
+          {/* Badge */}
+          <span className="text-xs px-3 py-1 rounded-full border border-red-500/50 bg-red-500/10 text-red-500 mb-4">
+            Con chi abbiamo lavorato
+          </span>
+
+          {/* Titolo */}
+          <h2 className="text-white text-4xl font-semibold mb-4">I nostri clienti</h2>
+
+          {/* Descrizione */}
+          <p className="text-gray-400 text-center max-w-2xl leading-relaxed px-4">
+            Ci immedesimiamo nella visione dei nostri clienti, per comprendere e realizzare i loro
+            obiettivi con la stessa cura e attenzione che dedicherebbero loro stessi. Questo
+            approccio empatico ci permette di sviluppare soluzioni che rispecchiano non solo le
+            esigenze, ma anche l'identità e le aspirazioni di chi ci sceglie come partner.
+          </p>
+
+          {/* Card 3D dei progetti - interattive */}
+          <ProjectCards3D />
+        </div>
+
+        {/* Sottosezione 2: Slider - 1920x200 */}
+        <div
+          className="w-full relative bg-[#1a1a1a]"
+          style={{
+            aspectRatio: '1920 / 200'
+          }}
+        >
+          <ClientsMarquee />
+        </div>
+
+        {/* Sottosezione 3: Progetti - 1920x750 */}
+        <div
+          className="w-full relative flex items-start justify-center"
+          style={{
+            aspectRatio: '1920 / 750'
+          }}
+        >
+          <ProjectsTable />
+        </div>
+
+        {/* Sottosezione 4: Lavora con noi */}
+        <div
+          className="w-full relative py-20 bg-gray-200 overflow-visible z-10"
+        >
+          {/* Cerchio sfumato rosso in alto a sinistra */}
+          <div
+            className="absolute -top-[400px] -left-[200px] w-[600px] h-[600px] rounded-full opacity-30 z-[1]"
+            style={{
+              background: '#dc2626',
+              filter: 'blur(240px)'
+            }}
+          />
+
+          {/* Cerchio sfumato cyan in basso a destra */}
+          <div
+            className="absolute -bottom-[200px] right-2 w-[600px] h-[600px] rounded-full opacity-40 z-[1]"
+            style={{
+              background: '#06b6d4',
+              filter: 'blur(240px)'
+            }}
+          />
+
+          {/* Contenuto */}
+          <div className="relative z-10 max-w-[1100px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-5 gap-3">
+            {/* Colonna sinistra - Badge */}
+            <div className="lg:col-span-2">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-500 text-white text-xs font-medium">
+                Scrivici, è gratis!
+              </span>
+            </div>
+
+            {/* Colonna destra - Contenuto */}
+            <div className="flex flex-col gap-2 lg:col-span-3">
+              <h4 className="text-4xl uppercase font-medium tracking-tight text-gray-900">
+                Vuoi lavorare con noi?{' '}
+                <span className="text-gray-500">Raccontaci il tuo progetto</span>
+              </h4>
+
+              <p className="text-gray-700">
+                Ogni percorso inizia con una chiamata conoscitiva, in cui potrai raccontarci quali sono le tue esigenze e ricevere i primi consigli sulla loro realizzazione.
+              </p>
+
+              {/* Bottone Contattaci */}
+              <a
+                href="#contatti"
+                className="mt-4 border border-gray-400/50 pl-3 pr-1 py-1 rounded-full bg-gray-100 flex items-center gap-2 group hover:-rotate-3 transition-all w-fit"
+              >
+                <p className="text-gray-900">Contattaci</p>
+                <div className="relative flex p-1.5 overflow-hidden text-white bg-black rounded-full group-hover:bg-red-500 transition-colors">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-all translate-y-0 group-hover:-translate-y-[105%]"
+                  >
+                    <path d="M5 12h14"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                  </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="absolute transition-all translate-y-[130%] group-hover:translate-y-0"
+                  >
+                    <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path>
+                    <path d="m21.854 2.147-10.94 10.939"></path>
+                  </svg>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          {/* Icona stella/asterisco */}
+          <svg
+            className="absolute z-[1] right-4 lg:right-auto -bottom-6 lg:-bottom-12 lg:left-20 w-[150px] h-[150px] lg:w-[300px] lg:h-[300px] animate-spin-slow"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 72 72"
+            fill="none"
+            style={{ animationDuration: '20s' }}
+          >
+            <path
+              d="M40 0H32V26.3432L13.3726 7.71573L7.71573 13.3726L26.3431 32H0V40H26.3432L7.71573 58.6274L13.3726 64.2843L32 45.6569V72H40V45.6569L58.6274 64.2843L64.2843 58.6274L45.6568 40H72V32H45.6569L64.2843 13.3726L58.6274 7.71573L40 26.3432V0Z"
+              fill="#e0e0e0"
+            />
+          </svg>
+        </div>
+      </section>
+
+      {/* Sezione Software */}
+      <SoftwareSection />
+
+      {/* Sezione Careers */}
+      <CareersSection />
+
+      {/* Sezione Reservly */}
+      <ReservlySection />
     </div>
   )
 }
