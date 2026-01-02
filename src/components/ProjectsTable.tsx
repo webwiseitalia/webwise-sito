@@ -68,12 +68,12 @@ export default function ProjectsTable() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-6xl mx-auto px-8 py-12"
+      className="relative w-full px-6 lg:px-12"
       onMouseMove={handleMouseMove}
     >
       {/* Titolo */}
-      <a href="#" className="inline-block mb-8">
-        <h2 className="text-white text-3xl font-semibold hover:text-red-500 transition-colors">
+      <a href="#" className="inline-block mb-10 lg:mb-12">
+        <h2 className="text-white text-4xl lg:text-5xl font-semibold hover:text-red-500 transition-colors">
           Progetti
         </h2>
       </a>
@@ -100,7 +100,7 @@ export default function ProjectsTable() {
       {/* Tabella progetti */}
       <div className="w-full">
         {/* Header */}
-        <div className="grid grid-cols-12 gap-4 px-4 py-4 text-gray-500 text-sm border-b border-gray-800">
+        <div className="grid grid-cols-12 gap-4 px-4 py-5 text-gray-500 text-sm border-b border-gray-700">
           <div className="col-span-4 sm:col-span-3">
             <p>Progetto</p>
           </div>
@@ -123,38 +123,37 @@ export default function ProjectsTable() {
           <a
             key={project.id}
             href={project.href}
-            className="grid grid-cols-12 gap-4 px-4 py-6 border-b border-gray-800 group hover:bg-white/5 transition-colors"
+            className="grid grid-cols-12 gap-4 px-4 py-8 lg:py-10 border-b border-gray-800 group hover:bg-white/5 transition-colors"
             onMouseEnter={() => setHoveredProject(project.id)}
             onMouseLeave={() => setHoveredProject(null)}
           >
             {/* Nome progetto */}
-            <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+            <div className="col-span-4 sm:col-span-3 flex items-center gap-4">
               {/* Thumbnail mobile */}
-              <div className="lg:hidden w-[50px] h-[50px] rounded-md overflow-hidden flex-shrink-0 bg-gradient-to-br from-red-500 to-red-800">
-              </div>
-              <p className="text-white font-bold group-hover:text-red-500 group-hover:translate-x-1 transition-all">
+              <div className="lg:hidden w-[60px] h-[60px] rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-red-500 to-red-800" />
+              <p className="text-white text-lg lg:text-xl font-bold group-hover:text-red-500 group-hover:translate-x-2 transition-all">
                 {project.name}
               </p>
             </div>
 
             {/* Industria */}
             <div className="hidden md:flex col-span-2 items-center">
-              <p className="text-gray-400">{project.industry}</p>
+              <p className="text-gray-400 text-base">{project.industry}</p>
             </div>
 
             {/* Strumenti */}
             <div className="hidden lg:flex col-span-2 items-center">
-              <p className="text-gray-400">{project.tools}</p>
+              <p className="text-gray-400 text-base">{project.tools}</p>
             </div>
 
             {/* Categoria */}
             <div className="hidden sm:flex col-span-3 lg:col-span-3 items-center">
-              <p className="text-gray-400">{project.category}</p>
+              <p className="text-gray-400 text-base">{project.category}</p>
             </div>
 
             {/* Anno */}
             <div className="col-span-8 sm:col-span-4 md:col-span-2 flex items-center justify-end sm:justify-start">
-              <p className="text-gray-400">{project.year}</p>
+              <p className="text-gray-400 text-base">{project.year}</p>
             </div>
           </a>
         ))}
