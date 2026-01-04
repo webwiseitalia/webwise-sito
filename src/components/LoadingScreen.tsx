@@ -62,8 +62,8 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         const deltaX = heroRect.left + heroRect.width / 2 - (loadingLogoRect.left + loadingLogoRect.width / 2)
         const deltaY = heroRect.top + heroRect.height / 2 - (loadingLogoRect.top + loadingLogoRect.height / 2)
 
-        // Scala dal logo grande (250px) al logo piccolo (125px nella hero)
-        const targetScale = 125 / 250
+        // Scala dal logo grande (350px) al logo piccolo (125px nella hero)
+        const targetScale = 125 / 350
 
         // Anima il logo verso la posizione nella hero
         gsap.to(logo, {
@@ -123,8 +123,8 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         alt="Webwise"
         className="invert"
         style={{
-          width: '250px',
-          height: '250px',
+          width: '350px',
+          height: '350px',
         }}
       />
     </div>
