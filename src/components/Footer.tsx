@@ -2,7 +2,7 @@ import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#1a1a1a] py-24 lg:py-32 px-6 lg:px-12">
+    <footer className="w-full bg-black py-24 lg:py-32 px-6 lg:px-12">
       <div className="max-w-6xl mx-auto">
         {/* Layout principale */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">

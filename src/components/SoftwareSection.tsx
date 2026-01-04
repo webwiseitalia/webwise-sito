@@ -1,5 +1,8 @@
+import { Link } from 'react-router-dom'
+
 interface Software {
   id: string
+  slug: string
   name: string
   description: string
   icon: React.ReactNode
@@ -8,6 +11,7 @@ interface Software {
 const softwares: Software[] = [
   {
     id: '/0.1',
+    slug: 'webwise-studio',
     name: 'WebWise Studio',
     description: 'Crea siti web professionali con l\'intelligenza artificiale, senza scrivere codice.',
     icon: (
@@ -18,6 +22,7 @@ const softwares: Software[] = [
   },
   {
     id: '/0.2',
+    slug: 'deepsite',
     name: 'DeepSite',
     description: 'Analisi avanzata dei dati web con machine learning per insights strategici.',
     icon: (
@@ -28,6 +33,7 @@ const softwares: Software[] = [
   },
   {
     id: '/0.3',
+    slug: 'flowengine',
     name: 'FlowEngine',
     description: 'Automazione dei processi aziendali con workflow intelligenti e integrati.',
     icon: (
@@ -38,6 +44,7 @@ const softwares: Software[] = [
   },
   {
     id: '/0.4',
+    slug: 'cloudsync',
     name: 'CloudSync',
     description: 'Sincronizzazione e gestione centralizzata di dati multi-piattaforma in tempo reale.',
     icon: (
@@ -48,6 +55,7 @@ const softwares: Software[] = [
   },
   {
     id: '/0.5',
+    slug: 'securevault',
     name: 'SecureVault',
     description: 'Deploy autonomo, monitoraggio e gestione software su qualsiasi ambiente.',
     icon: (
@@ -114,7 +122,7 @@ export default function SoftwareSection() {
       </div>
 
       {/* Sezione GRIGIA con software - Full Width */}
-      <div className="w-full bg-[#1a1a1a]">
+      <div className="w-full bg-black">
         {/* Header con callout text */}
         <div className="w-full px-6 lg:px-12 py-20 flex justify-center">
           <p className="text-2xl md:text-3xl lg:text-[42px] leading-tight text-white max-w-5xl text-center">
@@ -127,9 +135,9 @@ export default function SoftwareSection() {
         {/* Software List - Full Width */}
         <div className="w-full">
           {softwares.map((software) => (
-            <a
+            <Link
               key={software.id}
-              href="#"
+              to={`/software/${software.slug}`}
               className="group block border-t border-white/10 hover:bg-white/5 transition-all duration-300"
             >
               <div className="w-full px-6 lg:px-12 py-10 lg:py-16 flex flex-col lg:flex-row lg:items-center gap-8">
@@ -156,7 +164,7 @@ export default function SoftwareSection() {
                   <span className="text-white/30 text-sm font-mono hidden lg:block">{software.id}</span>
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
 
           {/* Bottom border */}

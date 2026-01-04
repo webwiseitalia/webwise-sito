@@ -1,3 +1,4 @@
+import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import ProjectCards3D from './components/ProjectCards3D'
 import ProjectsTable from './components/ProjectsTable'
@@ -5,9 +6,10 @@ import ClientsMarquee from './components/ClientsMarquee'
 import SoftwareSection from './components/SoftwareSection'
 import CareersSection from './components/CareersSection'
 import Footer from './components/Footer'
+import SoftwarePage from './pages/SoftwarePage'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
-function App() {
+function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar fixed */}
@@ -59,20 +61,11 @@ function App() {
       {/* Sezione Servizi - 1920x1400 con sfondo nero */}
       <section
         id="servizi"
-        className="w-full bg-[#1a1a1a] relative py-20"
+        className="w-full bg-black relative py-20"
         style={{
           aspectRatio: '1920 / 1400'
         }}
       >
-        {/* Pattern di punti sullo sfondo */}
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: 'radial-gradient(circle, #444 1px, transparent 1px)',
-            backgroundSize: '20px 20px'
-          }}
-        />
-
         <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Colonna sinistra - sticky */}
           <div className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit">
@@ -290,7 +283,7 @@ function App() {
 
         {/* Sottosezione 2: Slider - 1920x200 */}
         <div
-          className="w-full relative bg-[#1a1a1a]"
+          className="w-full relative bg-black"
           style={{
             aspectRatio: '1920 / 200'
           }}
@@ -407,9 +400,55 @@ function App() {
       {/* Sezione Careers */}
       <CareersSection />
 
+      {/* Sezione Reservly */}
+      <section
+        id="reservly"
+        className="w-full bg-black relative"
+        style={{
+          aspectRatio: '1920 / 1080'
+        }}
+      >
+        <div className="absolute inset-0 flex flex-col px-8 lg:px-24 py-16 lg:py-24">
+          {/* Badge */}
+          <span className="inline-flex items-center px-4 py-1.5 rounded-full border border-red-500 text-red-500 text-sm w-fit mb-4">
+            Come possiamo aiutarti
+          </span>
+
+          {/* Titolo grande */}
+          <h2 className="text-white font-medium leading-[1.1] max-w-5xl" style={{ fontSize: 'clamp(36px, 5.5vw, 72px)' }}>
+            Hallo! Wir sind Clou, deine Agentur in Luzern mit Fokus auf Branding, Purpose und Websites mit Wirkung.
+          </h2>
+
+          {/* Contenitore per descrizione e bottone - posizionato a destra e più in basso */}
+          <div className="mt-auto ml-auto max-w-lg flex flex-col gap-6 pb-16 lg:pb-24">
+            {/* Descrizione */}
+            <p className="text-white/90 text-lg lg:text-xl leading-relaxed">
+              In deinem Sinn, für dich, für deine Kund:innen und nicht zuletzt für uns, tun wir alles dafür, dass unsere Arbeit Sinn macht.
+            </p>
+
+            {/* Bottone */}
+            <a
+              href="#"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[#2a2a3a] hover:bg-[#3a3a4a] text-white text-sm font-medium rounded-full transition-colors w-fit"
+            >
+              unser Purpose
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <Footer />
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/software/:softwareId" element={<SoftwarePage />} />
+    </Routes>
   )
 }
 
