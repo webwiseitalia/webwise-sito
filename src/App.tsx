@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import ProjectCards3D from './components/ProjectCards3D'
 import ProjectsTable from './components/ProjectsTable'
@@ -7,6 +7,8 @@ import SoftwareSection from './components/SoftwareSection'
 import CareersSection from './components/CareersSection'
 import Footer from './components/Footer'
 import SoftwarePage from './pages/SoftwarePage'
+import ReservlyPage from './pages/ReservlyPage'
+import CareersPage from './pages/CareersPage'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
 function HomePage() {
@@ -70,7 +72,7 @@ function HomePage() {
           {/* Colonna sinistra - sticky */}
           <div className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit">
             {/* Badge */}
-            <span className="text-xs px-3 py-1 rounded-full border border-cyan-400/50 bg-cyan-400/10 text-cyan-400 w-fit">
+            <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
               Come possiamo aiutarti
             </span>
 
@@ -93,7 +95,7 @@ function HomePage() {
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
               >
                 <span>Leggi di più</span>
-                <span className="bg-black rounded-full p-1.5 group-hover:bg-cyan-500 transition-colors">
+                <span className="bg-black rounded-full p-1.5 group-hover:bg-[#2EBAEB] transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 7v14"></path>
                     <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
@@ -105,7 +107,7 @@ function HomePage() {
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
               >
                 <span>Contattaci</span>
-                <span className="bg-black rounded-full p-1.5 group-hover:bg-cyan-500 transition-colors">
+                <span className="bg-black rounded-full p-1.5 group-hover:bg-[#2EBAEB] transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12h14"></path>
                     <path d="m12 5 7 7-7 7"></path>
@@ -120,7 +122,7 @@ function HomePage() {
             {/* Card Ecommerce */}
             <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-20">
               <div className="flex items-start gap-4 mb-4">
-                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="8" cy="21" r="1"></circle>
                     <circle cx="19" cy="21" r="1"></circle>
@@ -128,10 +130,10 @@ function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Ecommerce</h3>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Ecommerce</h3>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Shopify</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Integrazione gestionale</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Shopify</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Integrazione gestionale</span>
                   </div>
                 </div>
               </div>
@@ -145,7 +147,7 @@ function HomePage() {
             {/* Card Design */}
             <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-28">
               <div className="flex items-start gap-4 mb-4">
-                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="22" x2="2" y1="6" y2="6"></line>
                     <line x1="22" x2="2" y1="18" y2="18"></line>
@@ -154,10 +156,10 @@ function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Design</h3>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Design</h3>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Vendita omnicanale</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Cloud</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Vendita omnicanale</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Cloud</span>
                   </div>
                 </div>
               </div>
@@ -171,7 +173,7 @@ function HomePage() {
             {/* Card Custom Software */}
             <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-36">
               <div className="flex items-start gap-4 mb-4">
-                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect>
                     <rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect>
@@ -180,10 +182,10 @@ function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Custom Software</h3>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Custom Software</h3>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Sicuro</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Personalizzato</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Sicuro</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Personalizzato</span>
                   </div>
                 </div>
               </div>
@@ -196,17 +198,17 @@ function HomePage() {
             {/* Card Blockchain & Web3 */}
             <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-44">
               <div className="flex items-start gap-4 mb-4">
-                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m16 18 6-6-6-6"></path>
                     <path d="m8 6-6 6 6 6"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">Blockchain & Web3</h3>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Blockchain & Web3</h3>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Cryptovalute</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Tecnologie decentralizzate</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Cryptovalute</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Tecnologie decentralizzate</span>
                   </div>
                 </div>
               </div>
@@ -219,7 +221,7 @@ function HomePage() {
             {/* Card AI & Machine Learning */}
             <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-52">
               <div className="flex items-start gap-4 mb-4">
-                <div className="bg-cyan-500 rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 8V4H8"></path>
                     <rect width="16" height="12" x="4" y="8" rx="2"></rect>
@@ -230,10 +232,10 @@ function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-cyan-400 transition-colors">AI & Machine Learning</h3>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">AI & Machine Learning</h3>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">Multipiattaforma</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500 text-white">UX Design</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Multipiattaforma</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">UX Design</span>
                   </div>
                 </div>
               </div>
@@ -262,7 +264,7 @@ function HomePage() {
           }}
         >
           {/* Badge */}
-          <span className="text-xs px-3 py-1 rounded-full border border-red-500/50 bg-red-500/10 text-red-500 mb-4">
+          <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-4">
             Con chi abbiamo lavorato
           </span>
 
@@ -302,7 +304,7 @@ function HomePage() {
           <div
             className="absolute -top-[300px] -left-[150px] w-[500px] h-[500px] rounded-full opacity-25 z-[1]"
             style={{
-              background: '#dc2626',
+              background: '#2EBAEB',
               filter: 'blur(200px)'
             }}
           />
@@ -311,7 +313,7 @@ function HomePage() {
           <div
             className="absolute -bottom-[150px] right-0 w-[500px] h-[500px] rounded-full opacity-35 z-[1]"
             style={{
-              background: '#06b6d4',
+              background: '#2EBAEB',
               filter: 'blur(200px)'
             }}
           />
@@ -320,7 +322,7 @@ function HomePage() {
           <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12 flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-16">
             {/* Colonna sinistra - Badge */}
             <div className="lg:w-1/3">
-              <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-red-500 text-white text-xs font-medium">
+              <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#2EBAEB] text-white text-xs font-medium">
                 Scrivici, è gratis!
               </span>
             </div>
@@ -342,7 +344,7 @@ function HomePage() {
                 className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:-rotate-2 transition-all w-fit"
               >
                 <span className="text-gray-900 font-medium">Contattaci</span>
-                <div className="relative flex p-2 overflow-hidden text-white bg-black rounded-full group-hover:bg-red-500 transition-colors">
+                <div className="relative flex p-2 overflow-hidden text-white bg-black rounded-full group-hover:bg-[#2EBAEB] transition-colors">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -410,7 +412,7 @@ function HomePage() {
       >
         <div className="absolute inset-0 flex flex-col px-8 lg:px-24 py-16 lg:py-24">
           {/* Badge */}
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full border border-red-500 text-red-500 text-sm w-fit mb-4">
+          <span className="inline-flex items-center px-4 py-1.5 rounded-full border border-[#2EBAEB] text-[#2EBAEB] text-sm w-fit mb-4">
             Come possiamo aiutarti
           </span>
 
@@ -427,12 +429,12 @@ function HomePage() {
             </p>
 
             {/* Bottone */}
-            <a
-              href="#"
+            <Link
+              to="/reservly"
               className="inline-flex items-center justify-center px-8 py-4 bg-[#2a2a3a] hover:bg-[#3a3a4a] text-white text-sm font-medium rounded-full transition-colors w-fit"
             >
-              unser Purpose
-            </a>
+              Scopri Reservly
+            </Link>
           </div>
         </div>
       </section>
@@ -448,6 +450,8 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/software/:softwareId" element={<SoftwarePage />} />
+      <Route path="/reservly" element={<ReservlyPage />} />
+      <Route path="/careers" element={<CareersPage />} />
     </Routes>
   )
 }

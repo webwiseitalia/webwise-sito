@@ -90,7 +90,7 @@ export default function ProjectCards3D() {
               href={project.href}
               className="block w-full h-full overflow-hidden absolute cursor-pointer group"
               style={{
-                backgroundColor: '#dc2626',
+                backgroundColor: '#2EBAEB',
                 backgroundImage: project.image ? `url(${project.image})` : undefined,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',

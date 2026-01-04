@@ -74,7 +74,7 @@ export default function SoftwareSection() {
         <div className="max-w-6xl mx-auto px-8">
           <div className="max-w-md ml-auto text-right">
             {/* Badge */}
-            <span className="inline-block text-xs px-3 py-1 rounded-full border border-cyan-400/50 bg-cyan-400/10 text-cyan-400 mb-4">
+            <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-4">
               Come possiamo aiutarti
             </span>
 

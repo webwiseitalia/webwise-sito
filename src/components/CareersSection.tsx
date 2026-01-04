@@ -5,7 +5,7 @@ export default function CareersSection() {
       <div
         className="absolute -top-[300px] -right-[150px] w-[500px] h-[500px] rounded-full opacity-35 z-[1]"
         style={{
-          background: '#06b6d4',
+          background: '#2EBAEB',
           filter: 'blur(200px)'
         }}
       />
@@ -14,7 +14,7 @@ export default function CareersSection() {
       <div
         className="absolute -bottom-[150px] left-0 w-[500px] h-[500px] rounded-full opacity-25 z-[1]"
         style={{
-          background: '#dc2626',
+          background: '#2EBAEB',
           filter: 'blur(200px)'
         }}
       />
@@ -38,7 +38,7 @@ export default function CareersSection() {
             className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:rotate-2 transition-all w-fit"
           >
             <span className="text-gray-900 font-medium">Candidati</span>
-            <div className="relative flex p-2 overflow-hidden text-white bg-black rounded-full group-hover:bg-cyan-500 transition-colors">
+            <div className="relative flex p-2 overflow-hidden text-white bg-black rounded-full group-hover:bg-[#2EBAEB] transition-colors">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -77,7 +77,7 @@ export default function CareersSection() {
 
         {/* Colonna destra - Badge */}
         <div className="lg:w-1/3 flex lg:justify-end">
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-cyan-500 text-white text-xs font-medium">
+          <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#2EBAEB] text-white text-xs font-medium">
             Stiamo assumendo!
           </span>
         </div>
