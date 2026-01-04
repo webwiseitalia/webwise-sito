@@ -11,48 +11,62 @@ interface LoadingScreenProps {
 export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived }: LoadingScreenProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const logoRef = useRef<HTMLImageElement>(null)
-  const circleRef = useRef<SVGCircleElement>(null)
-  const progressCircleRef = useRef<SVGCircleElement>(null)
-
-  const radius = 70
-  const circumference = 2 * Math.PI * radius
 
   useEffect(() => {
+    const logo = logoRef.current
+    if (!logo) return
+
     const tl = gsap.timeline()
 
-    // Animazione cerchio di caricamento - 2.5 secondi
-    tl.fromTo(
-      progressCircleRef.current,
-      { strokeDashoffset: circumference },
-      {
-        strokeDashoffset: 0,
-        duration: 2.5,
-        ease: 'power2.inOut',
-      }
-    )
+    // Stato iniziale: logo grande visibile
+    gsap.set(logo, {
+      scale: 1,
+      opacity: 1,
+    })
 
-    // Dopo il caricamento, fade out del cerchio
-    tl.to([circleRef.current, progressCircleRef.current], {
-      opacity: 0,
+    // Fase 1: Attesa 2 secondi (logo fermo visibile)
+    tl.to({}, { duration: 2 })
+
+    // Fase 2: Bounce elastico (più lento)
+    tl.to(logo, {
+      scale: 1.15,
       duration: 0.3,
       ease: 'power2.out',
     })
+    tl.to(logo, {
+      scale: 0.95,
+      duration: 0.25,
+      ease: 'power2.inOut',
+    })
+    tl.to(logo, {
+      scale: 1.05,
+      duration: 0.2,
+      ease: 'power2.inOut',
+    })
+    tl.to(logo, {
+      scale: 1,
+      duration: 0.25,
+      ease: 'power2.out',
+    })
 
-    // Calcola la posizione del logo nella hero e anima
+    // Fase 3: Piccola pausa
+    tl.to({}, { duration: 0.3 })
+
+    // Fase 4: Calcola posizione hero e anima verso di essa
     tl.add(() => {
-      if (heroLogoRef.current && logoRef.current) {
+      if (heroLogoRef.current && logo) {
         const heroRect = heroLogoRef.current.getBoundingClientRect()
-        const loadingLogoRect = logoRef.current.getBoundingClientRect()
+        const loadingLogoRect = logo.getBoundingClientRect()
 
         // Calcola la differenza di posizione
         const deltaX = heroRect.left + heroRect.width / 2 - (loadingLogoRect.left + loadingLogoRect.width / 2)
         const deltaY = heroRect.top + heroRect.height / 2 - (loadingLogoRect.top + loadingLogoRect.height / 2)
 
-        // Scala dal logo grande (100px) al logo piccolo (125px nella hero)
-        const targetScale = 125 / 100
+        // Scala dal logo grande (250px) al logo piccolo (125px nella hero)
+        const targetScale = 125 / 250
 
         // Anima il logo verso la posizione nella hero
-        gsap.to(logoRef.current, {
+        gsap.to(logo, {
           x: deltaX,
           y: deltaY,
           scale: targetScale,
@@ -66,17 +80,17 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       }
     })
 
-    // Aspetta che il logo arrivi, poi fade out simultaneo del logo loading e del container
+    // Aspetta che il logo arrivi, poi fade out
     tl.to(
-      logoRef.current,
+      logo,
       {
         opacity: 0,
         duration: 0.15,
       },
-      '+=0.85' // Aspetta la durata dell'animazione del logo (0.8s) + un piccolo margine
+      '+=0.85'
     )
 
-    // Fade out del container nero INSIEME al logo
+    // Fade out del container nero
     tl.to(
       containerRef.current,
       {
@@ -84,7 +98,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         duration: 0.3,
         ease: 'power2.out',
       },
-      '-=0.15' // Inizia insieme al fade out del logo
+      '-=0.15'
     )
 
     // Callback finale
@@ -95,56 +109,24 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     return () => {
       tl.kill()
     }
-  }, [circumference, heroLogoRef, onLogoTransitionComplete, onLogoArrived])
+  }, [heroLogoRef, onLogoTransitionComplete, onLogoArrived])
 
   return (
     <div
       ref={containerRef}
       className="fixed inset-0 z-[9999] bg-black flex items-center justify-center pointer-events-none"
     >
-      <div className="relative flex items-center justify-center">
-        {/* Cerchio di caricamento SVG */}
-        <svg
-          className="absolute"
-          width="180"
-          height="180"
-          viewBox="0 0 180 180"
-          style={{ transform: 'rotate(-90deg)' }}
-        >
-          {/* Cerchio di sfondo */}
-          <circle
-            ref={circleRef}
-            cx="90"
-            cy="90"
-            r={radius}
-            fill="none"
-            stroke="rgba(255, 255, 255, 0.1)"
-            strokeWidth="3"
-          />
-          {/* Cerchio di progresso */}
-          <circle
-            ref={progressCircleRef}
-            cx="90"
-            cy="90"
-            r={radius}
-            fill="none"
-            stroke="#2EBAEB"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={circumference}
-          />
-        </svg>
-
-        {/* Logo Webwise */}
-        <img
-          ref={logoRef}
-          src={logoWebwise}
-          alt="Webwise"
-          className="invert"
-          style={{ width: '100px', height: '100px' }}
-        />
-      </div>
+      {/* Logo Webwise - inizia completamente blurrato (invisibile) */}
+      <img
+        ref={logoRef}
+        src={logoWebwise}
+        alt="Webwise"
+        className="invert"
+        style={{
+          width: '250px',
+          height: '250px',
+        }}
+      />
     </div>
   )
 }
