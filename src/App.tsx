@@ -1,4 +1,6 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
+import gsap from 'gsap'
 import Navbar from './components/Navbar'
 import ProjectCards3D from './components/ProjectCards3D'
 import ProjectsTable from './components/ProjectsTable'
@@ -6,16 +8,144 @@ import ClientsMarquee from './components/ClientsMarquee'
 import SoftwareSection from './components/SoftwareSection'
 import CareersSection from './components/CareersSection'
 import Footer from './components/Footer'
+import LoadingScreen from './components/LoadingScreen'
 import SoftwarePage from './pages/SoftwarePage'
 import ReservlyPage from './pages/ReservlyPage'
 import CareersPage from './pages/CareersPage'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
+// Componente per testo con effetto typewriter
+function TypewriterText({
+  text,
+  className,
+  style,
+  isVisible,
+  delay = 0,
+  speed = 0.03,
+}: {
+  text: string
+  className?: string
+  style?: React.CSSProperties
+  isVisible: boolean
+  delay?: number
+  speed?: number
+}) {
+  const containerRef = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    if (!isVisible || !containerRef.current) return
+
+    const chars = containerRef.current.querySelectorAll('.char')
+    gsap.set(chars, { opacity: 0 })
+
+    gsap.to(chars, {
+      opacity: 1,
+      duration: 0.05,
+      stagger: speed,
+      delay: delay,
+      ease: 'none',
+    })
+  }, [isVisible, delay, speed])
+
+  return (
+    <span ref={containerRef} className={className} style={style}>
+      {text.split('').map((char, i) => (
+        <span key={i} className="char" style={{ opacity: 0 }}>
+          {char}
+        </span>
+      ))}
+    </span>
+  )
+}
+
 function HomePage() {
+  const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>('loading')
+  const [showLoading, setShowLoading] = useState(false)
+  const [showHeroLogo, setShowHeroLogo] = useState(true)
+  const heroLogoRef = useRef<HTMLImageElement>(null)
+  const navbarRef = useRef<HTMLElement>(null)
+  const leftColumnRef = useRef<HTMLDivElement>(null)
+  const rightColumnRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const hasVisited = sessionStorage.getItem('webwise-visited')
+    if (!hasVisited) {
+      setShowLoading(true)
+      setShowHeroLogo(false) // Nascondi il logo hero durante il loading
+    } else {
+      setAnimationPhase('complete')
+      setShowHeroLogo(true)
+    }
+  }, [])
+
+  // Callback quando il logo del loading arriva nella posizione della hero
+  const handleLogoArrived = useCallback(() => {
+    setShowHeroLogo(true) // Mostra il logo della hero
+  }, [])
+
+  const handleLogoTransitionComplete = useCallback(() => {
+    sessionStorage.setItem('webwise-visited', 'true')
+    setShowLoading(false)
+
+    // Delay prima del typewriter
+    setTimeout(() => {
+      setAnimationPhase('typewriter')
+
+      // Anima la navbar
+      if (navbarRef.current) {
+        gsap.fromTo(
+          navbarRef.current,
+          { opacity: 0, y: -20 },
+          { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+        )
+      }
+
+      // Anima le colonne laterali dopo il testo principale
+      setTimeout(() => {
+        if (leftColumnRef.current) {
+          gsap.fromTo(
+            leftColumnRef.current,
+            { opacity: 0, x: -30 },
+            { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
+          )
+        }
+        if (rightColumnRef.current) {
+          gsap.fromTo(
+            rightColumnRef.current,
+            { opacity: 0, x: 30 },
+            { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
+          )
+        }
+
+        // Animazione completa
+        setTimeout(() => {
+          setAnimationPhase('complete')
+        }, 600)
+      }, 2500) // Dopo che il typewriter del testo principale finisce
+    }, 300)
+  }, [])
+
+  const isTypewriterActive = animationPhase === 'typewriter' || animationPhase === 'complete'
+  const showFullContent = animationPhase === 'complete'
+
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Loading Screen */}
+      {showLoading && (
+        <LoadingScreen
+          onLogoTransitionComplete={handleLogoTransitionComplete}
+          heroLogoRef={heroLogoRef}
+          onLogoArrived={handleLogoArrived}
+        />
+      )}
+
       {/* Navbar fixed */}
-      <Navbar />
+      <nav
+        ref={navbarRef}
+        style={{ opacity: showLoading ? 0 : 1 }}
+      >
+        <Navbar />
+      </nav>
 
       {/* Hero Section - 1920x1080 con sfondo nero */}
       <section
@@ -27,16 +157,48 @@ function HomePage() {
         <div className="flex flex-col items-center text-center px-4">
           {/* Titolo principale - Inter SemiBold 75px */}
           <div className="text-white font-semibold tracking-tight" style={{ fontSize: '75px', lineHeight: '1.1' }}>
-            <p>WEBWISE</p>
-            <p>TRANSFORMING DIGITAL PRESENCE</p>
-            <p>WITH AI-DRIVEN STRATEGIES AND</p>
-            <p>SCALABLE TECHNOLOGIES</p>
+            <p>
+              <TypewriterText
+                text="WEBWISE"
+                isVisible={isTypewriterActive}
+                delay={0}
+                speed={0.06}
+              />
+            </p>
+            <p>
+              <TypewriterText
+                text="TRANSFORMING DIGITAL PRESENCE"
+                isVisible={isTypewriterActive}
+                delay={0.5}
+                speed={0.025}
+              />
+            </p>
+            <p>
+              <TypewriterText
+                text="WITH AI-DRIVEN STRATEGIES AND"
+                isVisible={isTypewriterActive}
+                delay={1.2}
+                speed={0.025}
+              />
+            </p>
+            <p>
+              <TypewriterText
+                text="SCALABLE TECHNOLOGIES"
+                isVisible={isTypewriterActive}
+                delay={1.9}
+                speed={0.025}
+              />
+            </p>
           </div>
 
           {/* Sezione inferiore con logo al centro */}
           <div className="flex items-center justify-center gap-8 mt-12" style={{ fontSize: '30px' }}>
             {/* Colonna sinistra */}
-            <div className="text-white font-semibold text-right tracking-wide" style={{ minWidth: '280px' }}>
+            <div
+              ref={leftColumnRef}
+              className="text-white font-semibold text-right tracking-wide"
+              style={{ minWidth: '280px', opacity: showLoading ? 0 : (showFullContent ? 1 : 0) }}
+            >
               <p style={{ whiteSpace: 'nowrap' }}>SMARTER SYSTEMS</p>
               <p style={{ whiteSpace: 'nowrap' }}>BETTER<span style={{ marginLeft: '100px' }}>WORK</span></p>
             </div>
@@ -44,15 +206,25 @@ function HomePage() {
             {/* Logo centrale - 125x125px come da Figma */}
             <div className="flex items-center justify-center flex-shrink-0">
               <img
+                ref={heroLogoRef}
                 src={logoWebwiseCenter}
                 alt="Webwise Logo"
                 className="invert"
-                style={{ width: '125px', height: '125px' }}
+                style={{
+                  width: '125px',
+                  height: '125px',
+                  opacity: showHeroLogo ? 1 : 0,
+                  transition: 'opacity 0.15s ease-out'
+                }}
               />
             </div>
 
             {/* Colonna destra */}
-            <div className="text-white font-semibold text-left tracking-wide" style={{ minWidth: '280px' }}>
+            <div
+              ref={rightColumnRef}
+              className="text-white font-semibold text-left tracking-wide"
+              style={{ minWidth: '280px', opacity: showLoading ? 0 : (showFullContent ? 1 : 0) }}
+            >
               <p>EST. 2022</p>
               <p style={{ paddingLeft: '60px', whiteSpace: 'nowrap' }}>→ EFFICENCY</p>
             </div>
