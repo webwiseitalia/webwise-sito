@@ -141,7 +141,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     })
     gsap.set(percentageHighlightEl, {
       opacity: 0,
-      clipPath: 'inset(100% 0 0 0)', // Completamente nascosta dal basso
+      clipPath: 'inset(100% 0 0 0)', // Completamente nascosta dall'alto
     })
 
     // Durata del fade-in iniziale
@@ -182,11 +182,11 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       ease: 'power2.out',
     }, fadeInDuration)
 
-    // Animazione sincronizzata: percentuale, clip-path E vermicelli insieme (2 secondi, lineare)
+    // Animazione sincronizzata: percentuale, clip-path E vermicelli insieme (3.5 secondi, lineare)
     const percentageObj = { value: 0 }
     tl.to(percentageObj, {
       value: 100,
-      duration: 2.0,
+      duration: 3.5,
       ease: 'none',
       onUpdate: () => {
         const currentValue = Math.round(percentageObj.value)
@@ -197,8 +197,9 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         percentageHighlightEl.textContent = `${currentValue}%`
 
         // Aggiorna il clip-path della scritta highlights (dal basso verso l'alto)
-        // inset(top right bottom left) - riduciamo top da 100% a 0%
-        const clipTop = 100 - percentageObj.value // 100% -> 0%
+        // Il testo ha padding/line-height, quindi mappiamo 0-100% su un range più preciso
+        // top va da 100% (nascosto) a ~15% (visibile) per compensare lo spazio sopra il testo
+        const clipTop = 100 - (percentageObj.value * 0.85) // 100% -> 15%
         gsap.set(percentageHighlightEl, { clipPath: `inset(${clipTop}% 0 0 0)` })
 
         // Aggiorna la lunghezza di tutti i vermicelli proporzionalmente alla percentuale
@@ -218,7 +219,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
 
     // Fase 2: Bounce del logo (inizia quando percentuale e vermicelli sono al 100%)
     // Il bounce "richiama" i serpenti
-    const bounceStart = fadeInDuration + 2.0
+    const bounceStart = fadeInDuration + 3.5
 
     tl.to(logo, {
       scale: 1.15,
@@ -366,7 +367,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
               left: 0,
               color: '#2EBAEB',
               opacity: 0,
-              clipPath: 'inset(100% 0 0 0)', // Inizia nascosta (dal basso)
+              clipPath: 'inset(100% 0 0 0)', // Inizia nascosta dall'alto
             }}
           >
             0%
