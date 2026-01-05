@@ -107,6 +107,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
   const logoRef = useRef<HTMLImageElement>(null)
   const pathsRef = useRef<(SVGPathElement | null)[]>([])
   const percentageRef = useRef<HTMLDivElement>(null)
+  const percentageColorRef = useRef<HTMLDivElement>(null)
 
   // Genera i serpenti una sola volta con dimensioni dello schermo
   const snakes = useMemo(() => {
@@ -122,8 +123,9 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     const logo = logoRef.current
     const paths = pathsRef.current.filter(Boolean) as SVGPathElement[]
     const percentageEl = percentageRef.current
+    const percentageColorEl = percentageColorRef.current
 
-    if (!logo || paths.length === 0 || !percentageEl) return
+    if (!logo || paths.length === 0 || !percentageEl || !percentageColorEl) return
 
     const tl = gsap.timeline()
 
@@ -202,7 +204,13 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       duration: 2.0,
       ease: 'power1.out',
       onUpdate: () => {
-        percentageEl.textContent = `${Math.round(percentageObj.value)}%`
+        const currentValue = Math.round(percentageObj.value)
+        percentageEl.textContent = `${currentValue}%`
+        percentageColorEl.textContent = `${currentValue}%`
+        // Aggiorna clip-path per rivelare il colore dal basso verso l'alto
+        // 0% → inset(100% 0 0 0) = tutto nascosto, 100% → inset(0% 0 0 0) = tutto visibile
+        const clipTop = 100 - currentValue
+        percentageColorEl.style.clipPath = `inset(${clipTop}% 0 0 0)`
       }
     }, fadeInDuration)
 
@@ -343,16 +351,33 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         }}
       />
 
-      {/* Percentuale di caricamento */}
+      {/* Percentuale di caricamento - due layer sovrapposti, in basso a sinistra */}
+      {/* Testo bianco (sotto) */}
       <div
         ref={percentageRef}
-        className="absolute bottom-8 left-8 text-white font-bold"
+        className="absolute bottom-8 left-8 font-bold"
         style={{
           fontSize: '120px',
           fontFamily: 'Moderniz, sans-serif',
           fontWeight: 700,
           letterSpacing: '-2px',
           opacity: 0,
+          color: 'white',
+        }}
+      >
+        0%
+      </div>
+      {/* Testo colorato (sopra) con clip-path */}
+      <div
+        ref={percentageColorRef}
+        className="absolute bottom-8 left-8 font-bold"
+        style={{
+          fontSize: '120px',
+          fontFamily: 'Moderniz, sans-serif',
+          fontWeight: 700,
+          letterSpacing: '-2px',
+          color: '#2EBAEB',
+          clipPath: 'inset(100% 0 0 0)',
         }}
       >
         0%

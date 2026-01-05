@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Navbar from './components/Navbar'
 import ProjectCards3D from './components/ProjectCards3D'
 import ProjectsTable from './components/ProjectsTable'
@@ -13,6 +14,8 @@ import SoftwarePage from './pages/SoftwarePage'
 import ReservlyPage from './pages/ReservlyPage'
 import CareersPage from './pages/CareersPage'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
+
+gsap.registerPlugin(ScrollTrigger)
 
 // Componente per testo con effetto typewriter
 function TypewriterText({
@@ -62,10 +65,15 @@ function HomePage() {
   const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>('loading')
   const [showLoading, setShowLoading] = useState(true)
   const [showHeroLogo, setShowHeroLogo] = useState(false)
+  const [logoParallaxComplete, setLogoParallaxComplete] = useState(false)
   const heroLogoRef = useRef<HTMLImageElement>(null)
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
+  const parallaxLogoRef = useRef<HTMLImageElement>(null)
+  const parallaxContainerRef = useRef<HTMLDivElement>(null)
+  const serviziLogoTargetRef = useRef<HTMLImageElement>(null)
+  const heroSectionRef = useRef<HTMLElement>(null)
 
   // L'animazione parte sempre ad ogni caricamento
   // showLoading è già true e showHeroLogo è già false per default
@@ -119,6 +127,79 @@ function HomePage() {
   const isTypewriterActive = animationPhase === 'typewriter' || animationPhase === 'complete'
   const showFullContent = animationPhase === 'complete'
 
+  // Animazione parallax del logo con ScrollTrigger
+  useEffect(() => {
+    if (showLoading || !parallaxLogoRef.current || !parallaxContainerRef.current) return
+
+    const logo = parallaxLogoRef.current
+    const container = parallaxContainerRef.current
+
+    // Calcola le dimensioni
+    const startSize = 125 // dimensione iniziale del logo nella hero
+    const maxSize = Math.max(window.innerWidth, window.innerHeight) * 1.2 // dimensione massima (riempie schermo)
+    const endSize = 36 // dimensione finale accanto a "Servizi"
+
+    // ScrollTrigger per animare la dimensione del logo
+    ScrollTrigger.create({
+      trigger: container,
+      start: 'top top',
+      end: 'bottom top',
+      scrub: 0.3,
+      onUpdate: (self) => {
+        const progress = self.progress
+
+        // Calcola la dimensione in base al progress
+        let size: number
+        let xOffset = 0
+        let yOffset = 0
+
+        if (progress < 0.4) {
+          // Fase 1: Logo si ingrandisce (0% - 40% dello scroll)
+          const phase1Progress = progress / 0.4
+          size = startSize + (maxSize - startSize) * phase1Progress
+        } else if (progress < 0.6) {
+          // Fase 2: Logo resta grande (40% - 60% dello scroll)
+          size = maxSize
+        } else {
+          // Fase 3: Logo si rimpicciolisce (60% - 100% dello scroll)
+          const phase3Progress = (progress - 0.6) / 0.4
+          size = maxSize - (maxSize - endSize) * phase3Progress
+
+          // Nella fase finale, sposta il logo verso la posizione target
+          if (progress > 0.85 && serviziLogoTargetRef.current) {
+            const targetRect = serviziLogoTargetRef.current.getBoundingClientRect()
+            const centerX = window.innerWidth / 2
+            const centerY = window.innerHeight / 2
+            const targetX = targetRect.left + targetRect.width / 2
+            const targetY = targetRect.top + targetRect.height / 2
+
+            const moveProgress = (progress - 0.85) / 0.15
+            xOffset = (targetX - centerX) * moveProgress
+            yOffset = (targetY - centerY) * moveProgress
+          }
+        }
+
+        gsap.set(logo, {
+          width: size,
+          height: size,
+          x: xOffset,
+          y: yOffset
+        })
+
+        // Quando l'animazione è quasi completa
+        if (progress >= 0.98 && !logoParallaxComplete) {
+          setLogoParallaxComplete(true)
+        } else if (progress < 0.98 && logoParallaxComplete) {
+          setLogoParallaxComplete(false)
+        }
+      }
+    })
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+    }
+  }, [showLoading, logoParallaxComplete])
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Loading Screen */}
@@ -138,13 +219,16 @@ function HomePage() {
         <Navbar />
       </nav>
 
-      {/* Hero Section - 1920x1080 con sfondo nero */}
-      <section
-        className="w-full min-h-screen bg-black flex items-center justify-center overflow-hidden"
-        style={{
-          aspectRatio: '1920 / 1080'
-        }}
-      >
+      {/* Contenitore per l'animazione parallax - include hero + 2 sezioni intermedie + servizi */}
+      <div ref={parallaxContainerRef}>
+        {/* Hero Section - 1920x1080 con sfondo nero */}
+        <section
+          ref={heroSectionRef}
+          className="w-full min-h-screen bg-black flex items-center justify-center overflow-hidden relative"
+          style={{
+            aspectRatio: '1920 / 1080'
+          }}
+        >
         <div className="flex flex-col items-center text-center px-4">
           {/* Titolo principale - Inter SemiBold 75px */}
           <div className="text-white font-semibold tracking-tight" style={{ fontSize: '75px', lineHeight: '1.1' }}>
@@ -221,38 +305,68 @@ function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
 
-      {/* Sezione Servizi - 1920x1400 con sfondo nero */}
-      <section
-        id="servizi"
-        className="w-full bg-black relative py-20"
-        style={{
-          aspectRatio: '1920 / 1400'
-        }}
-      >
-        <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Colonna sinistra - sticky */}
-          <div className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit">
-            {/* Badge */}
-            <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
-              Come possiamo aiutarti
-            </span>
+        {/* Sezione Intermedia 1 - Logo zoomato al massimo */}
+        <section
+          className="w-full bg-black flex items-center justify-center"
+          style={{
+            aspectRatio: '1920 / 540'
+          }}
+        />
 
-            {/* Titolo */}
-            <h2 className="text-white text-4xl font-semibold">Servizi</h2>
+        {/* Sezione Intermedia 2 - Logo inizia a rimpicciolirsi */}
+        <section
+          className="w-full bg-black flex items-center justify-center"
+          style={{
+            aspectRatio: '1920 / 540'
+          }}
+        />
 
-            {/* Descrizione */}
-            <p className="text-gray-400 max-w-[450px] leading-relaxed">
-              Capire esattamente quello che ti serve è il nostro pane quotidiano.
-              Sviluppiamo soluzioni software personalizzate che si allineano
-              perfettamente ai tuoi obiettivi. Il nostro approccio è un mix ben
-              rodato di metodo e creatività, garantendo prodotti di qualità superiore
-              e senza compromessi.
-            </p>
+        {/* Sezione Servizi - 1920x1400 con sfondo nero */}
+        <section
+          id="servizi"
+          className="w-full bg-black relative py-20"
+          style={{
+            aspectRatio: '1920 / 1400'
+          }}
+        >
+          <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Colonna sinistra - sticky */}
+            <div className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit">
+              {/* Badge */}
+              <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
+                Come possiamo aiutarti
+              </span>
 
-            {/* Bottoni */}
-            <div className="flex flex-wrap items-center gap-3 mt-6">
+              {/* Titolo con logo (nascosto fino a fine animazione parallax) */}
+              <div className="flex items-center gap-4">
+                <h2 className="text-white text-4xl font-semibold">Servizi</h2>
+                <img
+                  ref={serviziLogoTargetRef}
+                  src={logoWebwiseCenter}
+                  alt="Webwise"
+                  className="invert"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    opacity: logoParallaxComplete ? 1 : 0,
+                    transition: 'opacity 0.3s ease-out'
+                  }}
+                />
+              </div>
+
+              {/* Descrizione */}
+              <p className="text-gray-400 max-w-[450px] leading-relaxed">
+                Capire esattamente quello che ti serve è il nostro pane quotidiano.
+                Sviluppiamo soluzioni software personalizzate che si allineano
+                perfettamente ai tuoi obiettivi. Il nostro approccio è un mix ben
+                rodato di metodo e creatività, garantendo prodotti di qualità superiore
+                e senza compromessi.
+              </p>
+
+              {/* Bottoni */}
+              <div className="flex flex-wrap items-center gap-3 mt-6">
               <a
                 href="#"
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
@@ -408,8 +522,31 @@ function HomePage() {
               </p>
             </div>
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      </div>
+      {/* Fine contenitore parallax */}
+
+      {/* Logo Parallax Fixed - si muove con lo scroll (appare solo dopo loading e quando si inizia a scrollare) */}
+      {!showLoading && showHeroLogo && (
+        <img
+          ref={parallaxLogoRef}
+          src={logoWebwiseCenter}
+          alt="Webwise Logo Parallax"
+          className="invert pointer-events-none"
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '125px',
+            height: '125px',
+            zIndex: 50,
+            opacity: logoParallaxComplete ? 0 : 1,
+            transition: 'opacity 0.2s ease-out'
+          }}
+        />
+      )}
 
       {/* Sezione Portfolio - 1920x2580 */}
       <section
