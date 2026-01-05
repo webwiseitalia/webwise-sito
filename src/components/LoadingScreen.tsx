@@ -4,10 +4,8 @@ import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
 
 interface LoadingScreenProps {
   onLogoTransitionComplete: () => void
-  heroLogoRef: React.RefObject<HTMLDivElement>
+  heroLogoRef: React.RefObject<HTMLImageElement>
   onLogoArrived: () => void
-  parallaxLogoRef?: React.RefObject<HTMLImageElement>
-  targetPosition?: { x: number; y: number } | null
 }
 
 interface SnakePath {
@@ -104,14 +102,11 @@ function generateSnakes(count: number, centerX: number, centerY: number, logoRad
   return snakes
 }
 
-export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived, parallaxLogoRef, targetPosition }: LoadingScreenProps) {
+export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived }: LoadingScreenProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const internalLogoRef = useRef<HTMLImageElement>(null)
-  // Usa il ref esterno se fornito, altrimenti usa quello interno
-  const logoRef = parallaxLogoRef || internalLogoRef
+  const logoRef = useRef<HTMLImageElement>(null)
   const pathsRef = useRef<(SVGPathElement | null)[]>([])
   const percentageRef = useRef<HTMLDivElement>(null)
-  const percentageColorRef = useRef<HTMLDivElement>(null)
 
   // Genera i serpenti una sola volta con dimensioni dello schermo
   const snakes = useMemo(() => {
@@ -127,9 +122,8 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     const logo = logoRef.current
     const paths = pathsRef.current.filter(Boolean) as SVGPathElement[]
     const percentageEl = percentageRef.current
-    const percentageColorEl = percentageColorRef.current
 
-    if (!logo || paths.length === 0 || !percentageEl || !percentageColorEl) return
+    if (!logo || paths.length === 0 || !percentageEl) return
 
     const tl = gsap.timeline()
 
@@ -208,13 +202,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       duration: 2.0,
       ease: 'power1.out',
       onUpdate: () => {
-        const currentValue = Math.round(percentageObj.value)
-        percentageEl.textContent = `${currentValue}%`
-        percentageColorEl.textContent = `${currentValue}%`
-        // Aggiorna clip-path per rivelare il colore dal basso verso l'alto
-        // 0% → inset(100% 0 0 0) = tutto nascosto, 100% → inset(0% 0 0 0) = tutto visibile
-        const clipTop = 100 - currentValue
-        percentageColorEl.style.clipPath = `inset(${clipTop}% 0 0 0)`
+        percentageEl.textContent = `${Math.round(percentageObj.value)}%`
       }
     }, fadeInDuration)
 
@@ -268,46 +256,60 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     // Fase 3: Piccola pausa
     tl.to({}, { duration: 0.2 }, bounceStart + 0.8)
 
-    // Fase 4: Il logo si sposta verso la posizione target (accanto a "Servizi") e si rimpicciolisce
-    const finalScale = 36 / 350 // Scala finale: 36px
-    const centerX = window.innerWidth / 2
-    const centerY = window.innerHeight / 2
+    // Fase 4: Calcola posizione hero e anima verso di essa
+    tl.add(() => {
+      if (heroLogoRef.current && logo) {
+        const heroRect = heroLogoRef.current.getBoundingClientRect()
+        const loadingLogoRect = logo.getBoundingClientRect()
 
-    // Calcola offset verso la posizione target
-    const targetX = targetPosition ? targetPosition.x - centerX : 0
-    const targetY = targetPosition ? targetPosition.y - centerY : 0
+        const deltaX = heroRect.left + heroRect.width / 2 - (loadingLogoRect.left + loadingLogoRect.width / 2)
+        const deltaY = heroRect.top + heroRect.height / 2 - (loadingLogoRect.top + loadingLogoRect.height / 2)
 
-    tl.to(logo, {
-      scale: finalScale,
-      x: targetX,
-      y: targetY,
-      duration: 0.8,
-      ease: 'power3.inOut',
-      onComplete: () => {
-        onLogoArrived()
+        const targetScale = 125 / 350
+
+        gsap.to(logo, {
+          x: deltaX,
+          y: deltaY,
+          scale: targetScale,
+          duration: 0.8,
+          ease: 'power3.inOut',
+          onComplete: () => {
+            onLogoArrived()
+          }
+        })
       }
     }, bounceStart + 1.0)
 
-    // Fade out SOLO del container nero (sfondo), il logo resta visibile
+    // Aspetta che il logo arrivi, poi fade out
+    tl.to(
+      logo,
+      {
+        opacity: 0,
+        duration: 0.15,
+      },
+      bounceStart + 1.85
+    )
+
+    // Fade out del container nero
     tl.to(
       containerRef.current,
       {
-        backgroundColor: 'transparent',
+        opacity: 0,
         duration: 0.3,
         ease: 'power2.out',
       },
-      bounceStart + 1.8
+      bounceStart + 1.85
     )
 
     // Callback finale
     tl.add(() => {
       onLogoTransitionComplete()
-    }, bounceStart + 2.1)
+    }, bounceStart + 2.15)
 
     return () => {
       tl.kill()
     }
-  }, [heroLogoRef, onLogoTransitionComplete, onLogoArrived, snakes, targetPosition])
+  }, [heroLogoRef, onLogoTransitionComplete, onLogoArrived, snakes])
 
   return (
     <div
@@ -328,51 +330,29 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         ))}
       </svg>
 
-      {/* Logo Webwise - diventa il logo parallax dopo il loading */}
+      {/* Logo Webwise */}
       <img
         ref={logoRef}
         src={logoWebwise}
         alt="Webwise"
-        className="invert pointer-events-none"
+        className="invert relative z-10"
         style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
           width: '350px',
           height: '350px',
           opacity: 0,
-          zIndex: 100,
         }}
       />
 
-      {/* Percentuale di caricamento - due layer sovrapposti, in basso a sinistra */}
-      {/* Testo bianco (sotto) */}
+      {/* Percentuale di caricamento */}
       <div
         ref={percentageRef}
-        className="absolute bottom-8 left-8 font-bold"
+        className="absolute bottom-8 left-8 text-white font-bold"
         style={{
           fontSize: '120px',
           fontFamily: 'Moderniz, sans-serif',
           fontWeight: 700,
           letterSpacing: '-2px',
           opacity: 0,
-          color: 'white',
-        }}
-      >
-        0%
-      </div>
-      {/* Testo colorato (sopra) con clip-path */}
-      <div
-        ref={percentageColorRef}
-        className="absolute bottom-8 left-8 font-bold"
-        style={{
-          fontSize: '120px',
-          fontFamily: 'Moderniz, sans-serif',
-          fontWeight: 700,
-          letterSpacing: '-2px',
-          color: '#2EBAEB',
-          clipPath: 'inset(100% 0 0 0)',
         }}
       >
         0%
