@@ -350,11 +350,12 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
           position: 'fixed',
           top: '50%',
           left: '50%',
-          transform: 'translate(-50%, -50%)',
+          transform: 'translate(-50%, -50%) translateZ(0)',
           width: '350px',
           height: '350px',
           opacity: 0,
           zIndex: 10000,
+          backfaceVisibility: 'hidden',
         }}
       />
     </>

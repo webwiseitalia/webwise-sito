@@ -65,6 +65,7 @@ function HomePage() {
   const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>('loading')
   const [showLoading, setShowLoading] = useState(true)
   const [showHeroLogo, setShowHeroLogo] = useState(false)
+  const [showServiziLogo, setShowServiziLogo] = useState(false)
   const heroLogoRef = useRef<HTMLDivElement>(null)
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
@@ -73,6 +74,7 @@ function HomePage() {
   const heroSectionRef = useRef<HTMLElement>(null)
   const logoSectionRef = useRef<HTMLElement>(null)
   const serviziSectionRef = useRef<HTMLElement>(null)
+  const serviziBlockRef = useRef<HTMLDivElement>(null)
 
   // L'animazione parte sempre ad ogni caricamento
   // showLoading è già true e showHeroLogo è già false per default
@@ -128,12 +130,13 @@ function HomePage() {
 
   // Parallax del logo: Hero -> Midframe -> Servizi
   useEffect(() => {
-    if (showLoading || !parallaxLogoRef.current || !heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current) return
+    if (showLoading || !parallaxLogoRef.current || !heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current || !serviziBlockRef.current) return
 
     const logo = parallaxLogoRef.current
     const heroSection = heroSectionRef.current
     const midframeSection = logoSectionRef.current
     const serviziSection = serviziSectionRef.current
+    const serviziBlock = serviziBlockRef.current
 
     // Leggi le trasformazioni correnti del logo (impostate dal loading)
     const initialX = (gsap.getProperty(logo, 'x') as number) || 0
@@ -142,13 +145,18 @@ function HomePage() {
     // Scale values
     const baseSize = 350
     const heroScale = 125 / baseSize      // Logo nella hero (125px)
-    const midframeScale = 437 / baseSize  // Logo grande nel midframe (437px)
-    const serviziScale = 125 / baseSize   // Logo nei servizi (125px, stessa dimensione hero)
+    const midframeScale = 546 / baseSize  // Logo grande nel midframe (546px)
+    const serviziScale = 125 / baseSize   // Logo nei servizi (125px)
 
-    // Posizione finale: alto a sinistra della sezione servizi
-    const serviziRect = serviziSection.getBoundingClientRect()
-    const finalX = -(window.innerWidth / 2) + 100 + (125 / 2)  // 100px dal bordo sinistro
-    const finalY = -(window.innerHeight / 2) + 100 + (125 / 2) // 100px dal bordo superiore
+    // Posizione finale: a sinistra del titolo "Servizi"
+    const calculateFinalPosition = () => {
+      const blockRect = serviziBlock.getBoundingClientRect()
+      const logoSize = 125
+      // A sinistra del blocco, allineato con il titolo
+      const targetX = blockRect.left - logoSize - 30 - (window.innerWidth / 2) + (logoSize / 2)
+      const targetY = blockRect.top + 50 - (window.innerHeight / 2) // Allineato al titolo
+      return { x: targetX, y: targetY }
+    }
 
     // FASE 1: Hero -> Midframe (logo si ingrandisce e si centra)
     const trigger1 = ScrollTrigger.create({
@@ -156,11 +164,11 @@ function HomePage() {
       start: 'top top',
       endTrigger: midframeSection,
       end: 'center center',
-      scrub: 0.5,
+      scrub: 1,
       onUpdate: (self) => {
         const progress = self.progress
 
-        // Interpola scala da 125px a 437px
+        // Interpola scala da 125px a 546px
         const currentScale = heroScale + (midframeScale - heroScale) * progress
 
         // Interpola posizione da hero a centro (x=0, y=0)
@@ -171,32 +179,56 @@ function HomePage() {
           scale: currentScale,
           x: currentX,
           y: currentY,
+          force3D: true,
         })
       }
     })
 
-    // FASE 2: Midframe -> Servizi (logo si rimpicciolisce e va in alto a sinistra)
+    // FASE 2: Midframe -> Servizi
+    // Dal centro del midframe: prima va a sinistra, poi scende
     const trigger2 = ScrollTrigger.create({
       trigger: midframeSection,
       start: 'center center',
       endTrigger: serviziSection,
-      end: 'top center',
-      scrub: 0.5,
+      end: 'top top',
+      scrub: 1,
       onUpdate: (self) => {
         const progress = self.progress
+        const finalPos = calculateFinalPosition()
 
-        // Interpola scala da 437px a 125px
-        const currentScale = midframeScale + (serviziScale - midframeScale) * progress
+        // Rimpicciolisce subito
+        const scaleProgress = Math.min(progress / 0.3, 1)
+        const currentScale = midframeScale + (serviziScale - midframeScale) * scaleProgress
 
-        // Interpola posizione da centro (0,0) a alto-sinistra
-        const currentX = finalX * progress
-        const currentY = finalY * progress
+        let currentX, currentY
+
+        if (progress < 0.5) {
+          // Prima metà: vai a sinistra, resta al centro (Y = 0)
+          const subProgress = progress / 0.5
+          currentX = finalPos.x * subProgress
+          currentY = 0
+        } else {
+          // Seconda metà: già a sinistra, ora scendi
+          const subProgress = (progress - 0.5) / 0.5
+          currentX = finalPos.x
+          currentY = finalPos.y * subProgress
+        }
 
         gsap.set(logo, {
           scale: currentScale,
           x: currentX,
           y: currentY,
+          force3D: true,
         })
+
+        // Transizione logo fixed -> logo statico
+        if (progress >= 0.98) {
+          gsap.set(logo, { opacity: 0, force3D: true })
+          setShowServiziLogo(true)
+        } else {
+          gsap.set(logo, { opacity: 1, force3D: true })
+          setShowServiziLogo(false)
+        }
       }
     })
 
@@ -332,7 +364,21 @@ function HomePage() {
       >
         <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Colonna sinistra - sticky */}
-          <div className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit">
+          <div ref={serviziBlockRef} className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit relative">
+            {/* Logo statico a sinistra del titolo */}
+            <img
+              src={logoWebwiseCenter}
+              alt="Webwise Logo"
+              className="invert absolute"
+              style={{
+                top: '50px',
+                left: '-155px',
+                width: '125px',
+                height: '125px',
+                opacity: showServiziLogo ? 1 : 0,
+                transition: 'opacity 0.15s ease-out',
+              }}
+            />
             {/* Badge */}
             <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
               Come possiamo aiutarti
