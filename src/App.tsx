@@ -60,23 +60,15 @@ function TypewriterText({
 
 function HomePage() {
   const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>('loading')
-  const [showLoading, setShowLoading] = useState(false)
-  const [showHeroLogo, setShowHeroLogo] = useState(true)
+  const [showLoading, setShowLoading] = useState(true)
+  const [showHeroLogo, setShowHeroLogo] = useState(false)
   const heroLogoRef = useRef<HTMLImageElement>(null)
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const hasVisited = sessionStorage.getItem('webwise-visited')
-    if (!hasVisited) {
-      setShowLoading(true)
-      setShowHeroLogo(false) // Nascondi il logo hero durante il loading
-    } else {
-      setAnimationPhase('complete')
-      setShowHeroLogo(true)
-    }
-  }, [])
+  // L'animazione parte sempre ad ogni caricamento
+  // showLoading è già true e showHeroLogo è già false per default
 
   // Callback quando il logo del loading arriva nella posizione della hero
   const handleLogoArrived = useCallback(() => {
@@ -84,7 +76,6 @@ function HomePage() {
   }, [])
 
   const handleLogoTransitionComplete = useCallback(() => {
-    sessionStorage.setItem('webwise-visited', 'true')
     setShowLoading(false)
 
     // Delay prima del typewriter

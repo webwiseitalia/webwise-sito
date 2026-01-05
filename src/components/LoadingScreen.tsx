@@ -91,7 +91,7 @@ function generateSnakes(count: number, centerX: number, centerY: number, logoRad
       startX,
       startY,
       angle,
-      maxDistance * 0.75, // 3/4 della distanza massima
+      maxDistance * 1.1, // Oltre i bordi per assicurarsi che arrivino completamente
       centerX,
       centerY
     )
@@ -106,6 +106,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
   const containerRef = useRef<HTMLDivElement>(null)
   const logoRef = useRef<HTMLImageElement>(null)
   const pathsRef = useRef<(SVGPathElement | null)[]>([])
+  const percentageRef = useRef<HTMLDivElement>(null)
 
   // Genera i serpenti una sola volta con dimensioni dello schermo
   const snakes = useMemo(() => {
@@ -120,16 +121,32 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
   useEffect(() => {
     const logo = logoRef.current
     const paths = pathsRef.current.filter(Boolean) as SVGPathElement[]
+    const percentageEl = percentageRef.current
 
-    if (!logo || paths.length === 0) return
+    if (!logo || paths.length === 0 || !percentageEl) return
 
     const tl = gsap.timeline()
 
-    // Stato iniziale: logo grande visibile
+    // Stato iniziale: logo invisibile (per fade-in)
     gsap.set(logo, {
       scale: 1,
-      opacity: 1,
+      opacity: 0,
     })
+
+    // Stato iniziale: percentuale invisibile
+    gsap.set(percentageEl, {
+      opacity: 0,
+    })
+
+    // Durata del fade-in iniziale
+    const fadeInDuration = 0.6
+
+    // Fase 0: Fade-in del logo
+    tl.to(logo, {
+      opacity: 1,
+      duration: fadeInDuration,
+      ease: 'power2.out',
+    }, 0)
 
     // Configura ogni serpente
     paths.forEach((path, i) => {
@@ -142,18 +159,28 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       // Ottieni la lunghezza reale del path
       const realLength = path.getTotalLength()
 
-      // Stato iniziale: serpente nascosto
+      // Stato iniziale: serpente completamente nascosto (opacity 0)
       gsap.set(path, {
         strokeDasharray: realLength,
         strokeDashoffset: realLength,
-        opacity: snake.opacity,
+        opacity: 0,
       })
     })
 
-    // Fase 1: Serpenti si estendono gradualmente (1.8 secondi) con partenza sfalsata
+    // Fase 1: Serpenti si estendono gradualmente (dopo il fade-in) con partenza sfalsata
     paths.forEach((path, i) => {
-      const delay = Math.random() * 0.5 // Ritardo casuale 0-0.5s
+      const snake = snakes[i]
+      if (!snake) return
+
+      const delay = fadeInDuration + Math.random() * 0.5 // Dopo fade-in + ritardo casuale 0-0.5s
       const duration = 1.5 + Math.random() * 0.5 // Durata variabile 1.5-2s
+
+      // Fade-in del serpente insieme all'inizio dell'estensione
+      tl.to(path, {
+        opacity: snake.opacity,
+        duration: 0.3,
+        ease: 'power2.out',
+      }, delay)
 
       tl.to(path, {
         strokeDashoffset: 0,
@@ -162,9 +189,26 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       }, delay)
     })
 
+    // Fade-in e animazione percentuale sincronizzata con i serpenti (dopo il fade-in del logo)
+    tl.to(percentageEl, {
+      opacity: 1,
+      duration: 0.3,
+      ease: 'power2.out',
+    }, fadeInDuration)
+
+    const percentageObj = { value: 0 }
+    tl.to(percentageObj, {
+      value: 100,
+      duration: 2.0,
+      ease: 'power1.out',
+      onUpdate: () => {
+        percentageEl.textContent = `${Math.round(percentageObj.value)}%`
+      }
+    }, fadeInDuration)
+
     // Fase 2: Bounce del logo (inizia mentre i serpenti sono ancora estesi)
     // Il bounce "richiama" i serpenti
-    const bounceStart = 2.0
+    const bounceStart = fadeInDuration + 2.0
 
     tl.to(logo, {
       scale: 1.15,
@@ -173,13 +217,23 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     }, bounceStart)
 
     // Al primo "atterraggio" del bounce, i serpenti vengono risucchiati
+    // Usiamo offset negativo per far sparire dalla punta esterna verso il logo
+    // Aggiungiamo anche opacity: 0 per nascondere eventuali pallini residui
     tl.to(paths, {
       strokeDashoffset: (i, target) => {
-        return target.getTotalLength()
+        return -target.getTotalLength()
       },
+      opacity: 0,
       duration: 0.35,
       ease: 'power3.in',
     }, bounceStart + 0.25) // Inizia quando il logo inizia a scendere
+
+    // Fade out della percentuale insieme ai serpenti
+    tl.to(percentageEl, {
+      opacity: 0,
+      duration: 0.35,
+      ease: 'power3.in',
+    }, bounceStart + 0.25)
 
     tl.to(logo, {
       scale: 0.95,
@@ -285,8 +339,24 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         style={{
           width: '350px',
           height: '350px',
+          opacity: 0,
         }}
       />
+
+      {/* Percentuale di caricamento */}
+      <div
+        ref={percentageRef}
+        className="absolute bottom-8 left-8 text-white font-bold"
+        style={{
+          fontSize: '120px',
+          fontFamily: 'Moderniz, sans-serif',
+          fontWeight: 700,
+          letterSpacing: '-2px',
+          opacity: 0,
+        }}
+      >
+        0%
+      </div>
     </div>
   )
 }
