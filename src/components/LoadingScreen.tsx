@@ -4,9 +4,8 @@ import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
 
 interface LoadingScreenProps {
   onLogoTransitionComplete: () => void
-  heroLogoRef: React.RefObject<HTMLDivElement>
+  heroLogoRef: React.RefObject<HTMLImageElement>
   onLogoArrived: () => void
-  parallaxLogoRef?: React.RefObject<HTMLImageElement>
 }
 
 interface SnakePath {
@@ -103,14 +102,12 @@ function generateSnakes(count: number, centerX: number, centerY: number, logoRad
   return snakes
 }
 
-export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived, parallaxLogoRef }: LoadingScreenProps) {
+export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived }: LoadingScreenProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const internalLogoRef = useRef<HTMLImageElement>(null)
-  // Usa il ref esterno se fornito, altrimenti usa quello interno
-  const logoRef = parallaxLogoRef || internalLogoRef
+  const logoRef = useRef<HTMLImageElement>(null)
   const pathsRef = useRef<(SVGPathElement | null)[]>([])
   const percentageRef = useRef<HTMLDivElement>(null)
-  const percentageHighlightRef = useRef<HTMLDivElement>(null)
+  const percentageColorRef = useRef<HTMLDivElement>(null)
 
   // Genera i serpenti una sola volta con dimensioni dello schermo
   const snakes = useMemo(() => {
@@ -126,9 +123,9 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     const logo = logoRef.current
     const paths = pathsRef.current.filter(Boolean) as SVGPathElement[]
     const percentageEl = percentageRef.current
-    const percentageHighlightEl = percentageHighlightRef.current
+    const percentageColorEl = percentageColorRef.current
 
-    if (!logo || paths.length === 0 || !percentageEl || !percentageHighlightEl) return
+    if (!logo || paths.length === 0 || !percentageEl || !percentageColorEl) return
 
     const tl = gsap.timeline()
 
@@ -138,13 +135,9 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       opacity: 0,
     })
 
-    // Stato iniziale: percentuali invisibili
+    // Stato iniziale: percentuale invisibile
     gsap.set(percentageEl, {
       opacity: 0,
-    })
-    gsap.set(percentageHighlightEl, {
-      opacity: 0,
-      clipPath: 'inset(100% 0 0 0)', // Completamente nascosta dal basso
     })
 
     // Durata del fade-in iniziale
@@ -179,7 +172,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     })
 
     // Fade-in delle percentuali (dopo il fade-in del logo)
-    tl.to([percentageEl, percentageHighlightEl], {
+    tl.to([percentageEl, percentageColorEl], {
       opacity: 1,
       duration: 0.3,
       ease: 'power2.out',
@@ -197,12 +190,11 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
 
         // Aggiorna il testo di entrambe le percentuali
         percentageEl.textContent = `${currentValue}%`
-        percentageHighlightEl.textContent = `${currentValue}%`
+        percentageColorEl.textContent = `${currentValue}%`
 
-        // Aggiorna il clip-path della scritta highlights (dal basso verso l'alto)
-        // inset(top right bottom left) - riduciamo top da 100% a 0%
-        const clipTop = 100 - percentageObj.value // 100% -> 0%
-        gsap.set(percentageHighlightEl, { clipPath: `inset(${clipTop}% 0 0 0)` })
+        // Aggiorna clip-path per rivelare il colore dal basso verso l'alto
+        const clipTop = 100 - percentageObj.value
+        percentageColorEl.style.clipPath = `inset(${clipTop}% 0 0 0)`
 
         // Aggiorna la lunghezza di tutti i vermicelli proporzionalmente alla percentuale
         paths.forEach((path, i) => {
@@ -219,7 +211,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       }
     }, fadeInDuration)
 
-    // Fase 2: Bounce del logo (inizia quando percentuale e vermicelli sono al 100%)
+    // Fase 2: Bounce del logo (inizia mentre i serpenti sono ancora estesi)
     // Il bounce "richiama" i serpenti
     const bounceStart = fadeInDuration + 2.0
 
@@ -241,8 +233,8 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       ease: 'power3.in',
     }, bounceStart + 0.25) // Inizia quando il logo inizia a scendere
 
-    // Fade out delle percentuali insieme ai serpenti
-    tl.to([percentageEl, percentageHighlightEl], {
+    // Fade out della percentuale insieme ai serpenti
+    tl.to(percentageEl, {
       opacity: 0,
       duration: 0.35,
       ease: 'power3.in',
@@ -269,14 +261,15 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     // Fase 3: Piccola pausa
     tl.to({}, { duration: 0.2 }, bounceStart + 0.8)
 
-    // Fase 4: Il logo si sposta verso la posizione nella hero (tra le colonne)
+    // Fase 4: Calcola posizione hero e anima verso di essa
     tl.add(() => {
       if (heroLogoRef.current && logo) {
         const heroRect = heroLogoRef.current.getBoundingClientRect()
-        const logoRect = logo.getBoundingClientRect()
+        const loadingLogoRect = logo.getBoundingClientRect()
 
-        const deltaX = heroRect.left + heroRect.width / 2 - (logoRect.left + logoRect.width / 2)
-        const deltaY = heroRect.top + heroRect.height / 2 - (logoRect.top + logoRect.height / 2)
+        const deltaX = heroRect.left + heroRect.width / 2 - (loadingLogoRect.left + loadingLogoRect.width / 2)
+        const deltaY = heroRect.top + heroRect.height / 2 - (loadingLogoRect.top + loadingLogoRect.height / 2)
+
         const targetScale = 125 / 350
 
         gsap.to(logo, {
@@ -292,7 +285,17 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       }
     }, bounceStart + 1.0)
 
-    // Fade out del container nero (opacity), il logo resta visibile perché è fixed e fuori dal flusso
+    // Aspetta che il logo arrivi, poi fade out
+    tl.to(
+      logo,
+      {
+        opacity: 0,
+        duration: 0.15,
+      },
+      bounceStart + 1.85
+    )
+
+    // Fade out del container nero
     tl.to(
       containerRef.current,
       {
@@ -314,79 +317,68 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
   }, [heroLogoRef, onLogoTransitionComplete, onLogoArrived, snakes])
 
   return (
-    <>
-      {/* Container dello sfondo nero e altri elementi */}
-      <div
-        ref={containerRef}
-        className="fixed inset-0 z-[9999] bg-black flex items-center justify-center pointer-events-none"
-      >
-        {/* Serpenti SVG sinuosi */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none">
-          {snakes.map((_, i) => (
-            <path
-              key={i}
-              ref={(el) => { pathsRef.current[i] = el }}
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              fill="none"
-            />
-          ))}
-        </svg>
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-[9999] bg-black flex items-center justify-center pointer-events-none"
+    >
+      {/* Serpenti SVG sinuosi */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+        {snakes.map((_, i) => (
+          <path
+            key={i}
+            ref={(el) => { pathsRef.current[i] = el }}
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            fill="none"
+          />
+        ))}
+      </svg>
 
-        {/* Percentuale di caricamento - Container con due scritte sovrapposte */}
-        <div
-          className="absolute bottom-8 left-8"
-          style={{
-            fontSize: '120px',
-            fontFamily: 'Moderniz, sans-serif',
-            fontWeight: 700,
-            letterSpacing: '-2px',
-          }}
-        >
-          {/* Scritta bianca (base) */}
-          <div
-            ref={percentageRef}
-            className="text-white"
-            style={{ opacity: 0 }}
-          >
-            0%
-          </div>
-          {/* Scritta highlights (sovrapposta, con clip-path) */}
-          <div
-            ref={percentageHighlightRef}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              color: '#2EBAEB',
-              opacity: 0,
-              clipPath: 'inset(100% 0 0 0)', // Inizia nascosta (dal basso)
-            }}
-          >
-            0%
-          </div>
-        </div>
-      </div>
-
-      {/* Logo Webwise - FUORI dal container per non essere influenzato dal fade out */}
+      {/* Logo Webwise */}
       <img
         ref={logoRef}
         src={logoWebwise}
         alt="Webwise"
-        className="invert pointer-events-none"
+        className="invert relative z-10"
         style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%) translateZ(0)',
           width: '350px',
           height: '350px',
           opacity: 0,
-          zIndex: 10000,
-          backfaceVisibility: 'hidden',
         }}
       />
-    </>
+
+      {/* Percentuale di caricamento - due layer sovrapposti, in basso a sinistra */}
+      {/* Testo bianco (sotto) */}
+      <div
+        ref={percentageRef}
+        className="absolute bottom-8 left-8 font-bold"
+        style={{
+          fontSize: '120px',
+          fontFamily: 'Moderniz, sans-serif',
+          fontWeight: 700,
+          letterSpacing: '-2px',
+          opacity: 0,
+          color: 'white',
+        }}
+      >
+        0%
+      </div>
+      {/* Testo colorato (sopra) con clip-path */}
+      <div
+        ref={percentageColorRef}
+        className="absolute bottom-8 left-8 font-bold"
+        style={{
+          fontSize: '120px',
+          fontFamily: 'Moderniz, sans-serif',
+          fontWeight: 700,
+          letterSpacing: '-2px',
+          color: '#2EBAEB',
+          clipPath: 'inset(100% 0 0 0)',
+        }}
+      >
+        0%
+      </div>
+    </div>
   )
 }
