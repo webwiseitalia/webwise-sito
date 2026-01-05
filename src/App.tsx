@@ -15,6 +15,7 @@ import ReservlyPage from './pages/ReservlyPage'
 import CareersPage from './pages/CareersPage'
 import ProjectPage from './pages/ProjectPage'
 import ScrollToTop from './components/ScrollToTop'
+import ParticleLogo from './components/ParticleLogo'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -71,13 +72,13 @@ function HomePage() {
     hasSeenLoading ? 'complete' : 'loading'
   )
   const [showLoading, setShowLoading] = useState(!hasSeenLoading)
-  const [showHeroLogo, setShowHeroLogo] = useState(true)
-  // showServiziLogo rimosso - ora GSAP controlla direttamente l'opacity del logo statico
+  const [, setShowHeroLogo] = useState(true)
+  // Se abbiamo già visto il loading, mostra subito le particelle
+  const [showParticleLogo, setShowParticleLogo] = useState(hasSeenLoading)
   const heroLogoRef = useRef<HTMLDivElement>(null)
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
-  const parallaxLogoRef = useRef<HTMLImageElement>(null)
   const heroSectionRef = useRef<HTMLElement>(null)
   const logoSectionRef = useRef<HTMLElement>(null)
   const serviziSectionRef = useRef<HTMLElement>(null)
@@ -138,155 +139,15 @@ function HomePage() {
   const isTypewriterActive = animationPhase === 'typewriter' || animationPhase === 'complete'
   const showFullContent = animationPhase === 'complete'
 
-  // Parallax del logo: Hero -> Midframe -> Servizi
-  // APPROCCIO: Usiamo coordinate VIEWPORT (dove il logo appare sullo schermo)
-  // e le convertiamo in offset GSAP (rispetto alla posizione CSS base)
+  // Mostra il ParticleLogo quando il loading è completato o se lo saltiamo
   useEffect(() => {
-    if (showLoading || !parallaxLogoRef.current || !heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current || !serviziBlockRef.current || !heroLogoRef.current) return
-
-    const logo = parallaxLogoRef.current
-    const heroSection = heroSectionRef.current
-    const heroLogo = heroLogoRef.current
-    const midframeSection = logoSectionRef.current
-    const serviziSection = serviziSectionRef.current
-    const serviziBlock = serviziBlockRef.current
-
-    // ========== COSTANTI ==========
-    const baseSize = 350
-    const heroScale = 125 / baseSize      // 0.357
-    const midframeScale = 546 / baseSize  // 1.56
-    const serviziScale = 125 / baseSize   // 0.357
-
-    const viewportCenterX = window.innerWidth / 2
-    const viewportCenterY = window.innerHeight / 2
-
-    // ========== POSIZIONI TARGET (in coordinate viewport) ==========
-
-    // POSIZIONE HERO: dove il logo deve essere nella hero (tra le due colonne)
-    const heroLogoRect = heroLogo.getBoundingClientRect()
-    const heroTargetX = heroLogoRect.left + heroLogoRect.width / 2  // Centro X del contenitore hero
-    const heroTargetY = heroLogoRect.top + heroLogoRect.height / 2  // Centro Y del contenitore hero
-
-    // POSIZIONE MIDFRAME: centro viewport
-    const midframeTargetX = viewportCenterX
-    const midframeTargetY = viewportCenterY
-
-    // POSIZIONE SERVIZI: sopra il badge nella sezione servizi
-    const logoStatico = serviziBlock.querySelector('img') as HTMLImageElement
-    const logoOffsetInBlock = logoStatico ? logoStatico.offsetTop : 0
-    const stickyTopPx = 0.20 * window.innerHeight
-    const maxWidth = Math.min(1280, window.innerWidth)
-    const sectionPaddingLeft = 32
-    const sectionLeft = (window.innerWidth - maxWidth) / 2 + sectionPaddingLeft
-
-    const serviziTargetX = sectionLeft + 62.5  // Centro del logo 125px
-    const serviziTargetY = stickyTopPx + logoOffsetInBlock + 62.5
-
-    // ========== CONVERSIONE A OFFSET GSAP ==========
-    // Il logo ha CSS: position:fixed, top:50%, left:50%, transform:translate(-50%,-50%)
-    // Quindi la posizione CSS base è il centro del viewport
-    // Per spostare il logo a una posizione viewport (targetX, targetY):
-    // gsapX = targetX - viewportCenterX
-    // gsapY = targetY - viewportCenterY
-
-    const heroGsapX = heroTargetX - viewportCenterX
-    const heroGsapY = heroTargetY - viewportCenterY
-    const midframeGsapX = 0  // Centro = nessun offset
-    const midframeGsapY = 0
-    const serviziGsapX = serviziTargetX - viewportCenterX
-    const serviziGsapY = serviziTargetY - viewportCenterY
-
-    // ========== SETUP INIZIALE ==========
-    let hasStartedScrolling = false
-
-    if (hasSeenLoading) {
-      // Skip loading: posiziona il logo nella hero (invisibile)
-      gsap.set(logo, {
-        x: heroGsapX,
-        y: heroGsapY,
-        scale: heroScale,
-        opacity: 0,
-        force3D: true,
-      })
+    if (!showLoading) {
+      // Piccolo delay per assicurarsi che il DOM sia pronto
+      setTimeout(() => {
+        setShowParticleLogo(true)
+      }, 100)
     }
-    // Se veniamo dal loading, il logo è già posizionato dal LoadingScreen
-    // e dovrebbe essere già nella posizione hero (heroGsapX, heroGsapY)
-
-    // ========== FASE 1: Hero -> Midframe ==========
-    const trigger1 = ScrollTrigger.create({
-      trigger: heroSection,
-      start: 'top top',
-      endTrigger: midframeSection,
-      end: 'center center',
-      scrub: 1,
-      onUpdate: (self) => {
-        const progress = self.progress
-
-        // Gestione visibilità per hasSeenLoading
-        if (hasSeenLoading && progress > 0 && !hasStartedScrolling) {
-          hasStartedScrolling = true
-          gsap.set(logo, { opacity: 1 })
-          const heroImg = heroLogo.querySelector('img')
-          if (heroImg) gsap.set(heroImg, { opacity: 0 })
-        } else if (hasSeenLoading && progress === 0 && hasStartedScrolling) {
-          hasStartedScrolling = false
-          gsap.set(logo, { opacity: 0 })
-          const heroImg = heroLogo.querySelector('img')
-          if (heroImg) gsap.set(heroImg, { opacity: 1 })
-        }
-
-        // Interpola da hero a midframe
-        const currentScale = heroScale + (midframeScale - heroScale) * progress
-        const currentX = heroGsapX + (midframeGsapX - heroGsapX) * progress
-        const currentY = heroGsapY + (midframeGsapY - heroGsapY) * progress
-
-        gsap.set(logo, {
-          scale: currentScale,
-          x: currentX,
-          y: currentY,
-          force3D: true,
-        })
-      }
-    })
-
-    // ========== FASE 2: Midframe -> Servizi ==========
-    const trigger2 = ScrollTrigger.create({
-      trigger: midframeSection,
-      start: 'center center',
-      endTrigger: serviziSection,
-      end: 'top top',
-      scrub: 1,
-      onUpdate: (self) => {
-        const progress = self.progress
-
-        // Interpola da midframe a servizi
-        const currentScale = midframeScale + (serviziScale - midframeScale) * progress
-        const currentX = midframeGsapX + (serviziGsapX - midframeGsapX) * progress
-        const currentY = midframeGsapY + (serviziGsapY - midframeGsapY) * progress
-
-        // Transizione opacity al logo statico
-        if (progress >= 0.98) {
-          gsap.set(logo, { opacity: 0, force3D: true })
-          if (logoStatico) gsap.set(logoStatico, { opacity: 1 })
-        } else {
-          gsap.set(logo, { opacity: 1, force3D: true })
-          if (logoStatico) gsap.set(logoStatico, { opacity: 0 })
-        }
-
-        gsap.set(logo, {
-          scale: currentScale,
-          x: currentX,
-          y: currentY,
-          force3D: true,
-        })
-      }
-    })
-
-    return () => {
-      trigger1.kill()
-      trigger2.kill()
-    }
-  }, [showLoading, hasSeenLoading])
+  }, [showLoading])
 
 
   return (
@@ -297,30 +158,18 @@ function HomePage() {
           onLogoTransitionComplete={handleLogoTransitionComplete}
           heroLogoRef={heroLogoRef}
           onLogoArrived={handleLogoArrived}
-          parallaxLogoRef={parallaxLogoRef}
         />
       )}
 
-      {/* Logo Parallax Fixed - solo quando saltiamo il loading (altrimenti lo crea LoadingScreen) */}
-      {hasSeenLoading && (
-        <img
-          ref={parallaxLogoRef}
-          src={logoWebwiseCenter}
-          alt="Webwise Logo Parallax"
-          className="invert pointer-events-none"
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%) translateZ(0)',
-            width: '350px',
-            height: '350px',
-            zIndex: 40,
-            backfaceVisibility: 'hidden',
-            opacity: 0, // Inizialmente nascosto, il parallax lo mostrerà quando si scrolla
-          }}
-        />
-      )}
+      {/* ParticleLogo - effetto dissolve/particelle durante lo scroll */}
+      <ParticleLogo
+        heroSectionRef={heroSectionRef}
+        midframeSectionRef={logoSectionRef}
+        serviziSectionRef={serviziSectionRef}
+        serviziBlockRef={serviziBlockRef}
+        heroLogoRef={heroLogoRef}
+        isVisible={showParticleLogo}
+      />
 
 
       {/* Navbar fixed */}

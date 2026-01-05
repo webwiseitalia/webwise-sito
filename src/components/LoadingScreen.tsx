@@ -6,7 +6,6 @@ interface LoadingScreenProps {
   onLogoTransitionComplete: () => void
   heroLogoRef: React.RefObject<HTMLDivElement>
   onLogoArrived: () => void
-  parallaxLogoRef?: React.RefObject<HTMLImageElement>
 }
 
 interface SnakePath {
@@ -103,11 +102,9 @@ function generateSnakes(count: number, centerX: number, centerY: number, logoRad
   return snakes
 }
 
-export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived, parallaxLogoRef }: LoadingScreenProps) {
+export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived }: LoadingScreenProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const internalLogoRef = useRef<HTMLImageElement>(null)
-  // Usa il ref esterno se fornito, altrimenti usa quello interno
-  const logoRef = parallaxLogoRef || internalLogoRef
+  const logoRef = useRef<HTMLImageElement>(null)
   const pathsRef = useRef<(SVGPathElement | null)[]>([])
   const percentageRef = useRef<HTMLDivElement>(null)
   const percentageHighlightRef = useRef<HTMLDivElement>(null)
