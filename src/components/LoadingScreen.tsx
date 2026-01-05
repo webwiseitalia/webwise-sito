@@ -110,6 +110,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
   const logoRef = parallaxLogoRef || internalLogoRef
   const pathsRef = useRef<(SVGPathElement | null)[]>([])
   const percentageRef = useRef<HTMLDivElement>(null)
+  const percentageHighlightRef = useRef<HTMLDivElement>(null)
 
   // Genera i serpenti una sola volta con dimensioni dello schermo
   const snakes = useMemo(() => {
@@ -125,8 +126,9 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     const logo = logoRef.current
     const paths = pathsRef.current.filter(Boolean) as SVGPathElement[]
     const percentageEl = percentageRef.current
+    const percentageHighlightEl = percentageHighlightRef.current
 
-    if (!logo || paths.length === 0 || !percentageEl) return
+    if (!logo || paths.length === 0 || !percentageEl || !percentageHighlightEl) return
 
     const tl = gsap.timeline()
 
@@ -136,9 +138,13 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       opacity: 0,
     })
 
-    // Stato iniziale: percentuale invisibile
+    // Stato iniziale: percentuali invisibili
     gsap.set(percentageEl, {
       opacity: 0,
+    })
+    gsap.set(percentageHighlightEl, {
+      opacity: 0,
+      clipPath: 'inset(100% 0 0 0)', // Completamente nascosta dal basso
     })
 
     // Durata del fade-in iniziale
@@ -151,7 +157,8 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       ease: 'power2.out',
     }, 0)
 
-    // Configura ogni serpente
+    // Configura ogni serpente e memorizza le lunghezze reali
+    const pathLengths: number[] = []
     paths.forEach((path, i) => {
       const snake = snakes[i]
       if (!snake) return
@@ -161,55 +168,58 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
 
       // Ottieni la lunghezza reale del path
       const realLength = path.getTotalLength()
+      pathLengths[i] = realLength
 
-      // Stato iniziale: serpente completamente nascosto (opacity 0)
+      // Stato iniziale: serpente completamente nascosto (opacity 0, strokeDashoffset = lunghezza totale)
       gsap.set(path, {
         strokeDasharray: realLength,
         strokeDashoffset: realLength,
-        opacity: 0,
+        opacity: 0, // Nascosto finché l'animazione non parte
       })
     })
 
-    // Fase 1: Serpenti si estendono gradualmente (dopo il fade-in) con partenza sfalsata
-    paths.forEach((path, i) => {
-      const snake = snakes[i]
-      if (!snake) return
-
-      const delay = fadeInDuration + Math.random() * 0.5 // Dopo fade-in + ritardo casuale 0-0.5s
-      const duration = 1.5 + Math.random() * 0.5 // Durata variabile 1.5-2s
-
-      // Fade-in del serpente insieme all'inizio dell'estensione
-      tl.to(path, {
-        opacity: snake.opacity,
-        duration: 0.3,
-        ease: 'power2.out',
-      }, delay)
-
-      tl.to(path, {
-        strokeDashoffset: 0,
-        duration: duration,
-        ease: 'power1.out',
-      }, delay)
-    })
-
-    // Fade-in e animazione percentuale sincronizzata con i serpenti (dopo il fade-in del logo)
-    tl.to(percentageEl, {
+    // Fade-in delle percentuali (dopo il fade-in del logo)
+    tl.to([percentageEl, percentageHighlightEl], {
       opacity: 1,
       duration: 0.3,
       ease: 'power2.out',
     }, fadeInDuration)
 
+    // Animazione sincronizzata: percentuale, clip-path E vermicelli insieme (2 secondi, lineare)
     const percentageObj = { value: 0 }
     tl.to(percentageObj, {
       value: 100,
       duration: 2.0,
-      ease: 'power1.out',
+      ease: 'none',
       onUpdate: () => {
-        percentageEl.textContent = `${Math.round(percentageObj.value)}%`
+        const currentValue = Math.round(percentageObj.value)
+        const progress = percentageObj.value / 100 // 0 -> 1
+
+        // Aggiorna il testo di entrambe le percentuali
+        percentageEl.textContent = `${currentValue}%`
+        percentageHighlightEl.textContent = `${currentValue}%`
+
+        // Aggiorna il clip-path della scritta highlights (dal basso verso l'alto)
+        // inset(top right bottom left) - riduciamo top da 100% a 0%
+        const clipTop = 100 - percentageObj.value // 100% -> 0%
+        gsap.set(percentageHighlightEl, { clipPath: `inset(${clipTop}% 0 0 0)` })
+
+        // Aggiorna la lunghezza di tutti i vermicelli proporzionalmente alla percentuale
+        paths.forEach((path, i) => {
+          const realLength = pathLengths[i]
+          const snake = snakes[i]
+          if (realLength && snake) {
+            // strokeDashoffset: da realLength (nascosto) a 0 (completamente visibile)
+            const offset = realLength * (1 - progress)
+            // Mostra il vermicello solo se ha iniziato a crescere (progress > 0)
+            const opacity = progress > 0 ? snake.opacity : 0
+            gsap.set(path, { strokeDashoffset: offset, opacity })
+          }
+        })
       }
     }, fadeInDuration)
 
-    // Fase 2: Bounce del logo (inizia mentre i serpenti sono ancora estesi)
+    // Fase 2: Bounce del logo (inizia quando percentuale e vermicelli sono al 100%)
     // Il bounce "richiama" i serpenti
     const bounceStart = fadeInDuration + 2.0
 
@@ -231,8 +241,8 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       ease: 'power3.in',
     }, bounceStart + 0.25) // Inizia quando il logo inizia a scendere
 
-    // Fade out della percentuale insieme ai serpenti
-    tl.to(percentageEl, {
+    // Fade out delle percentuali insieme ai serpenti
+    tl.to([percentageEl, percentageHighlightEl], {
       opacity: 0,
       duration: 0.35,
       ease: 'power3.in',
@@ -324,19 +334,38 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
           ))}
         </svg>
 
-        {/* Percentuale di caricamento */}
+        {/* Percentuale di caricamento - Container con due scritte sovrapposte */}
         <div
-          ref={percentageRef}
-          className="absolute bottom-8 left-8 text-white font-bold"
+          className="absolute bottom-8 left-8"
           style={{
             fontSize: '120px',
             fontFamily: 'Moderniz, sans-serif',
             fontWeight: 700,
             letterSpacing: '-2px',
-            opacity: 0,
           }}
         >
-          0%
+          {/* Scritta bianca (base) */}
+          <div
+            ref={percentageRef}
+            className="text-white"
+            style={{ opacity: 0 }}
+          >
+            0%
+          </div>
+          {/* Scritta highlights (sovrapposta, con clip-path) */}
+          <div
+            ref={percentageHighlightRef}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              color: '#2EBAEB',
+              opacity: 0,
+              clipPath: 'inset(100% 0 0 0)', // Inizia nascosta (dal basso)
+            }}
+          >
+            0%
+          </div>
         </div>
       </div>
 

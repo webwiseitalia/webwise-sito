@@ -82,47 +82,48 @@ function HomePage() {
   // Callback quando il logo del loading arriva nella posizione della hero
   const handleLogoArrived = useCallback(() => {
     setShowHeroLogo(true) // Mostra il logo della hero
+
+    // Avvia subito il typewriter appena il logo si è rimpicciolito
+    setAnimationPhase('typewriter')
+
+    // Anima la navbar
+    if (navbarRef.current) {
+      gsap.fromTo(
+        navbarRef.current,
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+      )
+    }
   }, [])
 
   const handleLogoTransitionComplete = useCallback(() => {
     setShowLoading(false)
 
-    // Delay prima del typewriter
-    setTimeout(() => {
-      setAnimationPhase('typewriter')
+    // Riporta lo scroll in cima alla pagina (alla hero)
+    window.scrollTo(0, 0)
 
-      // Anima la navbar
-      if (navbarRef.current) {
+    // Anima le colonne laterali dopo il testo principale (timing ridotto per animazione più veloce)
+    setTimeout(() => {
+      if (leftColumnRef.current) {
         gsap.fromTo(
-          navbarRef.current,
-          { opacity: 0, y: -20 },
-          { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+          leftColumnRef.current,
+          { opacity: 0, x: -30 },
+          { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
+        )
+      }
+      if (rightColumnRef.current) {
+        gsap.fromTo(
+          rightColumnRef.current,
+          { opacity: 0, x: 30 },
+          { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
         )
       }
 
-      // Anima le colonne laterali dopo il testo principale
+      // Animazione completa
       setTimeout(() => {
-        if (leftColumnRef.current) {
-          gsap.fromTo(
-            leftColumnRef.current,
-            { opacity: 0, x: -30 },
-            { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
-          )
-        }
-        if (rightColumnRef.current) {
-          gsap.fromTo(
-            rightColumnRef.current,
-            { opacity: 0, x: 30 },
-            { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
-          )
-        }
-
-        // Animazione completa
-        setTimeout(() => {
-          setAnimationPhase('complete')
-        }, 600)
-      }, 2500) // Dopo che il typewriter del testo principale finisce
-    }, 300)
+        setAnimationPhase('complete')
+      }, 600)
+    }, 1200) // Ridotto da 2500ms per animazione più veloce
   }, [])
 
   const isTypewriterActive = animationPhase === 'typewriter' || animationPhase === 'complete'
@@ -272,31 +273,31 @@ function HomePage() {
                 text="WEBWISE"
                 isVisible={isTypewriterActive}
                 delay={0}
-                speed={0.06}
+                speed={0.035}
               />
             </p>
             <p>
               <TypewriterText
                 text="TRANSFORMING DIGITAL PRESENCE"
                 isVisible={isTypewriterActive}
-                delay={0.5}
-                speed={0.025}
+                delay={0.25}
+                speed={0.015}
               />
             </p>
             <p>
               <TypewriterText
                 text="WITH AI-DRIVEN STRATEGIES AND"
                 isVisible={isTypewriterActive}
-                delay={1.2}
-                speed={0.025}
+                delay={0.7}
+                speed={0.015}
               />
             </p>
             <p>
               <TypewriterText
                 text="SCALABLE TECHNOLOGIES"
                 isVisible={isTypewriterActive}
-                delay={1.9}
-                speed={0.025}
+                delay={1.1}
+                speed={0.015}
               />
             </p>
           </div>
