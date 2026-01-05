@@ -4,8 +4,9 @@ import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
 
 interface LoadingScreenProps {
   onLogoTransitionComplete: () => void
-  heroLogoRef: React.RefObject<HTMLImageElement>
+  heroLogoRef: React.RefObject<HTMLDivElement>
   onLogoArrived: () => void
+  parallaxLogoRef?: React.RefObject<HTMLImageElement>
 }
 
 interface SnakePath {
@@ -102,9 +103,11 @@ function generateSnakes(count: number, centerX: number, centerY: number, logoRad
   return snakes
 }
 
-export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived }: LoadingScreenProps) {
+export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived, parallaxLogoRef }: LoadingScreenProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const logoRef = useRef<HTMLImageElement>(null)
+  const internalLogoRef = useRef<HTMLImageElement>(null)
+  // Usa il ref esterno se fornito, altrimenti usa quello interno
+  const logoRef = parallaxLogoRef || internalLogoRef
   const pathsRef = useRef<(SVGPathElement | null)[]>([])
   const percentageRef = useRef<HTMLDivElement>(null)
 
@@ -256,15 +259,14 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     // Fase 3: Piccola pausa
     tl.to({}, { duration: 0.2 }, bounceStart + 0.8)
 
-    // Fase 4: Calcola posizione hero e anima verso di essa
+    // Fase 4: Il logo si sposta verso la posizione nella hero (tra le colonne)
     tl.add(() => {
       if (heroLogoRef.current && logo) {
         const heroRect = heroLogoRef.current.getBoundingClientRect()
-        const loadingLogoRect = logo.getBoundingClientRect()
+        const logoRect = logo.getBoundingClientRect()
 
-        const deltaX = heroRect.left + heroRect.width / 2 - (loadingLogoRect.left + loadingLogoRect.width / 2)
-        const deltaY = heroRect.top + heroRect.height / 2 - (loadingLogoRect.top + loadingLogoRect.height / 2)
-
+        const deltaX = heroRect.left + heroRect.width / 2 - (logoRect.left + logoRect.width / 2)
+        const deltaY = heroRect.top + heroRect.height / 2 - (logoRect.top + logoRect.height / 2)
         const targetScale = 125 / 350
 
         gsap.to(logo, {
@@ -280,17 +282,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       }
     }, bounceStart + 1.0)
 
-    // Aspetta che il logo arrivi, poi fade out
-    tl.to(
-      logo,
-      {
-        opacity: 0,
-        duration: 0.15,
-      },
-      bounceStart + 1.85
-    )
-
-    // Fade out del container nero
+    // Fade out del container nero (opacity), il logo resta visibile perché è fixed e fuori dal flusso
     tl.to(
       containerRef.current,
       {
@@ -312,51 +304,59 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
   }, [heroLogoRef, onLogoTransitionComplete, onLogoArrived, snakes])
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 z-[9999] bg-black flex items-center justify-center pointer-events-none"
-    >
-      {/* Serpenti SVG sinuosi */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none">
-        {snakes.map((_, i) => (
-          <path
-            key={i}
-            ref={(el) => { pathsRef.current[i] = el }}
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            fill="none"
-          />
-        ))}
-      </svg>
+    <>
+      {/* Container dello sfondo nero e altri elementi */}
+      <div
+        ref={containerRef}
+        className="fixed inset-0 z-[9999] bg-black flex items-center justify-center pointer-events-none"
+      >
+        {/* Serpenti SVG sinuosi */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none">
+          {snakes.map((_, i) => (
+            <path
+              key={i}
+              ref={(el) => { pathsRef.current[i] = el }}
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              fill="none"
+            />
+          ))}
+        </svg>
 
-      {/* Logo Webwise */}
+        {/* Percentuale di caricamento */}
+        <div
+          ref={percentageRef}
+          className="absolute bottom-8 left-8 text-white font-bold"
+          style={{
+            fontSize: '120px',
+            fontFamily: 'Moderniz, sans-serif',
+            fontWeight: 700,
+            letterSpacing: '-2px',
+            opacity: 0,
+          }}
+        >
+          0%
+        </div>
+      </div>
+
+      {/* Logo Webwise - FUORI dal container per non essere influenzato dal fade out */}
       <img
         ref={logoRef}
         src={logoWebwise}
         alt="Webwise"
-        className="invert relative z-10"
+        className="invert pointer-events-none"
         style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
           width: '350px',
           height: '350px',
           opacity: 0,
+          zIndex: 10000,
         }}
       />
-
-      {/* Percentuale di caricamento */}
-      <div
-        ref={percentageRef}
-        className="absolute bottom-8 left-8 text-white font-bold"
-        style={{
-          fontSize: '120px',
-          fontFamily: 'Moderniz, sans-serif',
-          fontWeight: 700,
-          letterSpacing: '-2px',
-          opacity: 0,
-        }}
-      >
-        0%
-      </div>
-    </div>
+    </>
   )
 }
