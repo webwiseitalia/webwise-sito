@@ -16,6 +16,7 @@ import CareersPage from './pages/CareersPage'
 import ProjectPage from './pages/ProjectPage'
 import ScrollToTop from './components/ScrollToTop'
 import ParticleLogo from './components/ParticleLogo'
+import DotShaderBackground from './components/DotShaderBackground'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -83,6 +84,7 @@ function HomePage() {
   const logoSectionRef = useRef<HTMLElement>(null)
   const serviziSectionRef = useRef<HTMLElement>(null)
   const serviziBlockRef = useRef<HTMLDivElement>(null)
+  const dotShaderRef = useRef<HTMLDivElement>(null)
 
   // L'animazione parte solo la prima volta che si visita la homepage
 
@@ -149,6 +151,72 @@ function HomePage() {
     }
   }, [showLoading])
 
+  // ScrollTrigger per lo zoom/dezoom dello sfondo shader (sincronizzato con il logo)
+  useEffect(() => {
+    if (!heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current || !dotShaderRef.current) return
+
+    // Zoom massimo: 2x
+    const maxScale = 2
+
+    // Applica transizione CSS per smoothness extra
+    dotShaderRef.current.style.transition = 'transform 0.1s ease-out, opacity 0.1s ease-out'
+
+    // Trigger per lo zoom IN (hero -> midframe center)
+    const zoomInTrigger = ScrollTrigger.create({
+      trigger: heroSectionRef.current,
+      start: 'top top',
+      endTrigger: logoSectionRef.current,
+      end: 'center center',
+      scrub: 2.5,
+      onUpdate: (self) => {
+        if (dotShaderRef.current) {
+          const scale = 1 + (maxScale - 1) * self.progress
+          // Normale (non flippato) durante lo zoom in
+          dotShaderRef.current.style.transform = `scale(${scale})`
+          dotShaderRef.current.style.opacity = '1'
+        }
+      }
+    })
+
+    // Trigger per lo zoom OUT con flip (midframe center -> inizio servizi)
+    const zoomOutTrigger = ScrollTrigger.create({
+      trigger: logoSectionRef.current,
+      start: 'center center',
+      endTrigger: serviziSectionRef.current,
+      end: 'top top',
+      scrub: 2.5,
+      onUpdate: (self) => {
+        if (dotShaderRef.current) {
+          // Dezoom da 2x a 1x
+          const scale = maxScale - (maxScale - 1) * self.progress
+          // Flippato verticalmente durante il dezoom
+          dotShaderRef.current.style.transform = `scale(${scale}) scaleY(-1)`
+          dotShaderRef.current.style.opacity = '1'
+        }
+      }
+    })
+
+    // Trigger per il fade out alla fine della sezione Servizi
+    const fadeOutTrigger = ScrollTrigger.create({
+      trigger: serviziSectionRef.current,
+      start: 'bottom bottom',
+      end: 'bottom top',
+      scrub: 2.5,
+      onUpdate: (self) => {
+        if (dotShaderRef.current) {
+          const opacity = 1 - self.progress
+          dotShaderRef.current.style.opacity = String(opacity)
+        }
+      }
+    })
+
+    return () => {
+      zoomInTrigger.kill()
+      zoomOutTrigger.kill()
+      fadeOutTrigger.kill()
+    }
+  }, [hasSeenLoading])
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -175,20 +243,33 @@ function HomePage() {
       {/* Navbar fixed */}
       <nav
         ref={navbarRef}
+        className="relative z-[100]"
         style={{ opacity: hasSeenLoading || !showLoading ? 1 : 0 }}
       >
         <Navbar />
       </nav>
 
+      {/* Dot Shader Background - Fixed, zooma con lo scroll, blend mode per vedere il contenuto */}
+      <div
+        ref={dotShaderRef}
+        className="fixed inset-0 z-30 pointer-events-none"
+        style={{
+          transformOrigin: 'center center',
+          mixBlendMode: 'screen',
+        }}
+      >
+        <DotShaderBackground />
+      </div>
+
       {/* Hero Section - 1920x1080 con sfondo nero */}
       <section
         ref={heroSectionRef}
-        className="w-full min-h-screen bg-black flex items-center justify-center overflow-hidden"
+        className="w-full min-h-screen bg-transparent flex items-center justify-center overflow-hidden relative"
         style={{
           aspectRatio: '1920 / 1080'
         }}
       >
-        <div className="flex flex-col items-center text-center px-4">
+        <div className="flex flex-col items-center text-center px-4 relative z-10">
           {/* Titolo principale - Inter SemiBold 75px */}
           <div className="text-white font-semibold tracking-tight" style={{ fontSize: '75px', lineHeight: '1.1' }}>
             <p>
@@ -264,11 +345,11 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Sezione Logo Centrale - 1920x1080 con sfondo nero */}
+      {/* Sezione Logo Centrale - 1920x1080 con sfondo trasparente per vedere lo shader */}
       {/* Il logo qui è animato dal parallax, non serve un'immagine statica */}
       <section
         ref={logoSectionRef}
-        className="w-full bg-black flex items-center justify-center"
+        className="w-full bg-transparent flex items-center justify-center"
         style={{
           aspectRatio: '1920 / 1080'
         }}
@@ -281,7 +362,7 @@ function HomePage() {
       <section
         ref={serviziSectionRef}
         id="servizi"
-        className="w-full bg-black relative py-20"
+        className="w-full bg-black relative py-20 overflow-hidden"
         style={{
           aspectRatio: '1920 / 1400'
         }}
