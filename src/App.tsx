@@ -65,15 +65,16 @@ function HomePage() {
   const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>('loading')
   const [showLoading, setShowLoading] = useState(true)
   const [showHeroLogo, setShowHeroLogo] = useState(false)
-  const [logoParallaxComplete, setLogoParallaxComplete] = useState(false)
-  const heroLogoRef = useRef<HTMLImageElement>(null)
+  const [showServiziLogo, setShowServiziLogo] = useState(false)
+  const heroLogoRef = useRef<HTMLDivElement>(null)
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
   const parallaxLogoRef = useRef<HTMLImageElement>(null)
-  const parallaxContainerRef = useRef<HTMLDivElement>(null)
-  const serviziLogoTargetRef = useRef<HTMLImageElement>(null)
   const heroSectionRef = useRef<HTMLElement>(null)
+  const logoSectionRef = useRef<HTMLElement>(null)
+  const serviziSectionRef = useRef<HTMLElement>(null)
+  const serviziBlockRef = useRef<HTMLDivElement>(null)
 
   // L'animazione parte sempre ad ogni caricamento
   // showLoading è già true e showHeroLogo è già false per default
@@ -82,7 +83,7 @@ function HomePage() {
   const handleLogoArrived = useCallback(() => {
     setShowHeroLogo(true) // Mostra il logo della hero
 
-    // Avvia il typewriter appena il logo arriva (non aspetta il fade out completo)
+    // Avvia subito il typewriter appena il logo si è rimpicciolito
     setAnimationPhase('typewriter')
 
     // Anima la navbar
@@ -98,10 +99,10 @@ function HomePage() {
   const handleLogoTransitionComplete = useCallback(() => {
     setShowLoading(false)
 
-    // Reset scroll a inizio pagina
+    // Riporta lo scroll in cima alla pagina (alla hero)
     window.scrollTo(0, 0)
 
-    // Anima le colonne laterali dopo il testo principale
+    // Anima le colonne laterali dopo il testo principale (timing ridotto per animazione più veloce)
     setTimeout(() => {
       if (leftColumnRef.current) {
         gsap.fromTo(
@@ -122,95 +123,131 @@ function HomePage() {
       setTimeout(() => {
         setAnimationPhase('complete')
       }, 600)
-    }, 1500) // Dopo che il typewriter del testo principale finisce (più veloce)
+    }, 1200) // Ridotto da 2500ms per animazione più veloce
   }, [])
 
   const isTypewriterActive = animationPhase === 'typewriter' || animationPhase === 'complete'
   const showFullContent = animationPhase === 'complete'
 
-  // Animazione parallax del logo con ScrollTrigger
+  // Parallax del logo: Hero -> Midframe -> Servizi
   useEffect(() => {
-    if (showLoading || !parallaxLogoRef.current || !parallaxContainerRef.current) return
+    if (showLoading || !parallaxLogoRef.current || !heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current || !serviziBlockRef.current) return
 
     const logo = parallaxLogoRef.current
-    const container = parallaxContainerRef.current
+    const heroSection = heroSectionRef.current
+    const midframeSection = logoSectionRef.current
+    const serviziSection = serviziSectionRef.current
+    const serviziBlock = serviziBlockRef.current
 
-    // Calcola le dimensioni
-    const startSize = 125 // dimensione iniziale del logo nella hero
-    const maxSize = Math.max(window.innerWidth, window.innerHeight) * 1.2 // dimensione massima (riempie schermo)
-    const endSize = 36 // dimensione finale accanto a "Servizi"
+    // Leggi le trasformazioni correnti del logo (impostate dal loading)
+    const initialX = (gsap.getProperty(logo, 'x') as number) || 0
+    const initialY = (gsap.getProperty(logo, 'y') as number) || 0
 
-    // ScrollTrigger per animare la dimensione del logo
-    ScrollTrigger.create({
-      trigger: container,
+    // Scale values
+    const baseSize = 350
+    const heroScale = 125 / baseSize      // Logo nella hero (125px)
+    const midframeScale = 546 / baseSize  // Logo grande nel midframe (546px)
+    const serviziScale = 125 / baseSize   // Logo nei servizi (125px)
+
+    // Posizione finale: a sinistra del titolo "Servizi"
+    const calculateFinalPosition = () => {
+      const blockRect = serviziBlock.getBoundingClientRect()
+      const logoSize = 125
+      // A sinistra del blocco, allineato con il titolo
+      const targetX = blockRect.left - logoSize - 30 - (window.innerWidth / 2) + (logoSize / 2)
+      const targetY = blockRect.top + 50 - (window.innerHeight / 2) // Allineato al titolo
+      return { x: targetX, y: targetY }
+    }
+
+    // FASE 1: Hero -> Midframe (logo si ingrandisce e si centra)
+    const trigger1 = ScrollTrigger.create({
+      trigger: heroSection,
       start: 'top top',
-      end: 'bottom top',
-      scrub: 0.3,
+      endTrigger: midframeSection,
+      end: 'center center',
+      scrub: 1,
       onUpdate: (self) => {
         const progress = self.progress
 
-        // Calcola la dimensione in base al progress
-        let size: number
-        let xOffset = 0
-        let yOffset = 0
+        // Interpola scala da 125px a 546px
+        const currentScale = heroScale + (midframeScale - heroScale) * progress
 
-        if (progress < 0.4) {
-          // Fase 1: Logo si ingrandisce (0% - 40% dello scroll)
-          const phase1Progress = progress / 0.4
-          size = startSize + (maxSize - startSize) * phase1Progress
-        } else if (progress < 0.6) {
-          // Fase 2: Logo resta grande (40% - 60% dello scroll)
-          size = maxSize
+        // Interpola posizione da hero a centro (x=0, y=0)
+        const currentX = initialX * (1 - progress)
+        const currentY = initialY * (1 - progress)
+
+        gsap.set(logo, {
+          scale: currentScale,
+          x: currentX,
+          y: currentY,
+          force3D: true,
+        })
+      }
+    })
+
+    // FASE 2: Midframe -> Servizi
+    // Dal centro del midframe: prima va a sinistra, poi scende
+    const trigger2 = ScrollTrigger.create({
+      trigger: midframeSection,
+      start: 'center center',
+      endTrigger: serviziSection,
+      end: 'top top',
+      scrub: 1,
+      onUpdate: (self) => {
+        const progress = self.progress
+        const finalPos = calculateFinalPosition()
+
+        // Rimpicciolisce subito
+        const scaleProgress = Math.min(progress / 0.3, 1)
+        const currentScale = midframeScale + (serviziScale - midframeScale) * scaleProgress
+
+        let currentX, currentY
+
+        if (progress < 0.5) {
+          // Prima metà: vai a sinistra, resta al centro (Y = 0)
+          const subProgress = progress / 0.5
+          currentX = finalPos.x * subProgress
+          currentY = 0
         } else {
-          // Fase 3: Logo si rimpicciolisce (60% - 100% dello scroll)
-          const phase3Progress = (progress - 0.6) / 0.4
-          size = maxSize - (maxSize - endSize) * phase3Progress
-
-          // Nella fase finale, sposta il logo verso la posizione target
-          if (progress > 0.85 && serviziLogoTargetRef.current) {
-            const targetRect = serviziLogoTargetRef.current.getBoundingClientRect()
-            const centerX = window.innerWidth / 2
-            const centerY = window.innerHeight / 2
-            const targetX = targetRect.left + targetRect.width / 2
-            const targetY = targetRect.top + targetRect.height / 2
-
-            const moveProgress = (progress - 0.85) / 0.15
-            xOffset = (targetX - centerX) * moveProgress
-            yOffset = (targetY - centerY) * moveProgress
-          }
+          // Seconda metà: già a sinistra, ora scendi
+          const subProgress = (progress - 0.5) / 0.5
+          currentX = finalPos.x
+          currentY = finalPos.y * subProgress
         }
 
         gsap.set(logo, {
-          width: size,
-          height: size,
-          x: xOffset,
-          y: yOffset
+          scale: currentScale,
+          x: currentX,
+          y: currentY,
+          force3D: true,
         })
 
-        // Quando l'animazione è quasi completa
-        if (progress >= 0.98 && !logoParallaxComplete) {
-          setLogoParallaxComplete(true)
-        } else if (progress < 0.98 && logoParallaxComplete) {
-          setLogoParallaxComplete(false)
+        // Transizione logo fixed -> logo statico
+        if (progress >= 0.98) {
+          gsap.set(logo, { opacity: 0, force3D: true })
+          setShowServiziLogo(true)
+        } else {
+          gsap.set(logo, { opacity: 1, force3D: true })
+          setShowServiziLogo(false)
         }
       }
     })
 
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+      trigger1.kill()
+      trigger2.kill()
     }
-  }, [showLoading, logoParallaxComplete])
+  }, [showLoading])
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Loading Screen */}
-      {showLoading && (
-        <LoadingScreen
-          onLogoTransitionComplete={handleLogoTransitionComplete}
-          heroLogoRef={heroLogoRef}
-          onLogoArrived={handleLogoArrived}
-        />
-      )}
+      {/* Loading Screen - non viene mai rimosso, solo reso trasparente */}
+      <LoadingScreen
+        onLogoTransitionComplete={handleLogoTransitionComplete}
+        heroLogoRef={heroLogoRef}
+        onLogoArrived={handleLogoArrived}
+        parallaxLogoRef={parallaxLogoRef}
+      />
 
       {/* Navbar fixed */}
       <nav
@@ -220,16 +257,14 @@ function HomePage() {
         <Navbar />
       </nav>
 
-      {/* Contenitore per l'animazione parallax - include hero + 2 sezioni intermedie + servizi */}
-      <div ref={parallaxContainerRef}>
-        {/* Hero Section - 1920x1080 con sfondo nero */}
-        <section
-          ref={heroSectionRef}
-          className="w-full min-h-screen bg-black flex items-center justify-center overflow-hidden relative"
-          style={{
-            aspectRatio: '1920 / 1080'
-          }}
-        >
+      {/* Hero Section - 1920x1080 con sfondo nero */}
+      <section
+        ref={heroSectionRef}
+        className="w-full min-h-screen bg-black flex items-center justify-center overflow-hidden"
+        style={{
+          aspectRatio: '1920 / 1080'
+        }}
+      >
         <div className="flex flex-col items-center text-center px-4">
           {/* Titolo principale - Inter SemiBold 75px */}
           <div className="text-white font-semibold tracking-tight" style={{ fontSize: '75px', lineHeight: '1.1' }}>
@@ -279,18 +314,16 @@ function HomePage() {
               <p style={{ whiteSpace: 'nowrap' }}>BETTER<span style={{ marginLeft: '100px' }}>WORK</span></p>
             </div>
 
-            {/* Logo centrale - 125x125px come da Figma */}
-            <div className="flex items-center justify-center flex-shrink-0">
+            {/* Logo centrale - 125x125px */}
+            <div ref={heroLogoRef} className="flex items-center justify-center flex-shrink-0">
               <img
-                ref={heroLogoRef}
                 src={logoWebwiseCenter}
                 alt="Webwise Logo"
                 className="invert"
                 style={{
                   width: '125px',
                   height: '125px',
-                  opacity: showHeroLogo ? 1 : 0,
-                  transition: 'opacity 0.15s ease-out'
+                  opacity: 0,
                 }}
               />
             </div>
@@ -306,68 +339,66 @@ function HomePage() {
             </div>
           </div>
         </div>
-        </section>
+      </section>
 
-        {/* Sezione Intermedia 1 - Logo zoomato al massimo */}
-        <section
-          className="w-full bg-black flex items-center justify-center"
-          style={{
-            aspectRatio: '1920 / 540'
-          }}
-        />
+      {/* Sezione Logo Centrale - 1920x1080 con sfondo nero */}
+      {/* Il logo qui è animato dal parallax, non serve un'immagine statica */}
+      <section
+        ref={logoSectionRef}
+        className="w-full bg-black flex items-center justify-center"
+        style={{
+          aspectRatio: '1920 / 1080'
+        }}
+      >
+        {/* Placeholder invisibile per mantenere le proporzioni */}
+        <div style={{ width: '437px', height: '437px' }} />
+      </section>
 
-        {/* Sezione Intermedia 2 - Logo inizia a rimpicciolirsi */}
-        <section
-          className="w-full bg-black flex items-center justify-center"
-          style={{
-            aspectRatio: '1920 / 540'
-          }}
-        />
+      {/* Sezione Servizi - 1920x1400 con sfondo nero */}
+      <section
+        ref={serviziSectionRef}
+        id="servizi"
+        className="w-full bg-black relative py-20"
+        style={{
+          aspectRatio: '1920 / 1400'
+        }}
+      >
+        <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Colonna sinistra - sticky */}
+          <div ref={serviziBlockRef} className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit relative">
+            {/* Logo statico a sinistra del titolo */}
+            <img
+              src={logoWebwiseCenter}
+              alt="Webwise Logo"
+              className="invert absolute"
+              style={{
+                top: '50px',
+                left: '-155px',
+                width: '125px',
+                height: '125px',
+                opacity: showServiziLogo ? 1 : 0,
+                transition: 'opacity 0.15s ease-out',
+              }}
+            />
+            {/* Badge */}
+            <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
+              Come possiamo aiutarti
+            </span>
 
-        {/* Sezione Servizi - 1920x1400 con sfondo nero */}
-        <section
-          id="servizi"
-          className="w-full bg-black relative py-20"
-          style={{
-            aspectRatio: '1920 / 1400'
-          }}
-        >
-          <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Colonna sinistra - sticky */}
-            <div className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit">
-              {/* Badge */}
-              <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
-                Come possiamo aiutarti
-              </span>
+            {/* Titolo */}
+            <h2 className="text-white text-4xl font-semibold">Servizi</h2>
 
-              {/* Titolo con logo (nascosto fino a fine animazione parallax) */}
-              <div className="flex items-center gap-4">
-                <h2 className="text-white text-4xl font-semibold">Servizi</h2>
-                <img
-                  ref={serviziLogoTargetRef}
-                  src={logoWebwiseCenter}
-                  alt="Webwise"
-                  className="invert"
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    opacity: logoParallaxComplete ? 1 : 0,
-                    transition: 'opacity 0.3s ease-out'
-                  }}
-                />
-              </div>
+            {/* Descrizione */}
+            <p className="text-gray-400 max-w-[450px] leading-relaxed">
+              Capire esattamente quello che ti serve è il nostro pane quotidiano.
+              Sviluppiamo soluzioni software personalizzate che si allineano
+              perfettamente ai tuoi obiettivi. Il nostro approccio è un mix ben
+              rodato di metodo e creatività, garantendo prodotti di qualità superiore
+              e senza compromessi.
+            </p>
 
-              {/* Descrizione */}
-              <p className="text-gray-400 max-w-[450px] leading-relaxed">
-                Capire esattamente quello che ti serve è il nostro pane quotidiano.
-                Sviluppiamo soluzioni software personalizzate che si allineano
-                perfettamente ai tuoi obiettivi. Il nostro approccio è un mix ben
-                rodato di metodo e creatività, garantendo prodotti di qualità superiore
-                e senza compromessi.
-              </p>
-
-              {/* Bottoni */}
-              <div className="flex flex-wrap items-center gap-3 mt-6">
+            {/* Bottoni */}
+            <div className="flex flex-wrap items-center gap-3 mt-6">
               <a
                 href="#"
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
@@ -523,31 +554,8 @@ function HomePage() {
               </p>
             </div>
           </div>
-          </div>
-        </section>
-      </div>
-      {/* Fine contenitore parallax */}
-
-      {/* Logo Parallax Fixed - si muove con lo scroll (appare solo dopo loading e quando si inizia a scrollare) */}
-      {!showLoading && showHeroLogo && (
-        <img
-          ref={parallaxLogoRef}
-          src={logoWebwiseCenter}
-          alt="Webwise Logo Parallax"
-          className="invert pointer-events-none"
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '125px',
-            height: '125px',
-            zIndex: 50,
-            opacity: logoParallaxComplete ? 0 : 1,
-            transition: 'opacity 0.2s ease-out'
-          }}
-        />
-      )}
+        </div>
+      </section>
 
       {/* Sezione Portfolio - 1920x2580 */}
       <section
