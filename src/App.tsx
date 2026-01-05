@@ -13,7 +13,6 @@ import LoadingScreen from './components/LoadingScreen'
 import SoftwarePage from './pages/SoftwarePage'
 import ReservlyPage from './pages/ReservlyPage'
 import CareersPage from './pages/CareersPage'
-import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -65,18 +64,42 @@ function HomePage() {
   const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>('loading')
   const [showLoading, setShowLoading] = useState(true)
   const [showHeroLogo, setShowHeroLogo] = useState(false)
-  const [logoParallaxComplete, setLogoParallaxComplete] = useState(false)
-  const heroLogoRef = useRef<HTMLImageElement>(null)
+  const [logoParallaxActive, setLogoParallaxActive] = useState(false)
+  const [targetPosition, setTargetPosition] = useState<{ x: number; y: number } | null>(null)
+  const heroLogoRef = useRef<HTMLDivElement>(null)
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
   const parallaxLogoRef = useRef<HTMLImageElement>(null)
   const parallaxContainerRef = useRef<HTMLDivElement>(null)
-  const serviziLogoTargetRef = useRef<HTMLImageElement>(null)
+  const serviziLogoTargetRef = useRef<HTMLDivElement>(null)
   const heroSectionRef = useRef<HTMLElement>(null)
 
   // L'animazione parte sempre ad ogni caricamento
   // showLoading è già true e showHeroLogo è già false per default
+
+  // Calcola la posizione target (accanto a "Servizi") al mount
+  useEffect(() => {
+    const updateTargetPosition = () => {
+      if (serviziLogoTargetRef.current) {
+        const rect = serviziLogoTargetRef.current.getBoundingClientRect()
+        setTargetPosition({
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        })
+      }
+    }
+
+    // Calcola subito e dopo un breve delay per assicurarsi che il layout sia pronto
+    updateTargetPosition()
+    const timer = setTimeout(updateTargetPosition, 100)
+
+    window.addEventListener('resize', updateTargetPosition)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('resize', updateTargetPosition)
+    }
+  }, [])
 
   // Callback quando il logo del loading arriva nella posizione della hero
   const handleLogoArrived = useCallback(() => {
@@ -128,69 +151,68 @@ function HomePage() {
   const showFullContent = animationPhase === 'complete'
 
   // Animazione parallax del logo con ScrollTrigger
+  // Il logo parte nella posizione target (accanto a Servizi) e si ingrandisce scrollando verso l'alto
   useEffect(() => {
-    if (showLoading || !parallaxLogoRef.current || !parallaxContainerRef.current) return
+    if (showLoading || !parallaxLogoRef.current || !parallaxContainerRef.current || !serviziLogoTargetRef.current) return
 
     const logo = parallaxLogoRef.current
     const container = parallaxContainerRef.current
 
-    // Calcola le dimensioni
-    const startSize = 125 // dimensione iniziale del logo nella hero
-    const maxSize = Math.max(window.innerWidth, window.innerHeight) * 1.2 // dimensione massima (riempie schermo)
-    const endSize = 36 // dimensione finale accanto a "Servizi"
+    // Calcola le scale (il logo base è 350px)
+    const baseSize = 350
+    const smallScale = 36 / baseSize // ~0.103 - dimensione nella posizione target (36px)
+    const maxScale = (Math.max(window.innerWidth, window.innerHeight) * 0.3) / baseSize // scala massima (30% dello schermo)
+
+    // Posizione iniziale: offset dalla posizione target rispetto al centro
+    const centerX = window.innerWidth / 2
+    const centerY = window.innerHeight / 2
+    const targetRect = serviziLogoTargetRef.current.getBoundingClientRect()
+    const initialX = targetRect.left + targetRect.width / 2 - centerX
+    const initialY = targetRect.top + targetRect.height / 2 - centerY
 
     // ScrollTrigger per animare la dimensione del logo
+    // Progress 0 = in cima (logo piccolo nella posizione target)
+    // Progress 1 = scrollato giù (non si vede più la sezione servizi)
     ScrollTrigger.create({
       trigger: container,
       start: 'top top',
       end: 'bottom top',
       scrub: 0.3,
       onUpdate: (self) => {
+        // Invertiamo il progress: quando siamo in cima (progress=0) il logo è nella posizione target
+        // Quando scrolliamo giù verso servizi, il logo si ingrandisce
         const progress = self.progress
 
-        // Calcola la dimensione in base al progress
-        let size: number
-        let xOffset = 0
-        let yOffset = 0
+        // Fase 1: 0-60% scroll - logo resta piccolo nella posizione target
+        // Fase 2: 60-100% scroll - logo si ingrandisce e si centra
+        let scale: number
+        let xOffset: number
+        let yOffset: number
 
-        if (progress < 0.4) {
-          // Fase 1: Logo si ingrandisce (0% - 40% dello scroll)
-          const phase1Progress = progress / 0.4
-          size = startSize + (maxSize - startSize) * phase1Progress
-        } else if (progress < 0.6) {
-          // Fase 2: Logo resta grande (40% - 60% dello scroll)
-          size = maxSize
+        if (progress < 0.6) {
+          // Logo piccolo nella posizione target
+          scale = smallScale
+          xOffset = initialX
+          yOffset = initialY
         } else {
-          // Fase 3: Logo si rimpicciolisce (60% - 100% dello scroll)
-          const phase3Progress = (progress - 0.6) / 0.4
-          size = maxSize - (maxSize - endSize) * phase3Progress
-
-          // Nella fase finale, sposta il logo verso la posizione target
-          if (progress > 0.85 && serviziLogoTargetRef.current) {
-            const targetRect = serviziLogoTargetRef.current.getBoundingClientRect()
-            const centerX = window.innerWidth / 2
-            const centerY = window.innerHeight / 2
-            const targetX = targetRect.left + targetRect.width / 2
-            const targetY = targetRect.top + targetRect.height / 2
-
-            const moveProgress = (progress - 0.85) / 0.15
-            xOffset = (targetX - centerX) * moveProgress
-            yOffset = (targetY - centerY) * moveProgress
-          }
+          // Logo si ingrandisce e si sposta verso il centro
+          const growProgress = (progress - 0.6) / 0.4
+          scale = smallScale + (maxScale - smallScale) * growProgress
+          xOffset = initialX * (1 - growProgress)
+          yOffset = initialY * (1 - growProgress)
         }
 
         gsap.set(logo, {
-          width: size,
-          height: size,
+          scale: scale,
           x: xOffset,
           y: yOffset
         })
 
-        // Quando l'animazione è quasi completa
-        if (progress >= 0.98 && !logoParallaxComplete) {
-          setLogoParallaxComplete(true)
-        } else if (progress < 0.98 && logoParallaxComplete) {
-          setLogoParallaxComplete(false)
+        // Attiva/disattiva il parallax
+        if (progress > 0.6 && !logoParallaxActive) {
+          setLogoParallaxActive(true)
+        } else if (progress <= 0.6 && logoParallaxActive) {
+          setLogoParallaxActive(false)
         }
       }
     })
@@ -198,18 +220,18 @@ function HomePage() {
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill())
     }
-  }, [showLoading, logoParallaxComplete])
+  }, [showLoading, logoParallaxActive])
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Loading Screen */}
-      {showLoading && (
-        <LoadingScreen
-          onLogoTransitionComplete={handleLogoTransitionComplete}
-          heroLogoRef={heroLogoRef}
-          onLogoArrived={handleLogoArrived}
-        />
-      )}
+      {/* Loading Screen - resta sempre nel DOM, solo il container diventa trasparente */}
+      <LoadingScreen
+        onLogoTransitionComplete={handleLogoTransitionComplete}
+        heroLogoRef={heroLogoRef}
+        onLogoArrived={handleLogoArrived}
+        parallaxLogoRef={parallaxLogoRef}
+        targetPosition={targetPosition}
+      />
 
       {/* Navbar fixed */}
       <nav
@@ -278,21 +300,12 @@ function HomePage() {
               <p style={{ whiteSpace: 'nowrap' }}>BETTER<span style={{ marginLeft: '100px' }}>WORK</span></p>
             </div>
 
-            {/* Logo centrale - 125x125px come da Figma */}
-            <div className="flex items-center justify-center flex-shrink-0">
-              <img
-                ref={heroLogoRef}
-                src={logoWebwiseCenter}
-                alt="Webwise Logo"
-                className="invert"
-                style={{
-                  width: '125px',
-                  height: '125px',
-                  opacity: showHeroLogo ? 1 : 0,
-                  transition: 'opacity 0.15s ease-out'
-                }}
-              />
-            </div>
+            {/* Spazio per il logo - il logo reale è quello del loading/parallax */}
+            <div
+              ref={heroLogoRef}
+              className="flex items-center justify-center flex-shrink-0"
+              style={{ width: '125px', height: '125px' }}
+            />
 
             {/* Colonna destra */}
             <div
@@ -339,19 +352,15 @@ function HomePage() {
                 Come possiamo aiutarti
               </span>
 
-              {/* Titolo con logo (nascosto fino a fine animazione parallax) */}
+              {/* Titolo con spazio per il logo parallax */}
               <div className="flex items-center gap-4">
                 <h2 className="text-white text-4xl font-semibold">Servizi</h2>
-                <img
+                {/* Placeholder per la posizione del logo - il logo reale è quello del parallax */}
+                <div
                   ref={serviziLogoTargetRef}
-                  src={logoWebwiseCenter}
-                  alt="Webwise"
-                  className="invert"
                   style={{
                     width: '36px',
                     height: '36px',
-                    opacity: logoParallaxComplete ? 1 : 0,
-                    transition: 'opacity 0.3s ease-out'
                   }}
                 />
               </div>
@@ -527,26 +536,7 @@ function HomePage() {
       </div>
       {/* Fine contenitore parallax */}
 
-      {/* Logo Parallax Fixed - si muove con lo scroll (appare solo dopo loading e quando si inizia a scrollare) */}
-      {!showLoading && showHeroLogo && (
-        <img
-          ref={parallaxLogoRef}
-          src={logoWebwiseCenter}
-          alt="Webwise Logo Parallax"
-          className="invert pointer-events-none"
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '125px',
-            height: '125px',
-            zIndex: 50,
-            opacity: logoParallaxComplete ? 0 : 1,
-            transition: 'opacity 0.2s ease-out'
-          }}
-        />
-      )}
+      {/* Logo Parallax - ora è il logo del LoadingScreen che resta visibile */}
 
       {/* Sezione Portfolio - 1920x2580 */}
       <section

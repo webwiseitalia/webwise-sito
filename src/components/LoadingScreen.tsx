@@ -4,8 +4,10 @@ import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
 
 interface LoadingScreenProps {
   onLogoTransitionComplete: () => void
-  heroLogoRef: React.RefObject<HTMLImageElement>
+  heroLogoRef: React.RefObject<HTMLDivElement>
   onLogoArrived: () => void
+  parallaxLogoRef?: React.RefObject<HTMLImageElement>
+  targetPosition?: { x: number; y: number } | null
 }
 
 interface SnakePath {
@@ -102,9 +104,11 @@ function generateSnakes(count: number, centerX: number, centerY: number, logoRad
   return snakes
 }
 
-export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived }: LoadingScreenProps) {
+export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, onLogoArrived, parallaxLogoRef, targetPosition }: LoadingScreenProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const logoRef = useRef<HTMLImageElement>(null)
+  const internalLogoRef = useRef<HTMLImageElement>(null)
+  // Usa il ref esterno se fornito, altrimenti usa quello interno
+  const logoRef = parallaxLogoRef || internalLogoRef
   const pathsRef = useRef<(SVGPathElement | null)[]>([])
   const percentageRef = useRef<HTMLDivElement>(null)
   const percentageColorRef = useRef<HTMLDivElement>(null)
@@ -264,60 +268,46 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     // Fase 3: Piccola pausa
     tl.to({}, { duration: 0.2 }, bounceStart + 0.8)
 
-    // Fase 4: Calcola posizione hero e anima verso di essa
-    tl.add(() => {
-      if (heroLogoRef.current && logo) {
-        const heroRect = heroLogoRef.current.getBoundingClientRect()
-        const loadingLogoRect = logo.getBoundingClientRect()
+    // Fase 4: Il logo si sposta verso la posizione target (accanto a "Servizi") e si rimpicciolisce
+    const finalScale = 36 / 350 // Scala finale: 36px
+    const centerX = window.innerWidth / 2
+    const centerY = window.innerHeight / 2
 
-        const deltaX = heroRect.left + heroRect.width / 2 - (loadingLogoRect.left + loadingLogoRect.width / 2)
-        const deltaY = heroRect.top + heroRect.height / 2 - (loadingLogoRect.top + loadingLogoRect.height / 2)
+    // Calcola offset verso la posizione target
+    const targetX = targetPosition ? targetPosition.x - centerX : 0
+    const targetY = targetPosition ? targetPosition.y - centerY : 0
 
-        const targetScale = 125 / 350
-
-        gsap.to(logo, {
-          x: deltaX,
-          y: deltaY,
-          scale: targetScale,
-          duration: 0.8,
-          ease: 'power3.inOut',
-          onComplete: () => {
-            onLogoArrived()
-          }
-        })
+    tl.to(logo, {
+      scale: finalScale,
+      x: targetX,
+      y: targetY,
+      duration: 0.8,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        onLogoArrived()
       }
     }, bounceStart + 1.0)
 
-    // Aspetta che il logo arrivi, poi fade out
-    tl.to(
-      logo,
-      {
-        opacity: 0,
-        duration: 0.15,
-      },
-      bounceStart + 1.85
-    )
-
-    // Fade out del container nero
+    // Fade out SOLO del container nero (sfondo), il logo resta visibile
     tl.to(
       containerRef.current,
       {
-        opacity: 0,
+        backgroundColor: 'transparent',
         duration: 0.3,
         ease: 'power2.out',
       },
-      bounceStart + 1.85
+      bounceStart + 1.8
     )
 
     // Callback finale
     tl.add(() => {
       onLogoTransitionComplete()
-    }, bounceStart + 2.15)
+    }, bounceStart + 2.1)
 
     return () => {
       tl.kill()
     }
-  }, [heroLogoRef, onLogoTransitionComplete, onLogoArrived, snakes])
+  }, [heroLogoRef, onLogoTransitionComplete, onLogoArrived, snakes, targetPosition])
 
   return (
     <div
@@ -338,16 +328,21 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         ))}
       </svg>
 
-      {/* Logo Webwise */}
+      {/* Logo Webwise - diventa il logo parallax dopo il loading */}
       <img
         ref={logoRef}
         src={logoWebwise}
         alt="Webwise"
-        className="invert relative z-10"
+        className="invert pointer-events-none"
         style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
           width: '350px',
           height: '350px',
           opacity: 0,
+          zIndex: 100,
         }}
       />
 
