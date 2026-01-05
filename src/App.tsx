@@ -72,7 +72,7 @@ function HomePage() {
   )
   const [showLoading, setShowLoading] = useState(!hasSeenLoading)
   const [showHeroLogo, setShowHeroLogo] = useState(true)
-  const [showServiziLogo, setShowServiziLogo] = useState(false)
+  // showServiziLogo rimosso - ora GSAP controlla direttamente l'opacity del logo statico
   const heroLogoRef = useRef<HTMLDivElement>(null)
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
@@ -139,6 +139,8 @@ function HomePage() {
   const showFullContent = animationPhase === 'complete'
 
   // Parallax del logo: Hero -> Midframe -> Servizi
+  // APPROCCIO: Usiamo coordinate VIEWPORT (dove il logo appare sullo schermo)
+  // e le convertiamo in offset GSAP (rispetto alla posizione CSS base)
   useEffect(() => {
     if (showLoading || !parallaxLogoRef.current || !heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current || !serviziBlockRef.current || !heroLogoRef.current) return
 
@@ -149,42 +151,68 @@ function HomePage() {
     const serviziSection = serviziSectionRef.current
     const serviziBlock = serviziBlockRef.current
 
-    // Scale values
+    // ========== COSTANTI ==========
     const baseSize = 350
-    const heroScale = 125 / baseSize      // Logo nella hero (125px)
-    const midframeScale = 546 / baseSize  // Logo grande nel midframe (546px)
-    const serviziScale = 125 / baseSize   // Logo nei servizi (125px)
+    const heroScale = 125 / baseSize      // 0.357
+    const midframeScale = 546 / baseSize  // 1.56
+    const serviziScale = 125 / baseSize   // 0.357
 
-    // Se hasSeenLoading, calcoliamo la posizione iniziale dal logo nella hero
-    // Altrimenti usiamo i valori impostati dal loading
-    let initialX = (gsap.getProperty(logo, 'x') as number) || 0
-    let initialY = (gsap.getProperty(logo, 'y') as number) || 0
+    const viewportCenterX = window.innerWidth / 2
+    const viewportCenterY = window.innerHeight / 2
+
+    // ========== POSIZIONI TARGET (in coordinate viewport) ==========
+
+    // POSIZIONE HERO: dove il logo deve essere nella hero (tra le due colonne)
+    const heroLogoRect = heroLogo.getBoundingClientRect()
+    const heroTargetX = heroLogoRect.left + heroLogoRect.width / 2  // Centro X del contenitore hero
+    const heroTargetY = heroLogoRect.top + heroLogoRect.height / 2  // Centro Y del contenitore hero
+
+    // POSIZIONE MIDFRAME: centro viewport
+    const midframeTargetX = viewportCenterX
+    const midframeTargetY = viewportCenterY
+
+    // POSIZIONE SERVIZI: sopra il badge nella sezione servizi
+    const logoStatico = serviziBlock.querySelector('img') as HTMLImageElement
+    const logoOffsetInBlock = logoStatico ? logoStatico.offsetTop : 0
+    const stickyTopPx = 0.20 * window.innerHeight
+    const maxWidth = Math.min(1280, window.innerWidth)
+    const sectionPaddingLeft = 32
+    const sectionLeft = (window.innerWidth - maxWidth) / 2 + sectionPaddingLeft
+
+    const serviziTargetX = sectionLeft + 62.5  // Centro del logo 125px
+    const serviziTargetY = stickyTopPx + logoOffsetInBlock + 62.5
+
+    // ========== CONVERSIONE A OFFSET GSAP ==========
+    // Il logo ha CSS: position:fixed, top:50%, left:50%, transform:translate(-50%,-50%)
+    // Quindi la posizione CSS base è il centro del viewport
+    // Per spostare il logo a una posizione viewport (targetX, targetY):
+    // gsapX = targetX - viewportCenterX
+    // gsapY = targetY - viewportCenterY
+
+    const heroGsapX = heroTargetX - viewportCenterX
+    const heroGsapY = heroTargetY - viewportCenterY
+    const midframeGsapX = 0  // Centro = nessun offset
+    const midframeGsapY = 0
+    const serviziGsapX = serviziTargetX - viewportCenterX
+    const serviziGsapY = serviziTargetY - viewportCenterY
+
+    // ========== SETUP INIZIALE ==========
+    let hasStartedScrolling = false
 
     if (hasSeenLoading) {
-      // Calcola la posizione del logo nella hero rispetto al centro della finestra
-      const heroLogoRect = heroLogo.getBoundingClientRect()
-      const heroLogoCenterX = heroLogoRect.left + heroLogoRect.width / 2
-      const heroLogoCenterY = heroLogoRect.top + heroLogoRect.height / 2
-      const viewportCenterX = window.innerWidth / 2
-      const viewportCenterY = window.innerHeight / 2
-
-      initialX = heroLogoCenterX - viewportCenterX
-      initialY = heroLogoCenterY - viewportCenterY
-
-      // Imposta posizione e scala iniziali del parallax logo
+      // Skip loading: posiziona il logo nella hero (invisibile)
       gsap.set(logo, {
-        x: initialX,
-        y: initialY,
+        x: heroGsapX,
+        y: heroGsapY,
         scale: heroScale,
-        opacity: 0, // Inizialmente nascosto, verrà mostrato quando si scrolla
+        opacity: 0,
         force3D: true,
       })
     }
+    // Se veniamo dal loading, il logo è già posizionato dal LoadingScreen
+    // e dovrebbe essere già nella posizione hero (heroGsapX, heroGsapY)
 
-    // Variabile per tracciare se siamo partiti
-    let hasStartedScrolling = false
-
-    // FASE 1: Hero -> Midframe (logo si ingrandisce e si centra)
+    // ========== FASE 1: Hero -> Midframe ==========
     const trigger1 = ScrollTrigger.create({
       trigger: heroSection,
       start: 'top top',
@@ -194,31 +222,23 @@ function HomePage() {
       onUpdate: (self) => {
         const progress = self.progress
 
-        // Se hasSeenLoading e inizia lo scroll, mostra parallax e nascondi hero logo
+        // Gestione visibilità per hasSeenLoading
         if (hasSeenLoading && progress > 0 && !hasStartedScrolling) {
           hasStartedScrolling = true
           gsap.set(logo, { opacity: 1 })
-          // Nascondi il logo nella hero
           const heroImg = heroLogo.querySelector('img')
-          if (heroImg) {
-            gsap.set(heroImg, { opacity: 0 })
-          }
+          if (heroImg) gsap.set(heroImg, { opacity: 0 })
         } else if (hasSeenLoading && progress === 0 && hasStartedScrolling) {
           hasStartedScrolling = false
           gsap.set(logo, { opacity: 0 })
-          // Mostra il logo nella hero
           const heroImg = heroLogo.querySelector('img')
-          if (heroImg) {
-            gsap.set(heroImg, { opacity: 1 })
-          }
+          if (heroImg) gsap.set(heroImg, { opacity: 1 })
         }
 
-        // Interpola scala da 125px a 546px
+        // Interpola da hero a midframe
         const currentScale = heroScale + (midframeScale - heroScale) * progress
-
-        // Interpola posizione da hero a centro (x=0, y=0)
-        const currentX = initialX * (1 - progress)
-        const currentY = initialY * (1 - progress)
+        const currentX = heroGsapX + (midframeGsapX - heroGsapX) * progress
+        const currentY = heroGsapY + (midframeGsapY - heroGsapY) * progress
 
         gsap.set(logo, {
           scale: currentScale,
@@ -229,45 +249,29 @@ function HomePage() {
       }
     })
 
-    // FASE 2: Midframe -> Servizi
-    // Il logo si rimpicciolisce e va verso la posizione finale (sopra il badge)
-    // La posizione finale è dove il logo statico apparirà
-
-    // Calcolo della posizione finale: quando serviziSection.top = 0 (viewport top),
-    // il logo deve essere allineato con il logo statico dentro serviziBlock
-    // Il logo statico ha top=20% della viewport + padding della sezione
-
+    // ========== FASE 2: Midframe -> Servizi ==========
     const trigger2 = ScrollTrigger.create({
       trigger: midframeSection,
       start: 'center center',
       endTrigger: serviziSection,
       end: 'top top',
-      scrub: 0.5,
+      scrub: 1,
       onUpdate: (self) => {
         const progress = self.progress
 
-        // Scala: si rimpicciolisce linearmente
+        // Interpola da midframe a servizi
         const currentScale = midframeScale + (serviziScale - midframeScale) * progress
+        const currentX = midframeGsapX + (serviziGsapX - midframeGsapX) * progress
+        const currentY = midframeGsapY + (serviziGsapY - midframeGsapY) * progress
 
-        // Calcola posizione finale in tempo reale basata sulla posizione del blocco servizi
-        // quando la sezione servizi è al top della viewport
-        const blockRect = serviziBlock.getBoundingClientRect()
-        const serviziRect = serviziSection.getBoundingClientRect()
-
-        // Offset del blocco rispetto alla sezione servizi (costante)
-        const blockOffsetFromSection = blockRect.top - serviziRect.top
-
-        // Quando progress=1, serviziSection.top = 0, quindi il logo statico sarà a:
-        // Y = blockOffsetFromSection (dalla top della viewport)
-        // X = blockRect.left (dalla sinistra della viewport)
-
-        // Il logo fixed è centrato (50%, 50%), quindi devo calcolare l'offset dal centro
-        const finalX = blockRect.left + 62.5 - (window.innerWidth / 2) // 62.5 = metà di 125px
-        const finalY = blockOffsetFromSection + 62.5 - (window.innerHeight / 2)
-
-        // Posizione: interpolazione lineare da centro (0,0) a posizione finale
-        const currentX = finalX * progress
-        const currentY = finalY * progress
+        // Transizione opacity al logo statico
+        if (progress >= 0.98) {
+          gsap.set(logo, { opacity: 0, force3D: true })
+          if (logoStatico) gsap.set(logoStatico, { opacity: 1 })
+        } else {
+          gsap.set(logo, { opacity: 1, force3D: true })
+          if (logoStatico) gsap.set(logoStatico, { opacity: 0 })
+        }
 
         gsap.set(logo, {
           scale: currentScale,
@@ -275,15 +279,6 @@ function HomePage() {
           y: currentY,
           force3D: true,
         })
-
-        // Transizione logo fixed -> logo statico
-        if (progress >= 0.95) {
-          gsap.set(logo, { opacity: 0, force3D: true })
-          setShowServiziLogo(true)
-        } else {
-          gsap.set(logo, { opacity: 1, force3D: true })
-          setShowServiziLogo(false)
-        }
       }
     })
 
@@ -445,7 +440,7 @@ function HomePage() {
         <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Colonna sinistra - sticky */}
           <div ref={serviziBlockRef} className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit relative">
-            {/* Logo statico sopra il badge */}
+            {/* Logo statico sopra il badge - opacity controllata da GSAP */}
             <img
               src={logoWebwiseCenter}
               alt="Webwise Logo"
@@ -453,8 +448,7 @@ function HomePage() {
               style={{
                 width: '125px',
                 height: '125px',
-                opacity: showServiziLogo ? 1 : 0,
-                transition: 'opacity 0.15s ease-out',
+                opacity: 0, // Inizialmente nascosto, GSAP lo mostra quando serve
                 marginBottom: '20px',
               }}
             />

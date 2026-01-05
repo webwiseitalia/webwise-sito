@@ -273,15 +273,23 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     tl.add(() => {
       if (heroLogoRef.current && logo) {
         const heroRect = heroLogoRef.current.getBoundingClientRect()
-        const logoRect = logo.getBoundingClientRect()
 
-        const deltaX = heroRect.left + heroRect.width / 2 - (logoRect.left + logoRect.width / 2)
-        const deltaY = heroRect.top + heroRect.height / 2 - (logoRect.top + logoRect.height / 2)
+        // Calcola la posizione TARGET in coordinate viewport
+        const heroTargetX = heroRect.left + heroRect.width / 2
+        const heroTargetY = heroRect.top + heroRect.height / 2
+
+        // Converti in offset GSAP (rispetto al centro viewport)
+        // Il logo ha CSS: position:fixed, top:50%, left:50%, transform:translate(-50%,-50%)
+        const viewportCenterX = window.innerWidth / 2
+        const viewportCenterY = window.innerHeight / 2
+
+        const targetGsapX = heroTargetX - viewportCenterX
+        const targetGsapY = heroTargetY - viewportCenterY
         const targetScale = 125 / 350
 
         gsap.to(logo, {
-          x: deltaX,
-          y: deltaY,
+          x: targetGsapX,
+          y: targetGsapY,
           scale: targetScale,
           duration: 0.8,
           ease: 'power3.inOut',
