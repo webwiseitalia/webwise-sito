@@ -157,63 +157,59 @@ function HomePage() {
 
     // Zoom massimo: 2x
     const maxScale = 2
+    const shaderEl = dotShaderRef.current
 
-    // Applica transizione CSS per smoothness extra
-    dotShaderRef.current.style.transition = 'transform 0.1s ease-out, opacity 0.1s ease-out'
+    // Abilita will-change per ottimizzazione GPU
+    shaderEl.style.willChange = 'transform, opacity'
 
-    // Trigger per lo zoom IN (hero -> midframe center)
-    const zoomInTrigger = ScrollTrigger.create({
-      trigger: heroSectionRef.current,
-      start: 'top top',
-      endTrigger: logoSectionRef.current,
-      end: 'center center',
-      scrub: 2.5,
-      onUpdate: (self) => {
-        if (dotShaderRef.current) {
-          const scale = 1 + (maxScale - 1) * self.progress
-          // Normale (non flippato) durante lo zoom in
-          dotShaderRef.current.style.transform = `scale(${scale})`
-          dotShaderRef.current.style.opacity = '1'
-        }
+    // Timeline per lo zoom IN (hero -> midframe center)
+    const zoomInTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: heroSectionRef.current,
+        start: 'top top',
+        endTrigger: logoSectionRef.current,
+        end: 'center center',
+        scrub: true,
       }
     })
+    zoomInTl.fromTo(shaderEl,
+      { scale: 1, scaleY: 1, opacity: 1 },
+      { scale: maxScale, scaleY: 1, opacity: 1, ease: 'none' }
+    )
 
-    // Trigger per lo zoom OUT con flip (midframe center -> inizio servizi)
-    const zoomOutTrigger = ScrollTrigger.create({
-      trigger: logoSectionRef.current,
-      start: 'center center',
-      endTrigger: serviziSectionRef.current,
-      end: 'top top',
-      scrub: 2.5,
-      onUpdate: (self) => {
-        if (dotShaderRef.current) {
-          // Dezoom da 2x a 1x
-          const scale = maxScale - (maxScale - 1) * self.progress
-          // Flippato verticalmente durante il dezoom
-          dotShaderRef.current.style.transform = `scale(${scale}) scaleY(-1)`
-          dotShaderRef.current.style.opacity = '1'
-        }
+    // Timeline per lo zoom OUT con flip (midframe center -> inizio servizi)
+    const zoomOutTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: logoSectionRef.current,
+        start: 'center center',
+        endTrigger: serviziSectionRef.current,
+        end: 'top top',
+        scrub: true,
       }
     })
+    zoomOutTl.fromTo(shaderEl,
+      { scale: maxScale, scaleY: -1, opacity: 1 },
+      { scale: 1, scaleY: -1, opacity: 1, ease: 'none' }
+    )
 
-    // Trigger per il fade out alla fine della sezione Servizi
-    const fadeOutTrigger = ScrollTrigger.create({
-      trigger: serviziSectionRef.current,
-      start: 'bottom bottom',
-      end: 'bottom top',
-      scrub: 2.5,
-      onUpdate: (self) => {
-        if (dotShaderRef.current) {
-          const opacity = 1 - self.progress
-          dotShaderRef.current.style.opacity = String(opacity)
-        }
+    // Timeline per il fade out alla fine della sezione Servizi
+    const fadeOutTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: serviziSectionRef.current,
+        start: 'bottom bottom',
+        end: 'bottom top',
+        scrub: true,
       }
     })
+    fadeOutTl.to(shaderEl, { opacity: 0, ease: 'none' })
 
     return () => {
-      zoomInTrigger.kill()
-      zoomOutTrigger.kill()
-      fadeOutTrigger.kill()
+      zoomInTl.scrollTrigger?.kill()
+      zoomOutTl.scrollTrigger?.kill()
+      fadeOutTl.scrollTrigger?.kill()
+      zoomInTl.kill()
+      zoomOutTl.kill()
+      fadeOutTl.kill()
     }
   }, [hasSeenLoading])
 
