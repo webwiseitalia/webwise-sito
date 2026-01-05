@@ -1,57 +1,9 @@
 import { useState, useRef } from 'react'
-
-interface Project {
-  id: number
-  name: string
-  industry: string
-  tools: string
-  category: string
-  year: string
-  image?: string
-  href: string
-}
-
-const projects: Project[] = [
-  {
-    id: 1,
-    name: 'Consorzio Vadò',
-    industry: 'Industry',
-    tools: 'React',
-    category: 'Website',
-    year: '2025',
-    href: '#'
-  },
-  {
-    id: 2,
-    name: 'Medusa',
-    industry: 'Blockchain',
-    tools: 'Nextjs',
-    category: 'Software',
-    year: '2024',
-    href: '#'
-  },
-  {
-    id: 3,
-    name: 'Quercetti S.p.A.',
-    industry: 'Toys',
-    tools: 'Shopify',
-    category: 'Ecommerce',
-    year: '2021',
-    href: '#'
-  },
-  {
-    id: 4,
-    name: 'Top Gear',
-    industry: 'Automotive',
-    tools: 'Drupal',
-    category: 'Website',
-    year: '2022',
-    href: '#'
-  },
-]
+import { Link } from 'react-router-dom'
+import { projects } from '../data/projects'
 
 export default function ProjectsTable() {
-  const [hoveredProject, setHoveredProject] = useState<number | null>(null)
+  const [hoveredProject, setHoveredProject] = useState<string | null>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -72,11 +24,11 @@ export default function ProjectsTable() {
       onMouseMove={handleMouseMove}
     >
       {/* Titolo */}
-      <a href="#" className="inline-block mb-10 lg:mb-12">
-        <h2 className="text-white text-4xl lg:text-5xl font-semibold hover:text-red-500 transition-colors">
+      <Link to="/#portfolio" className="inline-block mb-10 lg:mb-12">
+        <h2 className="text-white text-4xl lg:text-5xl font-semibold hover:text-[#2EBAEB] transition-colors">
           Progetti
         </h2>
-      </a>
+      </Link>
 
       {/* Preview immagine che segue il mouse (solo desktop) */}
       {hoveredProject !== null && (
@@ -89,7 +41,7 @@ export default function ProjectsTable() {
             transition: 'transform 0.2s ease-out'
           }}
         >
-          <div className="w-[250px] h-[250px] bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center">
+          <div className="w-[250px] h-[250px] bg-gradient-to-br from-[#2EBAEB]/30 to-[#2EBAEB]/10 flex items-center justify-center border border-[#2EBAEB]/20">
             <span className="text-white font-bold text-sm">
               {projects.find(p => p.id === hoveredProject)?.name}
             </span>
@@ -120,9 +72,9 @@ export default function ProjectsTable() {
 
         {/* Righe progetti */}
         {projects.map((project) => (
-          <a
+          <Link
             key={project.id}
-            href={project.href}
+            to={`/progetti/${project.slug}`}
             className="grid grid-cols-12 gap-4 px-4 py-8 lg:py-10 border-b border-gray-800 group hover:bg-white/5 transition-colors"
             onMouseEnter={() => setHoveredProject(project.id)}
             onMouseLeave={() => setHoveredProject(null)}
@@ -130,8 +82,8 @@ export default function ProjectsTable() {
             {/* Nome progetto */}
             <div className="col-span-4 sm:col-span-3 flex items-center gap-4">
               {/* Thumbnail mobile */}
-              <div className="lg:hidden w-[60px] h-[60px] rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-red-500 to-red-800" />
-              <p className="text-white text-lg lg:text-xl font-bold group-hover:text-red-500 group-hover:translate-x-2 transition-all">
+              <div className="lg:hidden w-[60px] h-[60px] rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-[#2EBAEB]/30 to-[#2EBAEB]/10" />
+              <p className="text-white text-lg lg:text-xl font-bold group-hover:text-[#2EBAEB] group-hover:translate-x-2 transition-all">
                 {project.name}
               </p>
             </div>
@@ -143,7 +95,7 @@ export default function ProjectsTable() {
 
             {/* Strumenti */}
             <div className="hidden lg:flex col-span-2 items-center">
-              <p className="text-gray-400 text-base">{project.tools}</p>
+              <p className="text-gray-400 text-base">{project.tools[0]}</p>
             </div>
 
             {/* Categoria */}
@@ -155,7 +107,7 @@ export default function ProjectsTable() {
             <div className="col-span-8 sm:col-span-4 md:col-span-2 flex items-center justify-end sm:justify-start">
               <p className="text-gray-400 text-base">{project.year}</p>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </div>

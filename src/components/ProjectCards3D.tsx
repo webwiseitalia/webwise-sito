@@ -1,22 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-
-interface Project {
-  id: number
-  title: string
-  image?: string
-  href: string
-}
-
-const projects: Project[] = [
-  { id: 1, title: 'Progetto 1', href: '#' },
-  { id: 2, title: 'Progetto 2', href: '#' },
-  { id: 3, title: 'Progetto 3', href: '#' },
-  { id: 4, title: 'Progetto 4', href: '#' },
-  { id: 5, title: 'Progetto 5', href: '#' },
-  { id: 6, title: 'Progetto 6', href: '#' },
-  { id: 7, title: 'Progetto 7', href: '#' },
-  { id: 8, title: 'Progetto 8', href: '#' },
-]
+import { Link } from 'react-router-dom'
+import { projects } from '../data/projects'
 
 export default function ProjectCards3D() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -56,6 +40,9 @@ export default function ProjectCards3D() {
     setRotation({ x: 0, y: -25 })
   }
 
+  // Usa i primi 8 progetti (o duplica se sono meno)
+  const cardProjects = projects.slice(0, 8)
+
   return (
     <div
       ref={containerRef}
@@ -77,21 +64,21 @@ export default function ProjectCards3D() {
           height: '380px'
         }}
       >
-        {projects.map((project, index) => {
+        {cardProjects.map((project, index) => {
           // Centra le card: metà vanno avanti, metà indietro
-          const centerIndex = (projects.length - 1) / 2
+          const centerIndex = (cardProjects.length - 1) / 2
           const baseOffset = (index - centerIndex) * 100
           const isCardHovered = hoveredCard === index
           // Quando in hover, la card si alza verso l'alto (translateY negativo)
           const translateY = isCardHovered ? -80 : 0
           return (
-            <a
+            <Link
               key={project.id}
-              href={project.href}
+              to={`/progetti/${project.slug}`}
               className="block w-full h-full overflow-hidden absolute cursor-pointer group"
               style={{
                 backgroundColor: '#2EBAEB',
-                backgroundImage: project.image ? `url(${project.image})` : undefined,
+                backgroundImage: project.heroImage ? `url(${project.heroImage})` : undefined,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 transform: `translateZ(${baseOffset}px) translateY(${translateY}px)`,
@@ -102,18 +89,18 @@ export default function ProjectCards3D() {
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
             >
-              {!project.image && (
-                <div className="absolute inset-0 bg-gradient-to-br from-red-500 to-red-800" />
+              {!project.heroImage && (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#2EBAEB] to-[#1a8fb8]" />
               )}
               <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div
                 className="absolute bottom-0 left-0 right-0 p-4 text-white font-semibold text-lg opacity-0 group-hover:opacity-100 transition-all transform translate-y-4 group-hover:translate-y-0"
                 style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
               >
-                {project.title}
+                {project.name}
               </div>
               <div className="absolute inset-0 bg-black/50 opacity-50" />
-            </a>
+            </Link>
           )
         })}
       </div>

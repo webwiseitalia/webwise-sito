@@ -13,6 +13,8 @@ import LoadingScreen from './components/LoadingScreen'
 import SoftwarePage from './pages/SoftwarePage'
 import ReservlyPage from './pages/ReservlyPage'
 import CareersPage from './pages/CareersPage'
+import ProjectPage from './pages/ProjectPage'
+import ScrollToTop from './components/ScrollToTop'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -62,9 +64,14 @@ function TypewriterText({
 }
 
 function HomePage() {
-  const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>('loading')
-  const [showLoading, setShowLoading] = useState(true)
-  const [showHeroLogo, setShowHeroLogo] = useState(false)
+  // Controlla se l'animazione di loading è già stata mostrata in questa sessione
+  const hasSeenLoading = sessionStorage.getItem('hasSeenLoading') === 'true'
+
+  const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>(
+    hasSeenLoading ? 'complete' : 'loading'
+  )
+  const [showLoading, setShowLoading] = useState(!hasSeenLoading)
+  const [showHeroLogo, setShowHeroLogo] = useState(true)
   const [showServiziLogo, setShowServiziLogo] = useState(false)
   const heroLogoRef = useRef<HTMLDivElement>(null)
   const navbarRef = useRef<HTMLElement>(null)
@@ -76,8 +83,7 @@ function HomePage() {
   const serviziSectionRef = useRef<HTMLElement>(null)
   const serviziBlockRef = useRef<HTMLDivElement>(null)
 
-  // L'animazione parte sempre ad ogni caricamento
-  // showLoading è già true e showHeroLogo è già false per default
+  // L'animazione parte solo la prima volta che si visita la homepage
 
   // Callback quando il logo del loading arriva nella posizione della hero
   const handleLogoArrived = useCallback(() => {
@@ -98,6 +104,9 @@ function HomePage() {
 
   const handleLogoTransitionComplete = useCallback(() => {
     setShowLoading(false)
+
+    // Segna che l'animazione è stata vista in questa sessione
+    sessionStorage.setItem('hasSeenLoading', 'true')
 
     // Riporta lo scroll in cima alla pagina (alla hero)
     window.scrollTo(0, 0)
@@ -131,23 +140,49 @@ function HomePage() {
 
   // Parallax del logo: Hero -> Midframe -> Servizi
   useEffect(() => {
-    if (showLoading || !parallaxLogoRef.current || !heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current || !serviziBlockRef.current) return
+    if (showLoading || !parallaxLogoRef.current || !heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current || !serviziBlockRef.current || !heroLogoRef.current) return
 
     const logo = parallaxLogoRef.current
     const heroSection = heroSectionRef.current
+    const heroLogo = heroLogoRef.current
     const midframeSection = logoSectionRef.current
     const serviziSection = serviziSectionRef.current
     const serviziBlock = serviziBlockRef.current
-
-    // Leggi le trasformazioni correnti del logo (impostate dal loading)
-    const initialX = (gsap.getProperty(logo, 'x') as number) || 0
-    const initialY = (gsap.getProperty(logo, 'y') as number) || 0
 
     // Scale values
     const baseSize = 350
     const heroScale = 125 / baseSize      // Logo nella hero (125px)
     const midframeScale = 546 / baseSize  // Logo grande nel midframe (546px)
     const serviziScale = 125 / baseSize   // Logo nei servizi (125px)
+
+    // Se hasSeenLoading, calcoliamo la posizione iniziale dal logo nella hero
+    // Altrimenti usiamo i valori impostati dal loading
+    let initialX = (gsap.getProperty(logo, 'x') as number) || 0
+    let initialY = (gsap.getProperty(logo, 'y') as number) || 0
+
+    if (hasSeenLoading) {
+      // Calcola la posizione del logo nella hero rispetto al centro della finestra
+      const heroLogoRect = heroLogo.getBoundingClientRect()
+      const heroLogoCenterX = heroLogoRect.left + heroLogoRect.width / 2
+      const heroLogoCenterY = heroLogoRect.top + heroLogoRect.height / 2
+      const viewportCenterX = window.innerWidth / 2
+      const viewportCenterY = window.innerHeight / 2
+
+      initialX = heroLogoCenterX - viewportCenterX
+      initialY = heroLogoCenterY - viewportCenterY
+
+      // Imposta posizione e scala iniziali del parallax logo
+      gsap.set(logo, {
+        x: initialX,
+        y: initialY,
+        scale: heroScale,
+        opacity: 0, // Inizialmente nascosto, verrà mostrato quando si scrolla
+        force3D: true,
+      })
+    }
+
+    // Variabile per tracciare se siamo partiti
+    let hasStartedScrolling = false
 
     // FASE 1: Hero -> Midframe (logo si ingrandisce e si centra)
     const trigger1 = ScrollTrigger.create({
@@ -158,6 +193,25 @@ function HomePage() {
       scrub: 1,
       onUpdate: (self) => {
         const progress = self.progress
+
+        // Se hasSeenLoading e inizia lo scroll, mostra parallax e nascondi hero logo
+        if (hasSeenLoading && progress > 0 && !hasStartedScrolling) {
+          hasStartedScrolling = true
+          gsap.set(logo, { opacity: 1 })
+          // Nascondi il logo nella hero
+          const heroImg = heroLogo.querySelector('img')
+          if (heroImg) {
+            gsap.set(heroImg, { opacity: 0 })
+          }
+        } else if (hasSeenLoading && progress === 0 && hasStartedScrolling) {
+          hasStartedScrolling = false
+          gsap.set(logo, { opacity: 0 })
+          // Mostra il logo nella hero
+          const heroImg = heroLogo.querySelector('img')
+          if (heroImg) {
+            gsap.set(heroImg, { opacity: 1 })
+          }
+        }
 
         // Interpola scala da 125px a 546px
         const currentScale = heroScale + (midframeScale - heroScale) * progress
@@ -237,22 +291,47 @@ function HomePage() {
       trigger1.kill()
       trigger2.kill()
     }
-  }, [showLoading])
+  }, [showLoading, hasSeenLoading])
+
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Loading Screen - non viene mai rimosso, solo reso trasparente */}
-      <LoadingScreen
-        onLogoTransitionComplete={handleLogoTransitionComplete}
-        heroLogoRef={heroLogoRef}
-        onLogoArrived={handleLogoArrived}
-        parallaxLogoRef={parallaxLogoRef}
-      />
+      {/* Loading Screen - mostra solo la prima volta */}
+      {!hasSeenLoading && (
+        <LoadingScreen
+          onLogoTransitionComplete={handleLogoTransitionComplete}
+          heroLogoRef={heroLogoRef}
+          onLogoArrived={handleLogoArrived}
+          parallaxLogoRef={parallaxLogoRef}
+        />
+      )}
+
+      {/* Logo Parallax Fixed - solo quando saltiamo il loading (altrimenti lo crea LoadingScreen) */}
+      {hasSeenLoading && (
+        <img
+          ref={parallaxLogoRef}
+          src={logoWebwiseCenter}
+          alt="Webwise Logo Parallax"
+          className="invert pointer-events-none"
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%) translateZ(0)',
+            width: '350px',
+            height: '350px',
+            zIndex: 40,
+            backfaceVisibility: 'hidden',
+            opacity: 0, // Inizialmente nascosto, il parallax lo mostrerà quando si scrolla
+          }}
+        />
+      )}
+
 
       {/* Navbar fixed */}
       <nav
         ref={navbarRef}
-        style={{ opacity: showLoading ? 0 : 1 }}
+        style={{ opacity: hasSeenLoading || !showLoading ? 1 : 0 }}
       >
         <Navbar />
       </nav>
@@ -308,7 +387,7 @@ function HomePage() {
             <div
               ref={leftColumnRef}
               className="text-white font-semibold text-right tracking-wide"
-              style={{ minWidth: '280px', opacity: showLoading ? 0 : (showFullContent ? 1 : 0) }}
+              style={{ minWidth: '280px', opacity: hasSeenLoading ? 1 : (showLoading ? 0 : (showFullContent ? 1 : 0)) }}
             >
               <p style={{ whiteSpace: 'nowrap' }}>SMARTER SYSTEMS</p>
               <p style={{ whiteSpace: 'nowrap' }}>BETTER<span style={{ marginLeft: '100px' }}>WORK</span></p>
@@ -323,7 +402,7 @@ function HomePage() {
                 style={{
                   width: '125px',
                   height: '125px',
-                  opacity: 0,
+                  opacity: hasSeenLoading ? 1 : 0,
                 }}
               />
             </div>
@@ -332,7 +411,7 @@ function HomePage() {
             <div
               ref={rightColumnRef}
               className="text-white font-semibold text-left tracking-wide"
-              style={{ minWidth: '280px', opacity: showLoading ? 0 : (showFullContent ? 1 : 0) }}
+              style={{ minWidth: '280px', opacity: hasSeenLoading ? 1 : (showLoading ? 0 : (showFullContent ? 1 : 0)) }}
             >
               <p>EST. 2022</p>
               <p style={{ paddingLeft: '60px', whiteSpace: 'nowrap' }}>→ EFFICENCY</p>
@@ -755,12 +834,16 @@ function HomePage() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/software/:softwareId" element={<SoftwarePage />} />
-      <Route path="/reservly" element={<ReservlyPage />} />
-      <Route path="/careers" element={<CareersPage />} />
-    </Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/software/:softwareId" element={<SoftwarePage />} />
+        <Route path="/reservly" element={<ReservlyPage />} />
+        <Route path="/careers" element={<CareersPage />} />
+        <Route path="/progetti/:projectSlug" element={<ProjectPage />} />
+      </Routes>
+    </>
   )
 }
 
