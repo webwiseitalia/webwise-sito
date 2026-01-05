@@ -149,16 +149,6 @@ function HomePage() {
     const midframeScale = 546 / baseSize  // Logo grande nel midframe (546px)
     const serviziScale = 125 / baseSize   // Logo nei servizi (125px)
 
-    // Posizione finale: a sinistra del titolo "Servizi"
-    const calculateFinalPosition = () => {
-      const blockRect = serviziBlock.getBoundingClientRect()
-      const logoSize = 125
-      // A sinistra del blocco, allineato con il titolo
-      const targetX = blockRect.left - logoSize - 30 - (window.innerWidth / 2) + (logoSize / 2)
-      const targetY = blockRect.top + 50 - (window.innerHeight / 2) // Allineato al titolo
-      return { x: targetX, y: targetY }
-    }
-
     // FASE 1: Hero -> Midframe (logo si ingrandisce e si centra)
     const trigger1 = ScrollTrigger.create({
       trigger: heroSection,
@@ -186,34 +176,44 @@ function HomePage() {
     })
 
     // FASE 2: Midframe -> Servizi
-    // Dal centro del midframe: prima va a sinistra, poi scende
+    // Il logo si rimpicciolisce e va verso la posizione finale (sopra il badge)
+    // La posizione finale è dove il logo statico apparirà
+
+    // Calcolo della posizione finale: quando serviziSection.top = 0 (viewport top),
+    // il logo deve essere allineato con il logo statico dentro serviziBlock
+    // Il logo statico ha top=20% della viewport + padding della sezione
+
     const trigger2 = ScrollTrigger.create({
       trigger: midframeSection,
       start: 'center center',
       endTrigger: serviziSection,
       end: 'top top',
-      scrub: 1,
+      scrub: 0.5,
       onUpdate: (self) => {
         const progress = self.progress
-        const finalPos = calculateFinalPosition()
 
-        // Rimpicciolisce subito
-        const scaleProgress = Math.min(progress / 0.3, 1)
-        const currentScale = midframeScale + (serviziScale - midframeScale) * scaleProgress
+        // Scala: si rimpicciolisce linearmente
+        const currentScale = midframeScale + (serviziScale - midframeScale) * progress
 
-        let currentX, currentY
+        // Calcola posizione finale in tempo reale basata sulla posizione del blocco servizi
+        // quando la sezione servizi è al top della viewport
+        const blockRect = serviziBlock.getBoundingClientRect()
+        const serviziRect = serviziSection.getBoundingClientRect()
 
-        if (progress < 0.5) {
-          // Prima metà: vai a sinistra, resta al centro (Y = 0)
-          const subProgress = progress / 0.5
-          currentX = finalPos.x * subProgress
-          currentY = 0
-        } else {
-          // Seconda metà: già a sinistra, ora scendi
-          const subProgress = (progress - 0.5) / 0.5
-          currentX = finalPos.x
-          currentY = finalPos.y * subProgress
-        }
+        // Offset del blocco rispetto alla sezione servizi (costante)
+        const blockOffsetFromSection = blockRect.top - serviziRect.top
+
+        // Quando progress=1, serviziSection.top = 0, quindi il logo statico sarà a:
+        // Y = blockOffsetFromSection (dalla top della viewport)
+        // X = blockRect.left (dalla sinistra della viewport)
+
+        // Il logo fixed è centrato (50%, 50%), quindi devo calcolare l'offset dal centro
+        const finalX = blockRect.left + 62.5 - (window.innerWidth / 2) // 62.5 = metà di 125px
+        const finalY = blockOffsetFromSection + 62.5 - (window.innerHeight / 2)
+
+        // Posizione: interpolazione lineare da centro (0,0) a posizione finale
+        const currentX = finalX * progress
+        const currentY = finalY * progress
 
         gsap.set(logo, {
           scale: currentScale,
@@ -223,7 +223,7 @@ function HomePage() {
         })
 
         // Transizione logo fixed -> logo statico
-        if (progress >= 0.98) {
+        if (progress >= 0.95) {
           gsap.set(logo, { opacity: 0, force3D: true })
           setShowServiziLogo(true)
         } else {
@@ -366,18 +366,17 @@ function HomePage() {
         <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Colonna sinistra - sticky */}
           <div ref={serviziBlockRef} className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit relative">
-            {/* Logo statico a sinistra del titolo */}
+            {/* Logo statico sopra il badge */}
             <img
               src={logoWebwiseCenter}
               alt="Webwise Logo"
-              className="invert absolute"
+              className="invert"
               style={{
-                top: '50px',
-                left: '-155px',
                 width: '125px',
                 height: '125px',
                 opacity: showServiziLogo ? 1 : 0,
                 transition: 'opacity 0.15s ease-out',
+                marginBottom: '20px',
               }}
             />
             {/* Badge */}
