@@ -168,6 +168,9 @@ function HomePage() {
     const serviziSection = serviziSectionRef.current
 
     // Stato iniziale: solo hero visibile a 1x, servizi nascosto
+    // will-change per ottimizzare il rendering GPU
+    heroShader.style.willChange = 'transform, opacity'
+    serviziShader.style.willChange = 'transform, opacity'
     heroShader.style.opacity = '1'
     heroShader.style.transform = 'scale(1)'
     serviziShader.style.opacity = '0'
@@ -184,7 +187,7 @@ function HomePage() {
       start: 'top top',
       endTrigger: midframeSection,
       end: 'center center',
-      scrub: 1,
+      scrub: 0.5,
       onUpdate: (self) => {
         phase1Progress = self.progress
 
@@ -214,7 +217,7 @@ function HomePage() {
       start: 'center center',
       endTrigger: serviziSection,
       end: 'top top',
-      scrub: 1,
+      scrub: 0.5,
       onUpdate: (self) => {
         phase2Progress = self.progress
 
