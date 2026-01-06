@@ -195,15 +195,15 @@ function HomePage() {
         const scale = 1 + phase1Progress // 1 → 2
         heroShader.style.transform = `scale(${scale})`
 
-        // Quando phase1 >= 0.90 e phase2 <= 0.10, siamo nella zona del logo nitido
-        // Qui avviene il flip istantaneo
-        if (phase1Progress >= 0.90 && phase2Progress <= 0.10) {
+        // Flip istantaneo solo quando arriviamo molto vicini a 2x (phase1 >= 0.99)
+        // Così il salto da 1.99x a 2x è impercettibile
+        if (phase1Progress >= 0.99 && phase2Progress <= 0.01) {
           // Swap: nascondi hero, mostra servizi a 2x flippato
           heroShader.style.opacity = '0'
           serviziShader.style.opacity = '1'
           serviziShader.style.transform = 'scale(2) scaleY(-1)'
-        } else if (phase1Progress < 0.90) {
-          // Prima della zona flip: mostra hero
+        } else if (phase1Progress < 0.99) {
+          // Prima del flip: mostra hero con zoom animato
           heroShader.style.opacity = '1'
           serviziShader.style.opacity = '0'
         }
@@ -221,18 +221,18 @@ function HomePage() {
       onUpdate: (self) => {
         phase2Progress = self.progress
 
-        // Quando phase2 > 0.10, inizia lo zoom out
-        if (phase2Progress > 0.10) {
+        // Inizia subito lo zoom out quando phase2 > 0.01
+        if (phase2Progress > 0.01) {
           // Nascondi hero, mostra servizi
           heroShader.style.opacity = '0'
           serviziShader.style.opacity = '1'
 
-          // Dezoom da 2x a 1x (normalizzato da 0.10-1.0 a 0-1)
-          const normalizedProgress = (phase2Progress - 0.10) / 0.90
+          // Dezoom da 2x a 1x (normalizzato da 0.01-1.0 a 0-1)
+          const normalizedProgress = (phase2Progress - 0.01) / 0.99
           const scale = 2 - normalizedProgress // 2 → 1
           serviziShader.style.transform = `scale(${scale}) scaleY(-1)`
           // Lo sfondo rimane visibile nella sezione servizi (niente fade out)
-        } else if (phase1Progress >= 0.90) {
+        } else if (phase1Progress >= 0.99) {
           // Nella zona flip: mostra servizi a 2x
           heroShader.style.opacity = '0'
           serviziShader.style.opacity = '1'
