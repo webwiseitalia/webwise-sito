@@ -84,7 +84,8 @@ function HomePage() {
   const logoSectionRef = useRef<HTMLElement>(null)
   const serviziSectionRef = useRef<HTMLElement>(null)
   const serviziBlockRef = useRef<HTMLDivElement>(null)
-  const dotShaderRef = useRef<HTMLDivElement>(null)
+  const heroShaderRef = useRef<HTMLDivElement>(null)
+  const serviziShaderRef = useRef<HTMLDivElement>(null)
 
   // L'animazione parte solo la prima volta che si visita la homepage
 
@@ -151,61 +152,88 @@ function HomePage() {
     }
   }, [showLoading])
 
-  // ScrollTrigger per lo zoom/dezoom dello sfondo shader (sincronizzato con il logo)
+  // ScrollTrigger per effetto parallax con ZOOM
+  // Sincronizzato con i timing del ParticleLogo:
+  // - FASE 1: hero top → midframe center center (zoom 1x → 2x)
+  // - FLIP: quando il logo è nitido nel midframe (phase1 >= 0.90 && phase2 <= 0.10)
+  // - FASE 2: midframe center center → servizi top top (zoom 2x → 1x)
   useEffect(() => {
-    if (!heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current || !dotShaderRef.current) return
+    if (!heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current) return
+    if (!heroShaderRef.current || !serviziShaderRef.current) return
 
-    // Zoom massimo: 2x
-    const maxScale = 2
+    const heroShader = heroShaderRef.current
+    const serviziShader = serviziShaderRef.current
+    const heroSection = heroSectionRef.current
+    const midframeSection = logoSectionRef.current
+    const serviziSection = serviziSectionRef.current
 
-    // Applica transizione CSS per smoothness extra
-    dotShaderRef.current.style.transition = 'transform 0.1s ease-out, opacity 0.1s ease-out'
+    // Stato iniziale: solo hero visibile a 1x, servizi nascosto
+    heroShader.style.opacity = '1'
+    heroShader.style.transform = 'scale(1)'
+    serviziShader.style.opacity = '0'
+    serviziShader.style.transform = 'scale(2) scaleY(-1)'
 
-    // Trigger per lo zoom IN (hero -> midframe center)
+    // Variabili per tracciare il progress delle due fasi (come ParticleLogo)
+    let phase1Progress = 0
+    let phase2Progress = 0
+
+    // FASE 1: Zoom IN da 1x a 2x (stessi trigger del ParticleLogo)
+    // Da hero top → midframe center center
     const zoomInTrigger = ScrollTrigger.create({
-      trigger: heroSectionRef.current,
+      trigger: heroSection,
       start: 'top top',
-      endTrigger: logoSectionRef.current,
+      endTrigger: midframeSection,
       end: 'center center',
-      scrub: 2.5,
+      scrub: 1,
       onUpdate: (self) => {
-        if (dotShaderRef.current) {
-          const scale = 1 + (maxScale - 1) * self.progress
-          // Normale (non flippato) durante lo zoom in
-          dotShaderRef.current.style.transform = `scale(${scale})`
-          dotShaderRef.current.style.opacity = '1'
+        phase1Progress = self.progress
+
+        // Zoom da 1x a 2x
+        const scale = 1 + phase1Progress // 1 → 2
+        heroShader.style.transform = `scale(${scale})`
+
+        // Quando phase1 >= 0.90 e phase2 <= 0.10, siamo nella zona del logo nitido
+        // Qui avviene il flip istantaneo
+        if (phase1Progress >= 0.90 && phase2Progress <= 0.10) {
+          // Swap: nascondi hero, mostra servizi a 2x flippato
+          heroShader.style.opacity = '0'
+          serviziShader.style.opacity = '1'
+          serviziShader.style.transform = 'scale(2) scaleY(-1)'
+        } else if (phase1Progress < 0.90) {
+          // Prima della zona flip: mostra hero
+          heroShader.style.opacity = '1'
+          serviziShader.style.opacity = '0'
         }
       }
     })
 
-    // Trigger per lo zoom OUT con flip (midframe center -> inizio servizi)
+    // FASE 2: Zoom OUT da 2x a 1x (stessi trigger del ParticleLogo)
+    // Da midframe center center → servizi top top
     const zoomOutTrigger = ScrollTrigger.create({
-      trigger: logoSectionRef.current,
+      trigger: midframeSection,
       start: 'center center',
-      endTrigger: serviziSectionRef.current,
+      endTrigger: serviziSection,
       end: 'top top',
-      scrub: 2.5,
+      scrub: 1,
       onUpdate: (self) => {
-        if (dotShaderRef.current) {
-          // Dezoom da 2x a 1x
-          const scale = maxScale - (maxScale - 1) * self.progress
-          // Flippato verticalmente durante il dezoom
-          dotShaderRef.current.style.transform = `scale(${scale}) scaleY(-1)`
-          dotShaderRef.current.style.opacity = '1'
-        }
-      }
-    })
+        phase2Progress = self.progress
 
-    // Trigger per il fade out alla fine della sezione Servizi
-    const fadeOutTrigger = ScrollTrigger.create({
-      trigger: serviziSectionRef.current,
-      start: 'bottom bottom',
-      end: 'bottom top',
-      scrub: 2.5,
-      onUpdate: (self) => {
-        if (dotShaderRef.current) {
-          const opacity = 1 - self.progress
-          dotShaderRef.current.style.opacity = String(opacity)
+        // Quando phase2 > 0.10, inizia lo zoom out
+        if (phase2Progress > 0.10) {
+          // Nascondi hero, mostra servizi
+          heroShader.style.opacity = '0'
+          serviziShader.style.opacity = '1'
+
+          // Dezoom da 2x a 1x (normalizzato da 0.10-1.0 a 0-1)
+          const normalizedProgress = (phase2Progress - 0.10) / 0.90
+          const scale = 2 - normalizedProgress // 2 → 1
+          serviziShader.style.transform = `scale(${scale}) scaleY(-1)`
+          // Lo sfondo rimane visibile nella sezione servizi (niente fade out)
+        } else if (phase1Progress >= 0.90) {
+          // Nella zona flip: mostra servizi a 2x
+          heroShader.style.opacity = '0'
+          serviziShader.style.opacity = '1'
+          serviziShader.style.transform = 'scale(2) scaleY(-1)'
         }
       }
     })
@@ -213,7 +241,6 @@ function HomePage() {
     return () => {
       zoomInTrigger.kill()
       zoomOutTrigger.kill()
-      fadeOutTrigger.kill()
     }
   }, [hasSeenLoading])
 
@@ -249,18 +276,6 @@ function HomePage() {
         <Navbar />
       </nav>
 
-      {/* Dot Shader Background - Fixed, zooma con lo scroll, blend mode per vedere il contenuto */}
-      <div
-        ref={dotShaderRef}
-        className="fixed inset-0 z-30 pointer-events-none"
-        style={{
-          transformOrigin: 'center center',
-          mixBlendMode: 'screen',
-        }}
-      >
-        <DotShaderBackground />
-      </div>
-
       {/* Hero Section - 1920x1080 con sfondo nero */}
       <section
         ref={heroSectionRef}
@@ -269,6 +284,18 @@ function HomePage() {
           aspectRatio: '1920 / 1080'
         }}
       >
+        {/* Sfondo Hero - dritto, scala 1x, position fixed per evitare bande nere */}
+        <div
+          ref={heroShaderRef}
+          className="fixed inset-0 z-0 pointer-events-none"
+          style={{
+            mixBlendMode: 'screen',
+            transformOrigin: 'center center',
+          }}
+        >
+          <DotShaderBackground />
+        </div>
+
         <div className="flex flex-col items-center text-center px-4 relative z-10">
           {/* Titolo principale - Inter SemiBold 75px */}
           <div className="text-white font-semibold tracking-tight" style={{ fontSize: '75px', lineHeight: '1.1' }}>
@@ -345,17 +372,17 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Sezione Logo Centrale - 1920x1080 con sfondo trasparente per vedere lo shader */}
-      {/* Il logo qui è animato dal parallax, non serve un'immagine statica */}
+      {/* Sezione Logo Centrale - 1920x1080 con sfondo trasparente */}
       <section
         ref={logoSectionRef}
-        className="w-full bg-transparent flex items-center justify-center"
+        className="w-full bg-transparent flex items-center justify-center relative overflow-hidden"
         style={{
           aspectRatio: '1920 / 1080'
         }}
       >
+        {/* Nessuno sfondo qui - lo zoom continua sugli sfondi hero/servizi */}
         {/* Placeholder invisibile per mantenere le proporzioni */}
-        <div style={{ width: '437px', height: '437px' }} />
+        <div style={{ width: '437px', height: '437px' }} className="relative z-10" />
       </section>
 
       {/* Sezione Servizi - 1920x1400 con sfondo nero */}
@@ -367,6 +394,19 @@ function HomePage() {
           aspectRatio: '1920 / 1400'
         }}
       >
+        {/* Sfondo Servizi - flippato, scala 1x */}
+        <div
+          ref={serviziShaderRef}
+          className="fixed inset-0 z-0 pointer-events-none"
+          style={{
+            mixBlendMode: 'screen',
+            transformOrigin: 'center center',
+            transform: 'scale(2) scaleY(-1)', // Inizia a 2x flippato, poi dezoom a 1x
+          }}
+        >
+          <DotShaderBackground />
+        </div>
+
         <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Colonna sinistra - sticky */}
           <div ref={serviziBlockRef} className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit relative">
