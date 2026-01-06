@@ -116,7 +116,7 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     const logoRadius = 175
     const maxDistance = Math.max(centerX, centerY)
 
-    return generateSnakes(20, centerX, centerY, logoRadius, maxDistance)
+    return generateSnakes(25, centerX, centerY, logoRadius, maxDistance)
   }, [])
 
   useEffect(() => {

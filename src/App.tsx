@@ -434,7 +434,7 @@ function HomePage() {
           </div>
 
           {/* Colonna destra - card servizi con sticky stacking */}
-          <div className="flex flex-col mt-[400px]">
+          <div className="flex flex-col mt-[200px]">
             {/* Card Ecommerce */}
             <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '35vh', zIndex: 1 }}>
               <div className="flex items-start gap-4 mb-4">
