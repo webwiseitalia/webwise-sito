@@ -144,8 +144,8 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
       clipPath: 'inset(100% 0 0 0)', // Completamente nascosta dall'alto
     })
 
-    // Durata del fade-in iniziale
-    const fadeInDuration = 0.6
+    // Durata del fade-in iniziale (ridotta per 2s totali)
+    const fadeInDuration = 0.3
 
     // Fase 0: Fade-in del logo
     tl.to(logo, {
@@ -178,15 +178,15 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     // Fade-in delle percentuali (dopo il fade-in del logo)
     tl.to([percentageEl, percentageHighlightEl], {
       opacity: 1,
-      duration: 0.3,
+      duration: 0.1,
       ease: 'power2.out',
     }, fadeInDuration)
 
-    // Animazione sincronizzata: percentuale, clip-path E vermicelli insieme (3.5 secondi, lineare)
+    // Animazione sincronizzata: percentuale, clip-path E vermicelli insieme (0.8 secondi per 2s totali)
     const percentageObj = { value: 0 }
     tl.to(percentageObj, {
       value: 100,
-      duration: 3.5,
+      duration: 0.8,
       ease: 'none',
       onUpdate: () => {
         const currentValue = Math.round(percentageObj.value)
@@ -218,56 +218,40 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
     }, fadeInDuration)
 
     // Fase 2: Bounce del logo (inizia quando percentuale e vermicelli sono al 100%)
-    // Il bounce "richiama" i serpenti
-    const bounceStart = fadeInDuration + 3.5
+    // bounceStart = 0.3 + 0.8 = 1.1s
+    const bounceStart = fadeInDuration + 0.8
 
     tl.to(logo, {
-      scale: 1.15,
-      duration: 0.25,
+      scale: 1.1,
+      duration: 0.15,
       ease: 'power2.out',
     }, bounceStart)
 
     // Al primo "atterraggio" del bounce, i serpenti vengono risucchiati
-    // Usiamo offset negativo per far sparire dalla punta esterna verso il logo
-    // Aggiungiamo anche opacity: 0 per nascondere eventuali pallini residui
     tl.to(paths, {
       strokeDashoffset: (i, target) => {
         return -target.getTotalLength()
       },
       opacity: 0,
-      duration: 0.35,
+      duration: 0.2,
       ease: 'power3.in',
-    }, bounceStart + 0.25) // Inizia quando il logo inizia a scendere
+    }, bounceStart + 0.15)
 
     // Fade out delle percentuali insieme ai serpenti
     tl.to([percentageEl, percentageHighlightEl], {
       opacity: 0,
-      duration: 0.35,
-      ease: 'power3.in',
-    }, bounceStart + 0.25)
-
-    tl.to(logo, {
-      scale: 0.95,
       duration: 0.2,
-      ease: 'power2.inOut',
-    }, bounceStart + 0.25)
-
-    tl.to(logo, {
-      scale: 1.05,
-      duration: 0.15,
-      ease: 'power2.inOut',
-    }, bounceStart + 0.45)
+      ease: 'power3.in',
+    }, bounceStart + 0.15)
 
     tl.to(logo, {
       scale: 1,
-      duration: 0.2,
+      duration: 0.15,
       ease: 'power2.out',
-    }, bounceStart + 0.6)
+    }, bounceStart + 0.15)
 
-    // Fase 3: Piccola pausa
-    tl.to({}, { duration: 0.2 }, bounceStart + 0.8)
-
-    // Fase 4: Il logo si sposta verso la posizione nella hero (tra le colonne)
+    // Fase 3: Il logo si sposta verso la posizione nella hero (tra le colonne)
+    // Inizia a bounceStart + 0.25 = 1.35s
     tl.add(() => {
       if (heroLogoRef.current && logo) {
         const heroRect = heroLogoRef.current.getBoundingClientRect()
@@ -277,7 +261,6 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         const heroTargetY = heroRect.top + heroRect.height / 2
 
         // Converti in offset GSAP (rispetto al centro viewport)
-        // Il logo ha CSS: position:fixed, top:50%, left:50%, transform:translate(-50%,-50%)
         const viewportCenterX = window.innerWidth / 2
         const viewportCenterY = window.innerHeight / 2
 
@@ -289,30 +272,30 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
           x: targetGsapX,
           y: targetGsapY,
           scale: targetScale,
-          duration: 0.8,
+          duration: 0.4,
           ease: 'power3.inOut',
           onComplete: () => {
             onLogoArrived()
           }
         })
       }
-    }, bounceStart + 1.0)
+    }, bounceStart + 0.25)
 
-    // Fade out del container nero (opacity), il logo resta visibile perché è fixed e fuori dal flusso
+    // Fade out del container nero (insieme al movimento del logo)
     tl.to(
       containerRef.current,
       {
         opacity: 0,
-        duration: 0.3,
+        duration: 0.35,
         ease: 'power2.out',
       },
-      bounceStart + 1.85
+      bounceStart + 0.35
     )
 
-    // Callback finale
+    // Callback finale a 2 secondi
     tl.add(() => {
       onLogoTransitionComplete()
-    }, bounceStart + 2.15)
+    }, 2.0)
 
     return () => {
       tl.kill()

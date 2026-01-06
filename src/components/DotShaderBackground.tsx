@@ -1,16 +1,13 @@
-import { useMemo, useEffect } from 'react'
-import { Canvas, ThreeEvent, useFrame, useThree } from '@react-three/fiber'
-import { shaderMaterial, useTrailTexture } from '@react-three/drei'
+import { useMemo, useEffect, useRef } from 'react'
+import { Canvas, useThree } from '@react-three/fiber'
+import { shaderMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 
 const DotMaterial = shaderMaterial(
   {
-    time: 0,
     resolution: new THREE.Vector2(),
     dotColor: new THREE.Color('#FFFFFF'),
     bgColor: new THREE.Color('#000000'),
-    mouseTrail: null,
-    render: 0,
     rotation: 0,
     gridSize: 50,
     dotOpacity: 0.05
@@ -21,12 +18,9 @@ const DotMaterial = shaderMaterial(
     }
   `,
   /* glsl */ `
-    uniform float time;
-    uniform int render;
     uniform vec2 resolution;
     uniform vec3 dotColor;
     uniform vec3 bgColor;
-    uniform sampler2D mouseTrail;
     uniform float rotation;
     uniform float gridSize;
     uniform float dotOpacity;
@@ -56,36 +50,24 @@ const DotMaterial = shaderMaterial(
 
       // Create a grid
       vec2 gridUv = fract(rotatedUv * gridSize);
-      vec2 gridUvCenterInScreenCoords = rotate((floor(rotatedUv * gridSize) + 0.5) / gridSize, -rotation);
-
-      // Calculate distance from the center of each cell
-      float baseDot = sdfCircle(gridUv, 0.25);
 
       // Screen mask
-      float screenMask = smoothstep(0.0, 1.0, 1.0 - uv.y); // 0 at the top, 1 at the bottom
+      float screenMask = smoothstep(0.0, 1.0, 1.0 - uv.y);
       vec2 centerDisplace = vec2(0.7, 1.1);
       float circleMaskCenter = length(uv - centerDisplace);
       float circleMaskFromCenter = smoothstep(0.5, 1.0, circleMaskCenter);
 
       float combinedMask = screenMask * circleMaskFromCenter;
-      float circleAnimatedMask = sin(time * 2.0 + circleMaskCenter * 10.0);
 
-      // Mouse trail effect
-      float mouseInfluence = texture2D(mouseTrail, gridUvCenterInScreenCoords).r;
-
-      float scaleInfluence = max(mouseInfluence * 0.5, circleAnimatedMask * 0.3);
-
-      // Create dots with animated scale, influenced by mouse
+      // Static dot size based on position only
       float dotSize = min(pow(circleMaskCenter, 2.0) * 0.3, 0.3);
 
-      float sdfDot = sdfCircle(gridUv, dotSize * (1.0 + scaleInfluence * 0.5));
+      float sdfDot = sdfCircle(gridUv, dotSize);
 
       float smoothDot = smoothstep(0.05, 0.0, sdfDot);
 
-      float opacityInfluence = max(mouseInfluence * 50.0, circleAnimatedMask * 0.5);
-
-      // Mix background color with dot color, using animated opacity to increase visibility
-      vec3 composition = mix(bgColor, dotColor, smoothDot * combinedMask * dotOpacity * (1.0 + opacityInfluence));
+      // Static composition - no animations
+      vec3 composition = mix(bgColor, dotColor, smoothDot * combinedMask * dotOpacity);
 
       gl_FragColor = vec4(composition, 1.0);
 
@@ -95,9 +77,9 @@ const DotMaterial = shaderMaterial(
   `
 )
 
-function Scene() {
-  const size = useThree((s) => s.size)
-  const viewport = useThree((s) => s.viewport)
+// Componente Scene che usa dimensioni fisse
+function Scene({ fixedWidth, fixedHeight }: { fixedWidth: number; fixedHeight: number }) {
+  const { viewport } = useThree()
 
   const rotation = 0
   const gridSize = 100
@@ -109,16 +91,6 @@ function Scene() {
     dotOpacity: 0.025
   }
 
-  const [trail, onMove] = useTrailTexture({
-    size: 512,
-    radius: 0.1,
-    maxAge: 400,
-    interpolate: 1,
-    ease: function easeInOutCirc(x: number) {
-      return x < 0.5 ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2 : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2
-    }
-  })
-
   const dotMaterial = useMemo(() => {
     return new DotMaterial()
   }, [])
@@ -129,42 +101,46 @@ function Scene() {
     dotMaterial.uniforms.dotOpacity.value = themeColors.dotOpacity
   }, [dotMaterial, themeColors])
 
-  useFrame((state) => {
-    dotMaterial.uniforms.time.value = state.clock.elapsedTime
-  })
-
-  const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
-    onMove(e)
-  }
-
+  // Usa dimensioni fisse invece di quelle dinamiche
+  const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1
   const scale = Math.max(viewport.width, viewport.height) / 2
 
   return (
-    <mesh scale={[scale, scale, 1]} onPointerMove={handlePointerMove}>
+    <mesh scale={[scale, scale, 1]}>
       <planeGeometry args={[2, 2]} />
       <primitive
         object={dotMaterial}
-        resolution={[size.width * viewport.dpr, size.height * viewport.dpr]}
+        resolution={[fixedWidth * dpr, fixedHeight * dpr]}
         rotation={rotation}
         gridSize={gridSize}
-        mouseTrail={trail}
-        render={0}
       />
     </mesh>
   )
 }
 
 export default function DotShaderBackground() {
+  // Cattura le dimensioni della finestra una sola volta al mount
+  const dimensionsRef = useRef({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1920,
+    height: typeof window !== 'undefined' ? window.innerHeight : 1080
+  })
+
   return (
     <Canvas
+      // Disabilita il resize automatico del canvas durante lo scroll
+      resize={{ scroll: false }}
       gl={{
         antialias: true,
         powerPreference: 'high-performance',
         outputColorSpace: THREE.SRGBColorSpace,
         toneMapping: THREE.NoToneMapping
       }}
+      style={{ width: '100%', height: '100%' }}
     >
-      <Scene />
+      <Scene
+        fixedWidth={dimensionsRef.current.width}
+        fixedHeight={dimensionsRef.current.height}
+      />
     </Canvas>
   )
 }

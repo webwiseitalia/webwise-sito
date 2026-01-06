@@ -85,7 +85,6 @@ function HomePage() {
   const serviziSectionRef = useRef<HTMLElement>(null)
   const serviziBlockRef = useRef<HTMLDivElement>(null)
   const heroShaderRef = useRef<HTMLDivElement>(null)
-  const serviziShaderRef = useRef<HTMLDivElement>(null)
 
   // L'animazione parte solo la prima volta che si visita la homepage
 
@@ -115,28 +114,11 @@ function HomePage() {
     // Riporta lo scroll in cima alla pagina (alla hero)
     window.scrollTo(0, 0)
 
-    // Anima le colonne laterali dopo il testo principale (timing ridotto per animazione più veloce)
+    // Le colonne laterali ora usano TypewriterText, quindi completiamo subito l'animazione
+    // Aspettiamo che il typewriter delle colonne finisca (~1.8s dopo l'inizio)
     setTimeout(() => {
-      if (leftColumnRef.current) {
-        gsap.fromTo(
-          leftColumnRef.current,
-          { opacity: 0, x: -30 },
-          { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
-        )
-      }
-      if (rightColumnRef.current) {
-        gsap.fromTo(
-          rightColumnRef.current,
-          { opacity: 0, x: 30 },
-          { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
-        )
-      }
-
-      // Animazione completa
-      setTimeout(() => {
-        setAnimationPhase('complete')
-      }, 600)
-    }, 1200) // Ridotto da 2500ms per animazione più veloce
+      setAnimationPhase('complete')
+    }, 1800)
   }, [])
 
   const isTypewriterActive = animationPhase === 'typewriter' || animationPhase === 'complete'
@@ -152,98 +134,52 @@ function HomePage() {
     }
   }, [showLoading])
 
-  // ScrollTrigger per effetto parallax con ZOOM
-  // Sincronizzato con i timing del ParticleLogo:
-  // - FASE 1: hero top → midframe center center (zoom 1x → 2x)
-  // - FLIP: quando il logo è nitido nel midframe (phase1 >= 0.90 && phase2 <= 0.10)
-  // - FASE 2: midframe center center → servizi top top (zoom 2x → 1x)
+  // ScrollTrigger per effetto parallax con ZOOM IN/OUT
+  // Progress 0-0.5: zoom in 1x → 2x (senza flip)
+  // Progress 0.5: flip
+  // Progress 0.5-1: zoom out 2x → 1x (con flip)
+  // Stato finale alla sezione servizi: scale(1) scaleY(-1), poi si fissa
   useEffect(() => {
     if (!heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current) return
-    if (!heroShaderRef.current || !serviziShaderRef.current) return
+    if (!heroShaderRef.current) return
 
-    const heroShader = heroShaderRef.current
-    const serviziShader = serviziShaderRef.current
+    const shader = heroShaderRef.current
     const heroSection = heroSectionRef.current
-    const midframeSection = logoSectionRef.current
     const serviziSection = serviziSectionRef.current
 
-    // Stato iniziale: solo hero visibile a 1x, servizi nascosto
-    // will-change per ottimizzare il rendering GPU
-    heroShader.style.willChange = 'transform, opacity'
-    serviziShader.style.willChange = 'transform, opacity'
-    heroShader.style.opacity = '1'
-    heroShader.style.transform = 'scale(1)'
-    serviziShader.style.opacity = '0'
-    serviziShader.style.transform = 'scale(2) scaleY(-1)'
+    // Stato iniziale
+    shader.style.transform = 'scale(1)'
 
-    // Variabili per tracciare il progress delle due fasi (come ParticleLogo)
-    let phase1Progress = 0
-    let phase2Progress = 0
-
-    // FASE 1: Zoom IN da 1x a 2x (stessi trigger del ParticleLogo)
-    // Da hero top → midframe center center
-    const zoomInTrigger = ScrollTrigger.create({
+    // UN SOLO ScrollTrigger che copre tutto il range
+    const mainTrigger = ScrollTrigger.create({
       trigger: heroSection,
       start: 'top top',
-      endTrigger: midframeSection,
-      end: 'center center',
-      scrub: 0.5,
-      onUpdate: (self) => {
-        phase1Progress = self.progress
-
-        // Zoom da 1x a 2x
-        const scale = 1 + phase1Progress // 1 → 2
-        heroShader.style.transform = `scale(${scale})`
-
-        // Flip istantaneo solo quando arriviamo molto vicini a 2x (phase1 >= 0.99)
-        // Così il salto da 1.99x a 2x è impercettibile
-        if (phase1Progress >= 0.99 && phase2Progress <= 0.01) {
-          // Swap: nascondi hero, mostra servizi a 2x flippato
-          heroShader.style.opacity = '0'
-          serviziShader.style.opacity = '1'
-          serviziShader.style.transform = 'scale(2) scaleY(-1)'
-        } else if (phase1Progress < 0.99) {
-          // Prima del flip: mostra hero con zoom animato
-          heroShader.style.opacity = '1'
-          serviziShader.style.opacity = '0'
-        }
-      }
-    })
-
-    // FASE 2: Zoom OUT da 2x a 1x (stessi trigger del ParticleLogo)
-    // Da midframe center center → servizi top top
-    const zoomOutTrigger = ScrollTrigger.create({
-      trigger: midframeSection,
-      start: 'center center',
       endTrigger: serviziSection,
       end: 'top top',
-      scrub: 0.5,
       onUpdate: (self) => {
-        phase2Progress = self.progress
+        const progress = self.progress
 
-        // Inizia subito lo zoom out quando phase2 > 0.01
-        if (phase2Progress > 0.01) {
-          // Nascondi hero, mostra servizi
-          heroShader.style.opacity = '0'
-          serviziShader.style.opacity = '1'
+        // Punto di flip: a metà del percorso (midframe)
+        const flipPoint = 0.5
 
-          // Dezoom da 2x a 1x (normalizzato da 0.01-1.0 a 0-1)
-          const normalizedProgress = (phase2Progress - 0.01) / 0.99
-          const scale = 2 - normalizedProgress // 2 → 1
-          serviziShader.style.transform = `scale(${scale}) scaleY(-1)`
-          // Lo sfondo rimane visibile nella sezione servizi (niente fade out)
-        } else if (phase1Progress >= 0.99) {
-          // Nella zona flip: mostra servizi a 2x
-          heroShader.style.opacity = '0'
-          serviziShader.style.opacity = '1'
-          serviziShader.style.transform = 'scale(2) scaleY(-1)'
+        if (progress < flipPoint) {
+          // FASE 1: Zoom IN da 1x a 2x (senza flip)
+          const phase1Progress = progress / flipPoint
+          const scale = 1 + phase1Progress // 1 → 2
+
+          shader.style.transform = `scale(${scale})`
+        } else {
+          // FASE 2: Zoom OUT da 2x a 1x (con flip)
+          const phase2Progress = (progress - flipPoint) / (1 - flipPoint)
+          const scale = 2 - phase2Progress // 2 → 1
+
+          shader.style.transform = `scale(${scale}) scaleY(-1)`
         }
       }
     })
 
     return () => {
-      zoomInTrigger.kill()
-      zoomOutTrigger.kill()
+      mainTrigger.kill()
     }
   }, [hasSeenLoading])
 
@@ -287,10 +223,10 @@ function HomePage() {
           aspectRatio: '1920 / 1080'
         }}
       >
-        {/* Sfondo Hero - dritto, scala 1x, position fixed per evitare bande nere */}
+        {/* Sfondo unico - zoom in/out con flip al centro */}
         <div
           ref={heroShaderRef}
-          className="fixed inset-0 z-0 pointer-events-none"
+          className="fixed inset-0 z-0"
           style={{
             mixBlendMode: 'screen',
             transformOrigin: 'center center',
@@ -342,10 +278,32 @@ function HomePage() {
             <div
               ref={leftColumnRef}
               className="text-white font-semibold text-right tracking-wide"
-              style={{ minWidth: '280px', opacity: hasSeenLoading ? 1 : (showLoading ? 0 : (showFullContent ? 1 : 0)) }}
+              style={{ minWidth: '280px' }}
             >
-              <p style={{ whiteSpace: 'nowrap' }}>SMARTER SYSTEMS</p>
-              <p style={{ whiteSpace: 'nowrap' }}>BETTER<span style={{ marginLeft: '100px' }}>WORK</span></p>
+              <p style={{ whiteSpace: 'nowrap' }}>
+                <TypewriterText
+                  text="SMARTER SYSTEMS"
+                  isVisible={isTypewriterActive}
+                  delay={1.4}
+                  speed={0.025}
+                />
+              </p>
+              <p style={{ whiteSpace: 'nowrap' }}>
+                <TypewriterText
+                  text="BETTER"
+                  isVisible={isTypewriterActive}
+                  delay={1.6}
+                  speed={0.025}
+                />
+                <span style={{ marginLeft: '100px' }}>
+                  <TypewriterText
+                    text="WORK"
+                    isVisible={isTypewriterActive}
+                    delay={1.75}
+                    speed={0.025}
+                  />
+                </span>
+              </p>
             </div>
 
             {/* Logo centrale - 125x125px */}
@@ -366,10 +324,24 @@ function HomePage() {
             <div
               ref={rightColumnRef}
               className="text-white font-semibold text-left tracking-wide"
-              style={{ minWidth: '280px', opacity: hasSeenLoading ? 1 : (showLoading ? 0 : (showFullContent ? 1 : 0)) }}
+              style={{ minWidth: '280px' }}
             >
-              <p>EST. 2022</p>
-              <p style={{ paddingLeft: '60px', whiteSpace: 'nowrap' }}>→ EFFICENCY</p>
+              <p>
+                <TypewriterText
+                  text="EST. 2022"
+                  isVisible={isTypewriterActive}
+                  delay={1.4}
+                  speed={0.025}
+                />
+              </p>
+              <p style={{ paddingLeft: '60px', whiteSpace: 'nowrap' }}>
+                <TypewriterText
+                  text="→ EFFICENCY"
+                  isVisible={isTypewriterActive}
+                  delay={1.6}
+                  speed={0.025}
+                />
+              </p>
             </div>
           </div>
         </div>
@@ -388,29 +360,19 @@ function HomePage() {
         <div style={{ width: '437px', height: '437px' }} className="relative z-10" />
       </section>
 
-      {/* Sezione Servizi - 1920x1400 con sfondo nero */}
+      {/* Sezione Servizi - 1920x1400 con sfondo trasparente per vedere i pallini */}
       <section
         ref={serviziSectionRef}
         id="servizi"
-        className="w-full bg-black relative py-20 overflow-hidden"
+        className="w-full relative py-20 overflow-hidden"
         style={{
           aspectRatio: '1920 / 1400'
         }}
       >
-        {/* Sfondo Servizi - flippato, scala 1x */}
-        <div
-          ref={serviziShaderRef}
-          className="fixed inset-0 z-0 pointer-events-none"
-          style={{
-            mixBlendMode: 'screen',
-            transformOrigin: 'center center',
-            transform: 'scale(2) scaleY(-1)', // Inizia a 2x flippato, poi dezoom a 1x
-          }}
-        >
-          <DotShaderBackground />
-        </div>
+        {/* Lo sfondo è gestito dall'unico DotShaderBackground nella hero section */}
+        {/* che viene flippato e dezoomato durante lo scroll */}
 
-        <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Colonna sinistra - sticky */}
           <div ref={serviziBlockRef} className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit relative">
             {/* Logo statico sopra il badge - opacity controllata da GSAP */}
@@ -472,9 +434,9 @@ function HomePage() {
           </div>
 
           {/* Colonna destra - card servizi */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-[20px] mt-[350px]">
             {/* Card Ecommerce */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-20">
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-2 transition-all hover:shadow-md cursor-pointer group">
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -499,7 +461,7 @@ function HomePage() {
             </div>
 
             {/* Card Design */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-28">
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-2 transition-all hover:shadow-md cursor-pointer group">
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -525,7 +487,7 @@ function HomePage() {
             </div>
 
             {/* Card Custom Software */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-36">
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-2 transition-all hover:shadow-md cursor-pointer group">
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -550,7 +512,7 @@ function HomePage() {
             </div>
 
             {/* Card Blockchain & Web3 */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-44">
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-2 transition-all hover:shadow-md cursor-pointer group">
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -573,7 +535,7 @@ function HomePage() {
             </div>
 
             {/* Card AI & Machine Learning */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-1 transition-all hover:shadow-lg cursor-pointer group sticky top-52">
+            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:-translate-y-2 transition-all hover:shadow-md cursor-pointer group">
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
