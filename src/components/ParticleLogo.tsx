@@ -289,15 +289,30 @@ export default function ParticleLogo({
     let trigger2: ScrollTrigger | null = null
     let isSnapping = false
     let lastScrollY = window.scrollY
-    let scrollDirection: 'down' | 'up' = 'down'
+    let snapStartY = 0
+
+    // Blocca lo scroll dell'utente durante lo snap
+    const preventScroll = (e: WheelEvent) => {
+      if (isSnapping) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+    }
 
     // Funzione per eseguire lo snap automatico nella direzione dello scroll
-    const performSnap = (trigger: ScrollTrigger) => {
+    const performSnap = (trigger: ScrollTrigger, direction: 'down' | 'up') => {
       if (isSnapping) return
 
       isSnapping = true
-      // Snap nella direzione in cui l'utente stava scrollando
-      const targetProgress = scrollDirection === 'down' ? 1 : 0
+
+      // Salva la posizione di partenza e blocca subito lo scroll manuale
+      snapStartY = window.scrollY
+
+      // Riporta IMMEDIATAMENTE alla posizione di partenza per evitare il salto
+      window.scrollTo(0, snapStartY)
+
+      // Snap nella direzione catturata dal PRIMO scroll
+      const targetProgress = direction === 'down' ? 1 : 0
       const startScroll = trigger.start
       const endScroll = trigger.end
       const targetScroll = startScroll + (endScroll - startScroll) * targetProgress
@@ -308,34 +323,42 @@ export default function ParticleLogo({
         ease: 'power2.inOut',
         onComplete: () => {
           isSnapping = false
+          lastScrollY = targetScroll
         }
       })
     }
 
-    // Rileva la direzione dello scroll e avvia snap immediato
+    // Rileva la direzione dello scroll - cattura SOLO il primo scroll e parte SUBITO
     const handleScroll = () => {
+      // Se stiamo già snappando, ignora completamente tutti gli scroll
       if (isSnapping) return
 
       const currentScrollY = window.scrollY
-      if (currentScrollY > lastScrollY) {
-        scrollDirection = 'down'
-      } else if (currentScrollY < lastScrollY) {
-        scrollDirection = 'up'
-      }
-      lastScrollY = currentScrollY
-
       const { phase1, phase2 } = progressRef.current
 
-      // Snap immediato per fase 1 (hero -> midframe)
-      if (phase1 > 0.02 && phase1 < 0.98 && phase2 === 0 && trigger1) {
-        performSnap(trigger1)
+      // Verifica se siamo in una zona di snap
+      const inSnapZone1 = phase1 > 0.02 && phase1 < 0.98 && phase2 === 0
+      const inSnapZone2 = phase2 > 0.02 && phase2 < 0.98
+
+      if (!inSnapZone1 && !inSnapZone2) {
+        // Non siamo in zona snap, aggiorna lastScrollY per la prossima volta
+        lastScrollY = currentScrollY
+        return
       }
-      // Snap immediato per fase 2 (midframe -> servizi)
-      else if (phase2 > 0.02 && phase2 < 0.98 && trigger2) {
-        performSnap(trigger2)
+
+      // Determina la direzione e parti IMMEDIATAMENTE
+      const direction: 'down' | 'up' = currentScrollY > lastScrollY ? 'down' : 'up'
+
+      // Snap immediato - nessun delay
+      if (inSnapZone1 && trigger1) {
+        performSnap(trigger1, direction)
+      } else if (inSnapZone2 && trigger2) {
+        performSnap(trigger2, direction)
       }
     }
 
+    // Aggiungi listener per bloccare la rotella durante lo snap
+    window.addEventListener('wheel', preventScroll, { passive: false })
     window.addEventListener('scroll', handleScroll, { passive: true })
 
     const setupTriggers = () => {
@@ -373,6 +396,7 @@ export default function ParticleLogo({
     return () => {
       window.removeEventListener('resize', resizeCanvas)
       window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('wheel', preventScroll)
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }

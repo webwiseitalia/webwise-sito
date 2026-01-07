@@ -84,6 +84,8 @@ function HomePage() {
   const logoSectionRef = useRef<HTMLElement>(null)
   const serviziSectionRef = useRef<HTMLElement>(null)
   const serviziBlockRef = useRef<HTMLDivElement>(null)
+  const serviziContentRef = useRef<HTMLDivElement>(null)
+  const portfolioSectionRef = useRef<HTMLElement>(null)
   const heroShaderRef = useRef<HTMLDivElement>(null)
   const dotShaderRef = useRef<DotShaderBackgroundRef>(null)
   const cardsContainerRef = useRef<HTMLDivElement>(null)
@@ -238,6 +240,57 @@ function HomePage() {
       zoomOutTrigger.kill()
     }
   }, [hasSeenLoading])
+
+  // Perspective Tilt parallax tra servizi e portfolio
+  useEffect(() => {
+    if (!serviziSectionRef.current || !portfolioSectionRef.current) return
+
+    const serviziSection = serviziSectionRef.current
+    const portfolioSection = portfolioSectionRef.current
+
+    // Imposta la prospettiva sul contenitore padre
+    serviziSection.style.perspective = '1500px'
+    serviziSection.style.perspectiveOrigin = 'center bottom'
+
+    // La sezione servizi si inclina verso il basso come una porta
+    const tiltTrigger = ScrollTrigger.create({
+      trigger: serviziSection,
+      start: 'bottom bottom',
+      end: 'bottom top',
+      scrub: 0.5,
+      onUpdate: (self) => {
+        const progress = self.progress
+
+        // Servizi: rotateX da 0 a -70deg (si inclina verso il basso)
+        // + translateZ per dare profondità + opacity fade
+        const rotateX = progress * -70
+        const translateZ = progress * -200
+        const opacity = 1 - (progress * 0.8)
+        const scale = 1 - (progress * 0.1)
+
+        if (serviziContentRef.current) {
+          serviziContentRef.current.style.transform = `rotateX(${rotateX}deg) translateZ(${translateZ}px) scale(${scale})`
+          serviziContentRef.current.style.opacity = `${opacity}`
+        }
+
+        // Portfolio: sale dal basso con leggero effetto elastico
+        const translateY = 150 * (1 - self.progress)
+        const portfolioScale = 0.95 + (progress * 0.05)
+        portfolioSection.style.transform = `translateY(${translateY}px) scale(${portfolioScale})`
+      }
+    })
+
+    return () => {
+      tiltTrigger.kill()
+      serviziSection.style.perspective = ''
+      serviziSection.style.perspectiveOrigin = ''
+      if (serviziContentRef.current) {
+        serviziContentRef.current.style.transform = ''
+        serviziContentRef.current.style.opacity = ''
+      }
+      portfolioSection.style.transform = ''
+    }
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -425,7 +478,7 @@ function HomePage() {
         {/* Lo sfondo è gestito dall'unico DotShaderBackground nella hero section */}
         {/* che viene flippato e dezoomato durante lo scroll */}
 
-        <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start" style={{ transformOrigin: 'center top' }}>
           {/* Colonna sinistra - sticky */}
           <div ref={serviziBlockRef} className="flex flex-col gap-4 h-fit relative sticky" style={{ top: '20vh' }}>
             {/* Logo statico sopra il badge - opacity controllata da GSAP */}
@@ -624,6 +677,7 @@ function HomePage() {
 
       {/* Sezione Portfolio - 1920x2580 */}
       <section
+        ref={portfolioSectionRef}
         id="portfolio"
         className="w-full bg-black relative"
         style={{
