@@ -414,8 +414,8 @@ function HomePage() {
               </p>
             </div>
 
-            {/* Logo centrale - 125x125px */}
-            <div ref={heroLogoRef} className="flex items-center justify-center flex-shrink-0">
+            {/* Logo centrale - 125x125px con dimensioni fisse per evitare shift durante le animazioni */}
+            <div ref={heroLogoRef} className="flex items-center justify-center flex-shrink-0" style={{ width: '125px', height: '125px' }}>
               <img
                 src={logoWebwiseCenter}
                 alt="Webwise Logo"

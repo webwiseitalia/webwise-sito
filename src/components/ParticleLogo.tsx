@@ -56,18 +56,24 @@ export default function ParticleLogo({
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
 
-    // Calcola posizioni
+    // Posizione hero cachata - calcolata una sola volta quando il ref è pronto
+    let heroPosition: { x: number; y: number } | null = null
+
     const getPositions = () => {
       const viewportCenterX = window.innerWidth / 2
       const viewportCenterY = window.innerHeight / 2
 
-      let heroX = viewportCenterX
-      let heroY = viewportCenterY
-      if (heroLogoRef.current) {
+      // Calcola la posizione hero dal ref solo se non è già cachata
+      if (!heroPosition && heroLogoRef.current) {
         const rect = heroLogoRef.current.getBoundingClientRect()
-        heroX = rect.left + rect.width / 2
-        heroY = rect.top + rect.height / 2
+        heroPosition = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        }
       }
+
+      const heroX = heroPosition?.x ?? viewportCenterX
+      const heroY = heroPosition?.y ?? viewportCenterY
 
       const stickyTopPx = 0.20 * window.innerHeight
       const maxWidth = Math.min(1280, window.innerWidth)
@@ -88,6 +94,20 @@ export default function ParticleLogo({
         servizi: { x: sectionLeft + 62.5, y: stickyTopPx + logoOffsetInBlock + 62.5, size: 125 },
       }
     }
+
+    // Aggiorna la posizione hero dopo un breve delay per assicurarsi che il layout sia stabile
+    const updateHeroPosition = () => {
+      if (heroLogoRef.current) {
+        const rect = heroLogoRef.current.getBoundingClientRect()
+        heroPosition = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        }
+      }
+    }
+
+    // Aspetta che il layout sia stabile prima di calcolare la posizione
+    setTimeout(updateHeroPosition, 100)
 
     // Carica immagine e crea particelle
     const loadParticles = () => {
@@ -287,79 +307,64 @@ export default function ParticleLogo({
     // Setup ScrollTriggers
     let trigger1: ScrollTrigger | null = null
     let trigger2: ScrollTrigger | null = null
-    let isSnapping = false
-    let lastScrollY = window.scrollY
-    let snapStartY = 0
+    let isAnimating = false
 
-    // Blocca lo scroll dell'utente durante lo snap
-    const preventScroll = (e: WheelEvent) => {
-      if (isSnapping) {
+    const handleWheel = (e: WheelEvent) => {
+      const { phase1, phase2 } = progressRef.current
+      const direction = e.deltaY > 0 ? 'down' : 'up'
+
+      // Zona snap 1: hero ↔ midframe (phase1 tra 0 e 1, phase2 = 0)
+      // - Scendendo: phase1 < 0.99 → vai a phase1 = 1
+      // - Salendo: phase1 > 0.01 → vai a phase1 = 0
+      const inSnapZone1 = phase2 === 0 && (
+        (direction === 'down' && phase1 < 0.99) ||
+        (direction === 'up' && phase1 > 0.01)
+      )
+
+      // Zona snap 2: midframe ↔ servizi (phase1 = 1, phase2 tra 0 e 1)
+      // - Scendendo: phase2 < 0.99 → vai a phase2 = 1
+      // - Salendo: phase2 > 0.01 → vai a phase2 = 0
+      const inSnapZone2 = phase1 >= 0.99 && (
+        (direction === 'down' && phase2 < 0.99) ||
+        (direction === 'up' && phase2 > 0.01)
+      )
+
+      const inAnySnapZone = inSnapZone1 || inSnapZone2
+
+      // Se stiamo animando, BLOCCA tutto
+      if (isAnimating) {
         e.preventDefault()
-        e.stopPropagation()
+        return
       }
-    }
 
-    // Funzione per eseguire lo snap automatico nella direzione dello scroll
-    const performSnap = (trigger: ScrollTrigger, direction: 'down' | 'up') => {
-      if (isSnapping) return
+      // Se non siamo in zona snap, lascia scrollare
+      if (!inAnySnapZone) return
 
-      isSnapping = true
+      // Primo scroll in zona snap: BLOCCA e avvia animazione
+      e.preventDefault()
+      isAnimating = true
 
-      // Salva la posizione di partenza e blocca subito lo scroll manuale
-      snapStartY = window.scrollY
+      const trigger = inSnapZone1 ? trigger1 : trigger2
 
-      // Riporta IMMEDIATAMENTE alla posizione di partenza per evitare il salto
-      window.scrollTo(0, snapStartY)
+      if (!trigger) {
+        isAnimating = false
+        return
+      }
 
-      // Snap nella direzione catturata dal PRIMO scroll
       const targetProgress = direction === 'down' ? 1 : 0
-      const startScroll = trigger.start
-      const endScroll = trigger.end
-      const targetScroll = startScroll + (endScroll - startScroll) * targetProgress
+      const targetScroll = trigger.start + (trigger.end - trigger.start) * targetProgress
 
       gsap.to(window, {
         scrollTo: { y: targetScroll, autoKill: false },
         duration: 0.8,
         ease: 'power2.inOut',
         onComplete: () => {
-          isSnapping = false
-          lastScrollY = targetScroll
+          isAnimating = false
         }
       })
     }
 
-    // Rileva la direzione dello scroll - cattura SOLO il primo scroll e parte SUBITO
-    const handleScroll = () => {
-      // Se stiamo già snappando, ignora completamente tutti gli scroll
-      if (isSnapping) return
-
-      const currentScrollY = window.scrollY
-      const { phase1, phase2 } = progressRef.current
-
-      // Verifica se siamo in una zona di snap
-      const inSnapZone1 = phase1 > 0.02 && phase1 < 0.98 && phase2 === 0
-      const inSnapZone2 = phase2 > 0.02 && phase2 < 0.98
-
-      if (!inSnapZone1 && !inSnapZone2) {
-        // Non siamo in zona snap, aggiorna lastScrollY per la prossima volta
-        lastScrollY = currentScrollY
-        return
-      }
-
-      // Determina la direzione e parti IMMEDIATAMENTE
-      const direction: 'down' | 'up' = currentScrollY > lastScrollY ? 'down' : 'up'
-
-      // Snap immediato - nessun delay
-      if (inSnapZone1 && trigger1) {
-        performSnap(trigger1, direction)
-      } else if (inSnapZone2 && trigger2) {
-        performSnap(trigger2, direction)
-      }
-    }
-
-    // Aggiungi listener per bloccare la rotella durante lo snap
-    window.addEventListener('wheel', preventScroll, { passive: false })
-    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('wheel', handleWheel, { passive: false })
 
     const setupTriggers = () => {
       if (!heroSectionRef.current || !midframeSectionRef.current || !serviziSectionRef.current) return
@@ -395,8 +400,7 @@ export default function ParticleLogo({
 
     return () => {
       window.removeEventListener('resize', resizeCanvas)
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('wheel', preventScroll)
+      window.removeEventListener('wheel', handleWheel)
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
