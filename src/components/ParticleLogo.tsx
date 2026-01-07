@@ -287,37 +287,35 @@ export default function ParticleLogo({
     // Setup ScrollTriggers
     let trigger1: ScrollTrigger | null = null
     let trigger2: ScrollTrigger | null = null
-    let snapTimeout: ReturnType<typeof setTimeout> | null = null
     let isSnapping = false
     let lastScrollY = window.scrollY
     let scrollDirection: 'down' | 'up' = 'down'
 
     // Funzione per eseguire lo snap automatico nella direzione dello scroll
-    const performSnap = (trigger: ScrollTrigger, progress: number) => {
+    const performSnap = (trigger: ScrollTrigger) => {
       if (isSnapping) return
 
-      // Se siamo a metà (tra 0.05 e 0.95), snappiamo nella direzione dello scroll
-      if (progress > 0.05 && progress < 0.95) {
-        isSnapping = true
-        // Snap nella direzione in cui l'utente stava scrollando
-        const targetProgress = scrollDirection === 'down' ? 1 : 0
-        const startScroll = trigger.start
-        const endScroll = trigger.end
-        const targetScroll = startScroll + (endScroll - startScroll) * targetProgress
+      isSnapping = true
+      // Snap nella direzione in cui l'utente stava scrollando
+      const targetProgress = scrollDirection === 'down' ? 1 : 0
+      const startScroll = trigger.start
+      const endScroll = trigger.end
+      const targetScroll = startScroll + (endScroll - startScroll) * targetProgress
 
-        gsap.to(window, {
-          scrollTo: { y: targetScroll, autoKill: false },
-          duration: 0.6,
-          ease: 'power2.inOut',
-          onComplete: () => {
-            isSnapping = false
-          }
-        })
-      }
+      gsap.to(window, {
+        scrollTo: { y: targetScroll, autoKill: false },
+        duration: 0.8,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          isSnapping = false
+        }
+      })
     }
 
-    // Rileva la direzione dello scroll
+    // Rileva la direzione dello scroll e avvia snap immediato
     const handleScroll = () => {
+      if (isSnapping) return
+
       const currentScrollY = window.scrollY
       if (currentScrollY > lastScrollY) {
         scrollDirection = 'down'
@@ -326,21 +324,16 @@ export default function ParticleLogo({
       }
       lastScrollY = currentScrollY
 
-      // Gestione snap con timeout
-      if (snapTimeout) clearTimeout(snapTimeout)
+      const { phase1, phase2 } = progressRef.current
 
-      snapTimeout = setTimeout(() => {
-        const { phase1, phase2 } = progressRef.current
-
-        // Snap per fase 1 (hero -> midframe)
-        if (phase1 > 0 && phase1 < 1 && phase2 === 0 && trigger1) {
-          performSnap(trigger1, phase1)
-        }
-        // Snap per fase 2 (midframe -> servizi)
-        else if (phase2 > 0 && phase2 < 1 && trigger2) {
-          performSnap(trigger2, phase2)
-        }
-      }, 150) // Aspetta 150ms dopo l'ultimo scroll
+      // Snap immediato per fase 1 (hero -> midframe)
+      if (phase1 > 0.02 && phase1 < 0.98 && phase2 === 0 && trigger1) {
+        performSnap(trigger1)
+      }
+      // Snap immediato per fase 2 (midframe -> servizi)
+      else if (phase2 > 0.02 && phase2 < 0.98 && trigger2) {
+        performSnap(trigger2)
+      }
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -380,7 +373,6 @@ export default function ParticleLogo({
     return () => {
       window.removeEventListener('resize', resizeCanvas)
       window.removeEventListener('scroll', handleScroll)
-      if (snapTimeout) clearTimeout(snapTimeout)
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
