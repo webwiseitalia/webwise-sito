@@ -321,12 +321,28 @@ export default function ParticleLogo({
         (direction === 'up' && phase1 > 0.01)
       )
 
-      // Zona snap 2: midframe ↔ servizi (phase1 = 1, phase2 tra 0 e 1)
-      // - Scendendo: phase2 < 0.99 → vai a phase2 = 1
-      // - Salendo: phase2 > 0.01 → vai a phase2 = 0
+      // Zona snap 2: midframe ↔ servizi
+      // La "linea di taglio" è il bordo superiore della prima card (35vh dalla top della viewport)
+      // - Scendendo dal midframe: snap verso servizi (phase2 basso)
+      // - Salendo dalla sezione servizi: snap SOLO se siamo SOPRA la linea delle card
+      const cardLineY = window.innerHeight * 0.35 // 35vh = posizione top della prima card
+
+      // Trova la prima card per verificare se siamo sopra di essa
+      const firstCard = document.querySelector('.service-card') as HTMLElement | null
+      let isAboveCardLine = false
+
+      if (firstCard && serviziSectionRef.current) {
+        const cardRect = firstCard.getBoundingClientRect()
+        // Se il top della card è sotto il 35vh della viewport, siamo sopra la linea
+        // Cioè la card non ha ancora raggiunto la sua posizione sticky
+        isAboveCardLine = cardRect.top > cardLineY
+      }
+
       const inSnapZone2 = phase1 >= 0.99 && (
-        (direction === 'down' && phase2 < 0.99) ||
-        (direction === 'up' && phase2 > 0.01)
+        // Scendendo: snap quando siamo al midframe
+        (direction === 'down' && phase2 < 0.05) ||
+        // Salendo: snap SOLO se siamo sopra la linea delle card
+        (direction === 'up' && phase2 > 0 && phase2 < 0.99 && isAboveCardLine)
       )
 
       const inAnySnapZone = inSnapZone1 || inSnapZone2
