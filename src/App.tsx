@@ -371,12 +371,12 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Sezione Logo Centrale - 1920x1080 con sfondo trasparente */}
+      {/* Sezione Logo Centrale - estesa per mantenere il logo nitido visibile più a lungo */}
       <section
         ref={logoSectionRef}
         className="w-full bg-transparent flex items-center justify-center relative overflow-hidden"
         style={{
-          aspectRatio: '1920 / 1080'
+          aspectRatio: '1920 / 3240'  // Triplicata l'altezza (1080 * 3 = 3240)
         }}
       >
         {/* Nessuno sfondo qui - lo zoom continua sugli sfondi hero/servizi */}

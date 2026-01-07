@@ -212,61 +212,52 @@ export default function ParticleLogo({
         if (logoStatico) logoStatico.style.opacity = '0'
       }
 
-      // ZONA MIDFRAME: quando phase1 >= 0.90 e phase2 <= 0.10, mostra logo pulito
-      // Questa è la "zona morta" dove il logo è completamente visibile
-      const inMidframeZone = phase1 >= 0.90 && phase2 <= 0.10
+      // Il logo nitido appare SOLO quando le particelle sono completamente ferme (dissolveAmount = 0)
+      // Zona centrale: phase1 = 1 e phase2 = 0 (o molto vicino)
+      const inCenterZone = phase1 >= 0.98 && phase2 <= 0.02
 
-      if (inMidframeZone) {
-        // Siamo nella zona midframe: logo pulito al 100%, niente particelle
-        if (midframeLogo) midframeLogo.style.opacity = '1'
-        currentX = positions.midframe.x
-        currentY = positions.midframe.y
-        currentSize = positions.midframe.size
-        dissolveAmount = 0
-        // Non disegnare particelle, esci
-        animationFrameRef.current = requestAnimationFrame(render)
-        return
+      if (midframeLogo) {
+        // Logo nitido visibile solo nella zona centrale, istantaneamente (no fade)
+        midframeLogo.style.opacity = inCenterZone ? '1' : '0'
       }
 
-      if (phase2 > 0.10) {
-        // FASE 2: Midframe -> Servizi (dopo la zona morta)
-        // Nascondi logo midframe
-        if (midframeLogo) midframeLogo.style.opacity = '0'
-
-        // Ricalcola progress per la dissoluzione (0.10-0.25 dissolvi, 0.85-1.0 ricomponi)
-        const adjustedPhase2 = (phase2 - 0.10) / 0.90  // Normalizza 0.10-1.0 a 0-1
-        const dissolveProgress = adjustedPhase2 < 0.17
-          ? adjustedPhase2 / 0.17  // Dissolvi nei primi 17% (circa 15% del range originale)
-          : adjustedPhase2 > 0.83
-            ? (1 - adjustedPhase2) / 0.17  // Ricomponi negli ultimi 17%
+      if (inCenterZone) {
+        // Nella zona centrale: logo nitido visibile, NASCONDI le particelle
+        // Non disegnare nulla - esci dal render
+        animationFrameRef.current = requestAnimationFrame(render)
+        return
+      } else if (phase2 > 0) {
+        // FASE 2: Midframe -> Servizi
+        // Ricalcola progress per la dissoluzione
+        const dissolveProgress = phase2 < 0.20
+          ? phase2 / 0.20  // Dissolvi nei primi 20%
+          : phase2 > 0.80
+            ? (1 - phase2) / 0.20  // Ricomponi negli ultimi 20%
             : 1  // Completamente dissolto nel mezzo
         dissolveAmount = Math.sin(dissolveProgress * Math.PI / 2) * 0.95
 
         currentX = positions.midframe.x + (positions.servizi.x - positions.midframe.x) * phase2
         currentY = positions.midframe.y + (positions.servizi.y - positions.midframe.y) * phase2
         currentSize = positions.midframe.size + (positions.servizi.size - positions.midframe.size) * phase2
-      } else if (phase1 > 0 && phase1 < 0.90) {
-        // FASE 1: Hero -> Midframe (prima della zona morta)
-        if (midframeLogo) midframeLogo.style.opacity = '0'
-
-        // Ricalcola progress per la dissoluzione (0-0.15 dissolvi, 0.75-0.90 ricomponi)
+      } else if (phase1 > 0) {
+        // FASE 1: Hero -> Midframe
+        // Le particelle si ricompongono gradualmente fino a formare il logo nitido
         const dissolveProgress = phase1 < 0.15
           ? phase1 / 0.15  // Dissolvi nei primi 15%
           : phase1 > 0.75
-            ? (0.90 - phase1) / 0.15  // Ricomponi tra 75% e 90%
+            ? (1 - phase1) / 0.25  // Ricomponi gradualmente tra 75% e 100%
             : 1  // Completamente dissolto nel mezzo
-        dissolveAmount = Math.sin(dissolveProgress * Math.PI / 2) * 0.95
+        dissolveAmount = Math.sin(Math.max(0, dissolveProgress) * Math.PI / 2) * 0.95
 
         currentX = positions.hero.x + (positions.midframe.x - positions.hero.x) * phase1
         currentY = positions.hero.y + (positions.midframe.y - positions.hero.y) * phase1
         currentSize = positions.hero.size + (positions.midframe.size - positions.hero.size) * phase1
       } else {
-        // Stato iniziale o transizione
+        // Stato iniziale
         currentX = positions.hero.x
         currentY = positions.hero.y
         currentSize = positions.hero.size
         dissolveAmount = 0
-        if (midframeLogo) midframeLogo.style.opacity = '0'
       }
 
       // Disegna particelle
@@ -303,7 +294,7 @@ export default function ParticleLogo({
         trigger: heroSectionRef.current,
         start: 'top top',
         endTrigger: midframeSectionRef.current,
-        end: 'center center',
+        end: 'top+=33% center',  // Arriva al logo nitido dopo 1/3 della sezione midframe
         scrub: 1,
         onUpdate: (self) => {
           progressRef.current.phase1 = self.progress
@@ -312,7 +303,7 @@ export default function ParticleLogo({
 
       trigger2 = ScrollTrigger.create({
         trigger: midframeSectionRef.current,
-        start: 'center center',
+        start: 'bottom-=33% center',  // Riparte quando manca 1/3 alla fine della sezione
         endTrigger: serviziSectionRef.current,
         end: 'top top',
         scrub: 1,
