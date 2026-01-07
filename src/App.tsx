@@ -86,6 +86,7 @@ function HomePage() {
   const serviziBlockRef = useRef<HTMLDivElement>(null)
   const heroShaderRef = useRef<HTMLDivElement>(null)
   const dotShaderRef = useRef<DotShaderBackgroundRef>(null)
+  const cardsContainerRef = useRef<HTMLDivElement>(null)
 
   // L'animazione parte solo la prima volta che si visita la homepage
 
@@ -136,77 +137,107 @@ function HomePage() {
   }, [showLoading])
 
   // ScrollTrigger per effetto parallax con ZOOM IN/OUT
-  // Progress 0-0.5: zoom in 1x → 2x (senza flip)
-  // Progress 0.5: flip
-  // Progress 0.5-1: zoom out 2x → 1x (con flip)
-  // Stato finale alla sezione servizi: scale(1) scaleY(-1), poi si fissa
+  // Sincronizzato con ParticleLogo usando gli stessi endpoint:
+  // - Fase 1 (zoom in): da hero fino a top+=33% del midframe
+  // - Zona statica: logo nitido, background fermo a 2x
+  // - Fase 2 (zoom out): da bottom-=33% del midframe fino a servizi
   useEffect(() => {
     if (!heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current) return
     if (!heroShaderRef.current) return
 
     const shader = heroShaderRef.current
     const heroSection = heroSectionRef.current
+    const logoSection = logoSectionRef.current
     const serviziSection = serviziSectionRef.current
 
     // Stato iniziale
     shader.style.transform = 'scale(1)'
 
-    // UN SOLO ScrollTrigger che copre tutto il range
-    const mainTrigger = ScrollTrigger.create({
+    // Trigger 1: Zoom IN (hero → logo nitido)
+    // Stesso endpoint del ParticleLogo fase 1: 'top+=33% center'
+    const zoomInTrigger = ScrollTrigger.create({
       trigger: heroSection,
       start: 'top top',
+      endTrigger: logoSection,
+      end: 'top+=33% center',
+      onUpdate: (self) => {
+        const scale = 1 + self.progress // 1 → 2
+        shader.style.transform = `scale(${scale})`
+
+        // fillAmount cresce verso la fine dello zoom
+        if (self.progress > 0.7 && dotShaderRef.current) {
+          const fillProgress = (self.progress - 0.7) / 0.3
+          const fillAmount = Math.sin(fillProgress * Math.PI / 2)
+          dotShaderRef.current.setFillAmount(fillAmount)
+        } else if (dotShaderRef.current) {
+          dotShaderRef.current.setFillAmount(0)
+        }
+      },
+      onLeave: () => {
+        // Quando lo zoom finisce, assicura scala 2x
+        shader.style.transform = `scale(2)`
+        if (dotShaderRef.current) dotShaderRef.current.setFillAmount(1)
+      }
+    })
+
+    // Trigger 2: Zona statica (logo nitido) - background fermo, gestisce solo il flip
+    const staticTrigger = ScrollTrigger.create({
+      trigger: logoSection,
+      start: 'top+=33% center',
+      end: 'bottom-=33% center',
+      onUpdate: (self) => {
+        // Background fermo a scala 2x, il flip avviene a metà
+        if (self.progress < 0.5) {
+          shader.style.transform = `scale(2)`
+        } else {
+          shader.style.transform = `scale(2) scaleY(-1)`
+        }
+
+        // fillAmount resta al massimo durante la zona statica
+        if (dotShaderRef.current) {
+          dotShaderRef.current.setFillAmount(1)
+        }
+      },
+      onLeave: () => {
+        shader.style.transform = `scale(2) scaleY(-1)`
+      },
+      onEnterBack: () => {
+        shader.style.transform = `scale(2) scaleY(-1)`
+      }
+    })
+
+    // Trigger 3: Zoom OUT (dopo logo nitido → servizi)
+    // Stesso startpoint del ParticleLogo fase 2: 'bottom-=33% center'
+    const zoomOutTrigger = ScrollTrigger.create({
+      trigger: logoSection,
+      start: 'bottom-=33% center',
       endTrigger: serviziSection,
       end: 'top top',
       onUpdate: (self) => {
-        const progress = self.progress
+        const scale = 2 - self.progress // 2 → 1
+        shader.style.transform = `scale(${scale}) scaleY(-1)`
 
-        // Punto di flip: a metà del percorso (midframe)
-        const flipPoint = 0.5
-
-        // Calcola fillAmount: massimo (1) al punto di flip (0.5), minimo (0) agli estremi
-        // Usiamo una curva che cresce da 0 a 1 avvicinandosi a 0.5 e poi decresce
-        // fillAmount = 1 - |progress - 0.5| * 2 → va da 0 (a 0 e 1) a 1 (a 0.5)
-        // Ma vogliamo che l'effetto sia più concentrato vicino al flip point
-        // Usiamo una curva più ripida: inizia a riempire dal 30% e finisce al 70%
-        const fillStart = 0.35
-        const fillEnd = 0.65
-        let fillAmount = 0
-        if (progress >= fillStart && progress <= flipPoint) {
-          // Da fillStart a flipPoint: 0 → 1
-          fillAmount = (progress - fillStart) / (flipPoint - fillStart)
-        } else if (progress > flipPoint && progress <= fillEnd) {
-          // Da flipPoint a fillEnd: 1 → 0
-          fillAmount = 1 - (progress - flipPoint) / (fillEnd - flipPoint)
-        }
-        // Applica easing per transizione più smooth
-        fillAmount = Math.sin(fillAmount * Math.PI / 2)
-
-        // Aggiorna lo shader con fillAmount
-        if (dotShaderRef.current) {
+        // fillAmount decresce all'inizio del de-zoom
+        if (self.progress < 0.3 && dotShaderRef.current) {
+          const fillProgress = 1 - (self.progress / 0.3)
+          const fillAmount = Math.sin(fillProgress * Math.PI / 2)
           dotShaderRef.current.setFillAmount(fillAmount)
+        } else if (dotShaderRef.current) {
+          dotShaderRef.current.setFillAmount(0)
         }
-
-        if (progress < flipPoint) {
-          // FASE 1: Zoom IN da 1x a 2x (senza flip)
-          const phase1Progress = progress / flipPoint
-          const scale = 1 + phase1Progress // 1 → 2
-
-          shader.style.transform = `scale(${scale})`
-        } else {
-          // FASE 2: Zoom OUT da 2x a 1x (con flip)
-          const phase2Progress = (progress - flipPoint) / (1 - flipPoint)
-          const scale = 2 - phase2Progress // 2 → 1
-
-          shader.style.transform = `scale(${scale}) scaleY(-1)`
-        }
+      },
+      onEnter: () => {
+        // Quando inizia il de-zoom
+        shader.style.transform = `scale(2) scaleY(-1)`
       }
     })
 
     return () => {
-      mainTrigger.kill()
+      zoomInTrigger.kill()
+      staticTrigger.kill()
+      zoomOutTrigger.kill()
     }
   }, [hasSeenLoading])
-
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -376,7 +407,7 @@ function HomePage() {
         ref={logoSectionRef}
         className="w-full bg-transparent flex items-center justify-center relative overflow-hidden"
         style={{
-          aspectRatio: '1920 / 3240'  // Triplicata l'altezza (1080 * 3 = 3240)
+          aspectRatio: '1920 / 1080'  // Altezza originale (1x)
         }}
       >
         {/* Nessuno sfondo qui - lo zoom continua sugli sfondi hero/servizi */}
@@ -384,21 +415,19 @@ function HomePage() {
         <div style={{ width: '437px', height: '437px' }} className="relative z-10" />
       </section>
 
-      {/* Sezione Servizi - 1920x1400 con sfondo trasparente per vedere i pallini */}
+      {/* Sezione Servizi - altezza automatica basata sul contenuto */}
       <section
         ref={serviziSectionRef}
         id="servizi"
         className="w-full relative py-20"
-        style={{
-          aspectRatio: '1920 / 1400'
-        }}
+        style={{ overflow: 'clip' }}
       >
         {/* Lo sfondo è gestito dall'unico DotShaderBackground nella hero section */}
         {/* che viene flippato e dezoomato durante lo scroll */}
 
         <div className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Colonna sinistra - sticky */}
-          <div ref={serviziBlockRef} className="flex flex-col gap-4 lg:sticky lg:top-[20%] h-fit relative">
+          <div ref={serviziBlockRef} className="flex flex-col gap-4 h-fit relative sticky" style={{ top: '20vh' }}>
             {/* Logo statico sopra il badge - opacity controllata da GSAP */}
             <img
               src={logoWebwiseCenter}
@@ -458,9 +487,11 @@ function HomePage() {
           </div>
 
           {/* Colonna destra - card servizi con sticky stacking */}
-          <div className="flex flex-col mt-[200px]">
+          {/* Tutte le card hanno lo stesso top (35vh) così quando la sezione esce, escono tutte insieme */}
+          {/* Lo scalino di 20px è creato con top incrementale ma tutte escono dalla viewport insieme */}
+          <div ref={cardsContainerRef} className="flex flex-col mt-[200px]">
             {/* Card Ecommerce */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '35vh', zIndex: 1 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '35vh', zIndex: 1 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -485,7 +516,7 @@ function HomePage() {
             </div>
 
             {/* Card Design */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 20px)', zIndex: 2 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 20px)', zIndex: 2 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -511,7 +542,7 @@ function HomePage() {
             </div>
 
             {/* Card Custom Software */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 40px)', zIndex: 3 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 40px)', zIndex: 3 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -536,7 +567,7 @@ function HomePage() {
             </div>
 
             {/* Card Blockchain & Web3 */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 60px)', zIndex: 4 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 60px)', zIndex: 4 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -559,7 +590,7 @@ function HomePage() {
             </div>
 
             {/* Card AI & Machine Learning */}
-            <div className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 80px)', zIndex: 5 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky" style={{ top: 'calc(35vh + 80px)', zIndex: 5 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -584,6 +615,9 @@ function HomePage() {
                 intelligenti, aiutando il tuo business a crescere con innovazione e precisione.
               </p>
             </div>
+
+            {/* Spacer per completare l'animazione sticky */}
+            <div style={{ height: 'calc(65vh - 80px)' }}></div>
           </div>
         </div>
       </section>
