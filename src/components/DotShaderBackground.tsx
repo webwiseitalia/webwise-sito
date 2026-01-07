@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef } from 'react'
+import { useMemo, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { shaderMaterial } from '@react-three/drei'
 import * as THREE from 'three'
@@ -10,7 +10,8 @@ const DotMaterial = shaderMaterial(
     bgColor: new THREE.Color('#000000'),
     rotation: 0,
     gridSize: 50,
-    dotOpacity: 0.05
+    dotOpacity: 0.05,
+    fillAmount: 0.0
   },
   /* glsl */ `
     void main() {
@@ -24,6 +25,7 @@ const DotMaterial = shaderMaterial(
     uniform float rotation;
     uniform float gridSize;
     uniform float dotOpacity;
+    uniform float fillAmount;
 
     vec2 rotate(vec2 uv, float angle) {
         float s = sin(angle);
@@ -57,10 +59,15 @@ const DotMaterial = shaderMaterial(
       float circleMaskCenter = length(uv - centerDisplace);
       float circleMaskFromCenter = smoothstep(0.5, 1.0, circleMaskCenter);
 
-      float combinedMask = screenMask * circleMaskFromCenter;
+      // Interpola tra la maschera originale (con zona vuota) e 1.0 (tutto pieno)
+      float adjustedCircleMask = mix(circleMaskFromCenter, 1.0, fillAmount);
+      float combinedMask = screenMask * adjustedCircleMask;
 
       // Static dot size based on position only
-      float dotSize = min(pow(circleMaskCenter, 2.0) * 0.3, 0.3);
+      // Anche la dimensione dei pallini deve essere uniforme quando fillAmount = 1
+      float originalDotSize = min(pow(circleMaskCenter, 2.0) * 0.3, 0.3);
+      float uniformDotSize = 0.15; // Dimensione uniforme per i pallini
+      float dotSize = mix(originalDotSize, uniformDotSize, fillAmount);
 
       float sdfDot = sdfCircle(gridUv, dotSize);
 
@@ -77,8 +84,19 @@ const DotMaterial = shaderMaterial(
   `
 )
 
+// Interfaccia per il ref esposto
+export interface DotShaderBackgroundRef {
+  setFillAmount: (value: number) => void
+}
+
 // Componente Scene che usa dimensioni fisse
-function Scene({ fixedWidth, fixedHeight }: { fixedWidth: number; fixedHeight: number }) {
+interface SceneProps {
+  fixedWidth: number
+  fixedHeight: number
+  materialRef: React.MutableRefObject<typeof DotMaterial | null>
+}
+
+function Scene({ fixedWidth, fixedHeight, materialRef }: SceneProps) {
   const { viewport } = useThree()
 
   const rotation = 0
@@ -94,6 +112,11 @@ function Scene({ fixedWidth, fixedHeight }: { fixedWidth: number; fixedHeight: n
   const dotMaterial = useMemo(() => {
     return new DotMaterial()
   }, [])
+
+  // Salva il riferimento al materiale
+  useEffect(() => {
+    materialRef.current = dotMaterial
+  }, [dotMaterial, materialRef])
 
   useEffect(() => {
     dotMaterial.uniforms.dotColor.value.setHex(parseInt(themeColors.dotColor.replace('#', ''), 16))
@@ -118,12 +141,23 @@ function Scene({ fixedWidth, fixedHeight }: { fixedWidth: number; fixedHeight: n
   )
 }
 
-export default function DotShaderBackground() {
+const DotShaderBackground = forwardRef<DotShaderBackgroundRef>((_, ref) => {
   // Cattura le dimensioni della finestra una sola volta al mount
   const dimensionsRef = useRef({
     width: typeof window !== 'undefined' ? window.innerWidth : 1920,
     height: typeof window !== 'undefined' ? window.innerHeight : 1080
   })
+
+  const materialRef = useRef<typeof DotMaterial | null>(null)
+
+  // Esponi il metodo setFillAmount
+  useImperativeHandle(ref, () => ({
+    setFillAmount: (value: number) => {
+      if (materialRef.current && materialRef.current.uniforms) {
+        materialRef.current.uniforms.fillAmount.value = value
+      }
+    }
+  }))
 
   return (
     <Canvas
@@ -140,7 +174,12 @@ export default function DotShaderBackground() {
       <Scene
         fixedWidth={dimensionsRef.current.width}
         fixedHeight={dimensionsRef.current.height}
+        materialRef={materialRef}
       />
     </Canvas>
   )
-}
+})
+
+DotShaderBackground.displayName = 'DotShaderBackground'
+
+export default DotShaderBackground

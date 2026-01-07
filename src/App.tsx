@@ -16,7 +16,7 @@ import CareersPage from './pages/CareersPage'
 import ProjectPage from './pages/ProjectPage'
 import ScrollToTop from './components/ScrollToTop'
 import ParticleLogo from './components/ParticleLogo'
-import DotShaderBackground from './components/DotShaderBackground'
+import DotShaderBackground, { DotShaderBackgroundRef } from './components/DotShaderBackground'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -85,6 +85,7 @@ function HomePage() {
   const serviziSectionRef = useRef<HTMLElement>(null)
   const serviziBlockRef = useRef<HTMLDivElement>(null)
   const heroShaderRef = useRef<HTMLDivElement>(null)
+  const dotShaderRef = useRef<DotShaderBackgroundRef>(null)
 
   // L'animazione parte solo la prima volta che si visita la homepage
 
@@ -162,6 +163,29 @@ function HomePage() {
         // Punto di flip: a metà del percorso (midframe)
         const flipPoint = 0.5
 
+        // Calcola fillAmount: massimo (1) al punto di flip (0.5), minimo (0) agli estremi
+        // Usiamo una curva che cresce da 0 a 1 avvicinandosi a 0.5 e poi decresce
+        // fillAmount = 1 - |progress - 0.5| * 2 → va da 0 (a 0 e 1) a 1 (a 0.5)
+        // Ma vogliamo che l'effetto sia più concentrato vicino al flip point
+        // Usiamo una curva più ripida: inizia a riempire dal 30% e finisce al 70%
+        const fillStart = 0.35
+        const fillEnd = 0.65
+        let fillAmount = 0
+        if (progress >= fillStart && progress <= flipPoint) {
+          // Da fillStart a flipPoint: 0 → 1
+          fillAmount = (progress - fillStart) / (flipPoint - fillStart)
+        } else if (progress > flipPoint && progress <= fillEnd) {
+          // Da flipPoint a fillEnd: 1 → 0
+          fillAmount = 1 - (progress - flipPoint) / (fillEnd - flipPoint)
+        }
+        // Applica easing per transizione più smooth
+        fillAmount = Math.sin(fillAmount * Math.PI / 2)
+
+        // Aggiorna lo shader con fillAmount
+        if (dotShaderRef.current) {
+          dotShaderRef.current.setFillAmount(fillAmount)
+        }
+
         if (progress < flipPoint) {
           // FASE 1: Zoom IN da 1x a 2x (senza flip)
           const phase1Progress = progress / flipPoint
@@ -232,7 +256,7 @@ function HomePage() {
             transformOrigin: 'center center',
           }}
         >
-          <DotShaderBackground />
+          <DotShaderBackground ref={dotShaderRef} />
         </div>
 
         <div className="flex flex-col items-center text-center px-4 relative z-10">
