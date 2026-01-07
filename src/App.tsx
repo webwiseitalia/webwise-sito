@@ -116,10 +116,10 @@ function HomePage() {
     window.scrollTo(0, 0)
 
     // Le colonne laterali ora usano TypewriterText, quindi completiamo subito l'animazione
-    // Aspettiamo che il typewriter delle colonne finisca (~1.8s dopo l'inizio)
+    // Aspettiamo che il typewriter delle colonne finisca (~1s dopo l'inizio)
     setTimeout(() => {
       setAnimationPhase('complete')
-    }, 1800)
+    }, 1000)
   }, [])
 
   const isTypewriterActive = animationPhase === 'typewriter' || animationPhase === 'complete'
@@ -267,31 +267,31 @@ function HomePage() {
                 text="WEBWISE"
                 isVisible={isTypewriterActive}
                 delay={0}
-                speed={0.035}
+                speed={0.018}
               />
             </p>
             <p>
               <TypewriterText
                 text="TRANSFORMING DIGITAL PRESENCE"
                 isVisible={isTypewriterActive}
-                delay={0.25}
-                speed={0.015}
+                delay={0.12}
+                speed={0.008}
               />
             </p>
             <p>
               <TypewriterText
                 text="WITH AI-DRIVEN STRATEGIES AND"
                 isVisible={isTypewriterActive}
-                delay={0.7}
-                speed={0.015}
+                delay={0.35}
+                speed={0.008}
               />
             </p>
             <p>
               <TypewriterText
                 text="SCALABLE TECHNOLOGIES"
                 isVisible={isTypewriterActive}
-                delay={1.1}
-                speed={0.015}
+                delay={0.55}
+                speed={0.008}
               />
             </p>
           </div>
@@ -308,23 +308,23 @@ function HomePage() {
                 <TypewriterText
                   text="SMARTER SYSTEMS"
                   isVisible={isTypewriterActive}
-                  delay={1.4}
-                  speed={0.025}
+                  delay={0.7}
+                  speed={0.012}
                 />
               </p>
               <p style={{ whiteSpace: 'nowrap' }}>
                 <TypewriterText
                   text="BETTER"
                   isVisible={isTypewriterActive}
-                  delay={1.6}
-                  speed={0.025}
+                  delay={0.85}
+                  speed={0.012}
                 />
                 <span style={{ marginLeft: '100px' }}>
                   <TypewriterText
                     text="WORK"
                     isVisible={isTypewriterActive}
-                    delay={1.75}
-                    speed={0.025}
+                    delay={0.92}
+                    speed={0.012}
                   />
                 </span>
               </p>
@@ -354,16 +354,16 @@ function HomePage() {
                 <TypewriterText
                   text="EST. 2022"
                   isVisible={isTypewriterActive}
-                  delay={1.4}
-                  speed={0.025}
+                  delay={0.7}
+                  speed={0.012}
                 />
               </p>
               <p style={{ paddingLeft: '60px', whiteSpace: 'nowrap' }}>
                 <TypewriterText
                   text="→ EFFICENCY"
                   isVisible={isTypewriterActive}
-                  delay={1.6}
-                  speed={0.025}
+                  delay={0.85}
+                  speed={0.012}
                 />
               </p>
             </div>
