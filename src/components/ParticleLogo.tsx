@@ -310,6 +310,12 @@ export default function ParticleLogo({
     let isAnimating = false
 
     const handleWheel = (e: WheelEvent) => {
+      // Se stiamo animando, BLOCCA TUTTI gli scroll (anche quelli fuori dalle zone snap)
+      if (isAnimating) {
+        e.preventDefault()
+        return
+      }
+
       const { phase1, phase2 } = progressRef.current
       const direction = e.deltaY > 0 ? 'down' : 'up'
 
@@ -346,12 +352,6 @@ export default function ParticleLogo({
       )
 
       const inAnySnapZone = inSnapZone1 || inSnapZone2
-
-      // Se stiamo animando, BLOCCA tutto
-      if (isAnimating) {
-        e.preventDefault()
-        return
-      }
 
       // Se non siamo in zona snap, lascia scrollare
       if (!inAnySnapZone) return
@@ -396,6 +396,8 @@ export default function ParticleLogo({
         }
       })
 
+      let prevPhase2 = 1
+
       trigger2 = ScrollTrigger.create({
         trigger: midframeSectionRef.current,
         start: 'bottom-=33% center',  // Riparte quando manca 1/3 alla fine della sezione
@@ -403,7 +405,34 @@ export default function ParticleLogo({
         end: 'top top',
         scrub: 1,
         onUpdate: (self) => {
-          progressRef.current.phase2 = self.progress
+          const newPhase2 = self.progress
+          const isGoingUp = newPhase2 < prevPhase2
+
+          // RISALENDO: appena phase2 inizia a scendere da 1, fai partire lo snap SUBITO
+          if (isGoingUp && prevPhase2 >= 0.99 && newPhase2 < 0.99 && !isAnimating) {
+            isAnimating = true
+            const targetScroll = self.start
+            const currentScroll = window.scrollY
+
+            // Killa qualsiasi animazione GSAP in corso
+            gsap.killTweensOf(window)
+
+            // Ferma il momentum nativo: forza la pagina a restare dove è ORA
+            // poi parti con l'animazione smooth da qui
+            window.scrollTo({ top: currentScroll, behavior: 'instant' as ScrollBehavior })
+
+            gsap.to(window, {
+              scrollTo: { y: targetScroll, autoKill: false },
+              duration: 0.8,
+              ease: 'power2.inOut',
+              onComplete: () => {
+                isAnimating = false
+              }
+            })
+          }
+
+          prevPhase2 = newPhase2
+          progressRef.current.phase2 = newPhase2
         }
       })
     }
