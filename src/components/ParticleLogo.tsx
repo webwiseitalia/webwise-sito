@@ -331,7 +331,7 @@ export default function ParticleLogo({
       // La "linea di taglio" è il bordo superiore della prima card (35vh dalla top della viewport)
       // - Scendendo dal midframe: snap verso servizi (phase2 basso)
       // - Salendo dalla sezione servizi: snap SOLO se siamo SOPRA la linea delle card
-      const cardLineY = window.innerHeight * 0.35 // 35vh = posizione top della prima card
+      const cardLineY = window.innerHeight * 0.35 // 35vh - linea verde dove si ferma la card Ecommerce
 
       // Trova la prima card per verificare se siamo sopra di essa
       const firstCard = document.querySelector('.service-card') as HTMLElement | null
@@ -347,8 +347,8 @@ export default function ParticleLogo({
       const inSnapZone2 = phase1 >= 0.99 && (
         // Scendendo: snap quando siamo al midframe
         (direction === 'down' && phase2 < 0.05) ||
-        // Salendo: snap SOLO se siamo sopra la linea delle card
-        (direction === 'up' && phase2 > 0 && phase2 < 0.99 && isAboveCardLine)
+        // Salendo: snap quando phase2 è alto (vicino a servizi) e siamo sopra la linea delle card
+        (direction === 'up' && phase2 > 0.90 && isAboveCardLine)
       )
 
       const inAnySnapZone = inSnapZone1 || inSnapZone2
@@ -396,8 +396,6 @@ export default function ParticleLogo({
         }
       })
 
-      let prevPhase2 = 1
-
       trigger2 = ScrollTrigger.create({
         trigger: midframeSectionRef.current,
         start: 'bottom-=33% center',  // Riparte quando manca 1/3 alla fine della sezione
@@ -405,34 +403,7 @@ export default function ParticleLogo({
         end: 'top top',
         scrub: 1,
         onUpdate: (self) => {
-          const newPhase2 = self.progress
-          const isGoingUp = newPhase2 < prevPhase2
-
-          // RISALENDO: appena phase2 inizia a scendere da 1, fai partire lo snap SUBITO
-          if (isGoingUp && prevPhase2 >= 0.99 && newPhase2 < 0.99 && !isAnimating) {
-            isAnimating = true
-            const targetScroll = self.start
-            const currentScroll = window.scrollY
-
-            // Killa qualsiasi animazione GSAP in corso
-            gsap.killTweensOf(window)
-
-            // Ferma il momentum nativo: forza la pagina a restare dove è ORA
-            // poi parti con l'animazione smooth da qui
-            window.scrollTo({ top: currentScroll, behavior: 'instant' as ScrollBehavior })
-
-            gsap.to(window, {
-              scrollTo: { y: targetScroll, autoKill: false },
-              duration: 0.8,
-              ease: 'power2.inOut',
-              onComplete: () => {
-                isAnimating = false
-              }
-            })
-          }
-
-          prevPhase2 = newPhase2
-          progressRef.current.phase2 = newPhase2
+          progressRef.current.phase2 = self.progress
         }
       })
     }
