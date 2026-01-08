@@ -82,7 +82,8 @@ function HomePage() {
   const rightColumnRef = useRef<HTMLDivElement>(null)
   const heroSectionRef = useRef<HTMLElement>(null)
   const logoSectionRef = useRef<HTMLElement>(null)
-  const serviziSectionRef = useRef<HTMLElement>(null)
+  const servizi1SectionRef = useRef<HTMLElement>(null) // Sezione sopra la linea verde - solo logo
+  const serviziSectionRef = useRef<HTMLElement>(null) // Sezione sotto la linea verde - card e contenuto
   const serviziBlockRef = useRef<HTMLDivElement>(null)
   const serviziContentRef = useRef<HTMLDivElement>(null)
   const portfolioSectionRef = useRef<HTMLElement>(null)
@@ -256,7 +257,7 @@ function HomePage() {
       <ParticleLogo
         heroSectionRef={heroSectionRef}
         midframeSectionRef={logoSectionRef}
-        serviziSectionRef={serviziSectionRef}
+        servizi1SectionRef={servizi1SectionRef}
         serviziBlockRef={serviziBlockRef}
         heroLogoRef={heroLogoRef}
         isVisible={showParticleLogo}
@@ -417,20 +418,29 @@ function HomePage() {
         <div style={{ width: '437px', height: '437px' }} className="relative z-10" />
       </section>
 
-      {/* Sezione Servizi - altezza automatica basata sul contenuto */}
+      {/* Sezione Servizi 1 - SOPRA la linea verde (35vh) - contiene SOLO il logo */}
+      {/* Il logo arriva qui con l'animazione da midframe e rimane fisso */}
       <section
-        ref={serviziSectionRef}
-        id="servizi"
-        className="w-full relative py-20"
-        style={{ overflow: 'clip' }}
+        ref={servizi1SectionRef}
+        className="w-full relative"
+        style={{ height: '35vh', overflow: 'clip' }}
       >
-        {/* Lo sfondo è gestito dall'unico DotShaderBackground nella hero section */}
-        {/* che viene flippato e dezoomato durante lo scroll */}
-
-        <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start" style={{ transformOrigin: 'center top' }}>
-          {/* Colonna sinistra - sticky */}
-          <div ref={serviziBlockRef} className="flex flex-col gap-4 h-fit relative sticky" style={{ top: '20vh' }}>
-            {/* Logo statico sopra il badge - opacity controllata da GSAP */}
+        {/* LINEA VERDE DEBUG - bordo inferiore della sezione servizi1 */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            backgroundColor: '#00ff00',
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+        />
+        <div className="relative max-w-7xl mx-auto px-8 h-full">
+          {/* Logo statico - posizionato in alto a sinistra, sticky */}
+          <div ref={serviziBlockRef} className="sticky" style={{ top: '20vh', paddingTop: '20px' }}>
             <img
               src={logoWebwiseCenter}
               alt="Webwise Logo"
@@ -438,10 +448,23 @@ function HomePage() {
               style={{
                 width: '125px',
                 height: '125px',
-                opacity: 0, // Inizialmente nascosto, GSAP lo mostra quando serve
-                marginBottom: '20px',
+                opacity: 0, // Controllato da ParticleLogo
               }}
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Sezione Servizi 2 - SOTTO la linea verde - contiene card e contenuto */}
+      <section
+        ref={serviziSectionRef}
+        id="servizi"
+        className="w-full relative py-20"
+        style={{ overflow: 'clip' }}
+      >
+        <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start" style={{ transformOrigin: 'center top' }}>
+          {/* Colonna sinistra - sticky */}
+          <div className="flex flex-col gap-4 h-fit relative sticky" style={{ top: '20vh' }}>
             {/* Badge */}
             <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
               Come possiamo aiutarti

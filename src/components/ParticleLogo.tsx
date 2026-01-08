@@ -19,7 +19,7 @@ interface Particle {
 interface ParticleLogoProps {
   heroSectionRef: React.RefObject<HTMLElement | null>
   midframeSectionRef: React.RefObject<HTMLElement | null>
-  serviziSectionRef: React.RefObject<HTMLElement | null>
+  servizi1SectionRef: React.RefObject<HTMLElement | null> // Sezione sopra la linea verde - solo logo
   serviziBlockRef: React.RefObject<HTMLDivElement | null>
   heroLogoRef: React.RefObject<HTMLDivElement | null>
   isVisible: boolean
@@ -28,7 +28,7 @@ interface ParticleLogoProps {
 export default function ParticleLogo({
   heroSectionRef,
   midframeSectionRef,
-  serviziSectionRef,
+  servizi1SectionRef,
   serviziBlockRef,
   heroLogoRef,
   isVisible,
@@ -108,9 +108,6 @@ export default function ParticleLogo({
 
     // Aspetta che il layout sia stabile prima di calcolare la posizione
     setTimeout(updateHeroPosition, 100)
-
-    // Flag per lo snap - definiti qui perché usati sia nel render che in handleWheel
-    let isSnappingToMidframe = false
 
     // Carica immagine e crea particelle
     const loadParticles = () => {
@@ -225,16 +222,15 @@ export default function ParticleLogo({
         document.body.appendChild(midframeLogo)
       }
 
-      if (phase2 >= 0.98 || (isSnappingToMidframe && phase2 > 0.80)) {
-        // Arrivato alla fine OPPURE snap verso midframe in corso (con phase2 ancora alto):
-        // Mostra logo statico servizi, nascondi particelle
-        // Questo "congela" il logo finché lo snap non è ben avviato
+      // SEMPLIFICATO: Il logo statico servizi appare quando phase2 >= 0.98
+      // Ora il trigger2 finisce in servizi1 (sopra la linea verde), quindi
+      // quando phase2 = 1, il logo è nella sua posizione finale e non si muove più
+      if (phase2 >= 0.98) {
         if (logoStatico) logoStatico.style.opacity = '1'
         if (midframeLogo) midframeLogo.style.opacity = '0'
         animationFrameRef.current = requestAnimationFrame(render)
         return
       } else {
-        // Non ancora arrivato alla fine: nascondi logo statico servizi
         if (logoStatico) logoStatico.style.opacity = '0'
       }
 
@@ -332,29 +328,23 @@ export default function ParticleLogo({
         (direction === 'up' && phase1 > 0.01)
       )
 
-      // Zona snap 2: midframe ↔ servizi
-      // La "linea di taglio" è il bordo superiore della prima card (35vh dalla top della viewport)
-      // - Scendendo dal midframe: snap verso servizi (phase2 basso)
-      // - Salendo dalla sezione servizi: snap SOLO se siamo SOPRA la linea delle card
-      const cardLineY = window.innerHeight * 0.35 // 35vh - linea verde dove si ferma la card Ecommerce
-
-      // Trova la prima card per verificare se siamo sopra di essa
-      const firstCard = document.querySelector('.service-card') as HTMLElement | null
-      let isAboveCardLine = false
-
-      if (firstCard && serviziSectionRef.current) {
-        const cardRect = firstCard.getBoundingClientRect()
-        // Se il top della card è sotto il 35vh della viewport, siamo sopra la linea
-        // Cioè la card non ha ancora raggiunto la sua posizione sticky
-        isAboveCardLine = cardRect.top > cardLineY
-      }
+      // Zona snap 2: midframe ↔ servizi1 (sopra la linea verde)
+      // CONTROLLO POSIZIONE FISICA: uso getBoundingClientRect() per sapere se sono in servizi1
+      const servizi1Rect = servizi1SectionRef.current?.getBoundingClientRect()
+      // Sono fisicamente in servizi1 quando:
+      // - La sezione è visibile sullo schermo (bottom > 0)
+      // - Il top della sezione è nella metà superiore dello schermo (top < 50% viewport)
+      // Questo cattura meglio la zona di transizione
+      const viewportHeight = window.innerHeight
+      const isPhysicallyInServizi1 = servizi1Rect &&
+        servizi1Rect.bottom > 0 &&
+        servizi1Rect.top < viewportHeight * 0.5
 
       const inSnapZone2 = phase1 >= 0.99 && (
-        // Scendendo: snap quando siamo al midframe
+        // Scendendo: snap quando siamo al midframe (phase2 basso = non ancora partito verso servizi)
         (direction === 'down' && phase2 < 0.05) ||
-        // Salendo: snap IMMEDIATAMENTE quando il logo statico servizi è visibile (phase2 >= 0.98)
-        // Questo parte PRIMA che le particelle appaiano
-        (direction === 'up' && phase2 >= 0.98)
+        // Salendo: snap SOLO se sono FISICAMENTE dentro servizi1 (sopra la linea verde)
+        (direction === 'up' && isPhysicallyInServizi1)
       )
 
       const inAnySnapZone = inSnapZone1 || inSnapZone2
@@ -366,16 +356,10 @@ export default function ParticleLogo({
       e.preventDefault()
       isAnimating = true
 
-      // Se stiamo snappando da servizi verso midframe, setta il flag per congelare il logo
-      if (inSnapZone2 && direction === 'up') {
-        isSnappingToMidframe = true
-      }
-
       const trigger = inSnapZone1 ? trigger1 : trigger2
 
       if (!trigger) {
         isAnimating = false
-        isSnappingToMidframe = false
         return
       }
 
@@ -388,7 +372,6 @@ export default function ParticleLogo({
         ease: 'power2.inOut',
         onComplete: () => {
           isAnimating = false
-          isSnappingToMidframe = false
         }
       })
     }
@@ -396,7 +379,7 @@ export default function ParticleLogo({
     window.addEventListener('wheel', handleWheel, { passive: false })
 
     const setupTriggers = () => {
-      if (!heroSectionRef.current || !midframeSectionRef.current || !serviziSectionRef.current) return
+      if (!heroSectionRef.current || !midframeSectionRef.current || !servizi1SectionRef.current) return
 
       trigger1 = ScrollTrigger.create({
         trigger: heroSectionRef.current,
@@ -412,7 +395,7 @@ export default function ParticleLogo({
       trigger2 = ScrollTrigger.create({
         trigger: midframeSectionRef.current,
         start: 'bottom-=33% center',  // Riparte quando manca 1/3 alla fine della sezione
-        endTrigger: serviziSectionRef.current,
+        endTrigger: servizi1SectionRef.current, // FINISCE in servizi1 (sopra la linea verde)
         end: 'top top',
         scrub: 1,
         onUpdate: (self) => {
@@ -439,7 +422,7 @@ export default function ParticleLogo({
       const midframeLogo = document.getElementById('midframe-static-logo')
       if (midframeLogo) midframeLogo.remove()
     }
-  }, [isVisible, heroSectionRef, midframeSectionRef, serviziSectionRef, serviziBlockRef, heroLogoRef])
+  }, [isVisible, heroSectionRef, midframeSectionRef, servizi1SectionRef, serviziBlockRef, heroLogoRef])
 
   if (!isVisible) return null
 
