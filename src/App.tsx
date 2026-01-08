@@ -425,19 +425,6 @@ function HomePage() {
         className="w-full relative"
         style={{ height: '35vh', overflow: 'clip' }}
       >
-        {/* LINEA VERDE DEBUG - bordo inferiore della sezione servizi1 */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '3px',
-            backgroundColor: '#00ff00',
-            zIndex: 9999,
-            pointerEvents: 'none',
-          }}
-        />
         <div className="relative max-w-7xl mx-auto px-8 h-full">
           {/* Logo statico - posizionato in alto a sinistra, sticky */}
           <div ref={serviziBlockRef} className="sticky" style={{ top: '20vh', paddingTop: '20px' }}>
