@@ -109,6 +109,9 @@ export default function ParticleLogo({
     // Aspetta che il layout sia stabile prima di calcolare la posizione
     setTimeout(updateHeroPosition, 100)
 
+    // Flag per lo snap - definiti qui perché usati sia nel render che in handleWheel
+    let isSnappingToMidframe = false
+
     // Carica immagine e crea particelle
     const loadParticles = () => {
       return new Promise<void>((resolve) => {
@@ -222,8 +225,10 @@ export default function ParticleLogo({
         document.body.appendChild(midframeLogo)
       }
 
-      if (phase2 >= 0.98) {
-        // Arrivato alla fine: nascondi particelle e midframe logo, mostra logo statico servizi
+      if (phase2 >= 0.98 || (isSnappingToMidframe && phase2 > 0.80)) {
+        // Arrivato alla fine OPPURE snap verso midframe in corso (con phase2 ancora alto):
+        // Mostra logo statico servizi, nascondi particelle
+        // Questo "congela" il logo finché lo snap non è ben avviato
         if (logoStatico) logoStatico.style.opacity = '1'
         if (midframeLogo) midframeLogo.style.opacity = '0'
         animationFrameRef.current = requestAnimationFrame(render)
@@ -347,8 +352,9 @@ export default function ParticleLogo({
       const inSnapZone2 = phase1 >= 0.99 && (
         // Scendendo: snap quando siamo al midframe
         (direction === 'down' && phase2 < 0.05) ||
-        // Salendo: snap quando phase2 è alto (vicino a servizi) e siamo sopra la linea delle card
-        (direction === 'up' && phase2 > 0.90 && isAboveCardLine)
+        // Salendo: snap IMMEDIATAMENTE quando il logo statico servizi è visibile (phase2 >= 0.98)
+        // Questo parte PRIMA che le particelle appaiano
+        (direction === 'up' && phase2 >= 0.98)
       )
 
       const inAnySnapZone = inSnapZone1 || inSnapZone2
@@ -360,10 +366,16 @@ export default function ParticleLogo({
       e.preventDefault()
       isAnimating = true
 
+      // Se stiamo snappando da servizi verso midframe, setta il flag per congelare il logo
+      if (inSnapZone2 && direction === 'up') {
+        isSnappingToMidframe = true
+      }
+
       const trigger = inSnapZone1 ? trigger1 : trigger2
 
       if (!trigger) {
         isAnimating = false
+        isSnappingToMidframe = false
         return
       }
 
@@ -376,6 +388,7 @@ export default function ParticleLogo({
         ease: 'power2.inOut',
         onComplete: () => {
           isAnimating = false
+          isSnappingToMidframe = false
         }
       })
     }
