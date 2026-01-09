@@ -145,13 +145,14 @@ function HomePage() {
   // - Zona statica: logo nitido, background fermo a 2x
   // - Fase 2 (zoom out): da bottom-=33% del midframe fino a servizi
   useEffect(() => {
-    if (!heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current) return
+    if (!heroSectionRef.current || !logoSectionRef.current || !serviziSectionRef.current || !servizi1SectionRef.current) return
     if (!heroShaderRef.current) return
 
     const shader = heroShaderRef.current
     const heroSection = heroSectionRef.current
     const logoSection = logoSectionRef.current
     const serviziSection = serviziSectionRef.current
+    const servizi1Section = servizi1SectionRef.current
 
     // Stato iniziale
     shader.style.transform = 'scale(1)'
@@ -235,12 +236,53 @@ function HomePage() {
       }
     })
 
+    // Trigger 4: Background FISSO durante animazione card (servizi1 → fine servizi2)
+    // Il background resta bloccato a scale(1) mentre le card scorrono sopra
+    const fixedBackgroundTrigger = ScrollTrigger.create({
+      trigger: servizi1Section,
+      start: 'top top',
+      endTrigger: serviziSection,
+      end: 'bottom bottom',
+      onEnter: () => {
+        // Blocca il background a scala 1 (flippato)
+        shader.style.transform = `scale(1) scaleY(-1)`
+        if (dotShaderRef.current) dotShaderRef.current.setFillAmount(0)
+      },
+      onLeaveBack: () => {
+        // Tornando indietro, lascia che zoomOutTrigger gestisca l'animazione
+      }
+    })
+
     return () => {
       zoomInTrigger.kill()
       staticTrigger.kill()
       zoomOutTrigger.kill()
+      fixedBackgroundTrigger.kill()
     }
   }, [hasSeenLoading])
+
+  // ScrollTrigger per pinnare le card quando l'animazione sticky è completa
+  // Questo previene che le card collassino quando escono dalla viewport
+  useEffect(() => {
+    if (!cardsContainerRef.current || !serviziSectionRef.current) return
+
+    const cardsContainer = cardsContainerRef.current
+    const serviziSection = serviziSectionRef.current
+
+    // Pin le card quando hanno finito di impilarsi
+    const cardsPinTrigger = ScrollTrigger.create({
+      trigger: cardsContainer,
+      start: 'bottom bottom', // Quando il bottom delle card raggiunge il bottom della viewport
+      endTrigger: serviziSection,
+      end: 'bottom bottom', // Fino alla fine della sezione servizi
+      pin: true,
+      pinSpacing: false // Non aggiungere spazio extra
+    })
+
+    return () => {
+      cardsPinTrigger.kill()
+    }
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -499,8 +541,6 @@ function HomePage() {
           </div>
 
           {/* Colonna destra - card servizi con sticky stacking */}
-          {/* Tutte le card hanno lo stesso top (35vh) così quando la sezione esce, escono tutte insieme */}
-          {/* Lo scalino di 20px è creato con top incrementale ma tutte escono dalla viewport insieme */}
           <div ref={cardsContainerRef} className="flex flex-col mt-[200px]">
             {/* Card Ecommerce */}
             <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '35vh', zIndex: 1 }}>
@@ -627,9 +667,8 @@ function HomePage() {
                 intelligenti, aiutando il tuo business a crescere con innovazione e precisione.
               </p>
             </div>
-
-            {/* Spacer per completare l'animazione sticky */}
-            <div style={{ height: 'calc(65vh - 80px)' }}></div>
+            {/* Spacer per permettere lo scroll mentre le card restano sticky */}
+            <div style={{ height: '100vh' }}></div>
           </div>
         </div>
       </section>
