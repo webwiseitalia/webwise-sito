@@ -261,29 +261,6 @@ function HomePage() {
     }
   }, [hasSeenLoading])
 
-  // ScrollTrigger per pinnare le card quando l'animazione sticky è completa
-  // Questo previene che le card collassino quando escono dalla viewport
-  useEffect(() => {
-    if (!cardsContainerRef.current || !serviziSectionRef.current) return
-
-    const cardsContainer = cardsContainerRef.current
-    const serviziSection = serviziSectionRef.current
-
-    // Pin le card quando hanno finito di impilarsi
-    const cardsPinTrigger = ScrollTrigger.create({
-      trigger: cardsContainer,
-      start: 'bottom bottom', // Quando il bottom delle card raggiunge il bottom della viewport
-      endTrigger: serviziSection,
-      end: 'bottom bottom', // Fino alla fine della sezione servizi
-      pin: true,
-      pinSpacing: false // Non aggiungere spazio extra
-    })
-
-    return () => {
-      cardsPinTrigger.kill()
-    }
-  }, [])
-
   return (
     <div className="min-h-screen flex flex-col">
       {/* Loading Screen - mostra solo la prima volta */}
@@ -485,11 +462,12 @@ function HomePage() {
       </section>
 
       {/* Sezione Servizi 2 - SOTTO la linea verde - contiene card e contenuto */}
+      {/* L'altezza minima garantisce che le card sticky abbiano abbastanza spazio per restare in posizione */}
       <section
         ref={serviziSectionRef}
         id="servizi"
         className="w-full relative py-20"
-        style={{ overflow: 'clip' }}
+        style={{ overflow: 'clip', minHeight: '250vh' }}
       >
         <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start" style={{ transformOrigin: 'center top' }}>
           {/* Colonna sinistra - sticky */}
@@ -642,7 +620,7 @@ function HomePage() {
             </div>
 
             {/* Card AI & Machine Learning */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky" style={{ top: 'calc(35vh + 80px)', zIndex: 5 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 80px)', zIndex: 5 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -667,8 +645,9 @@ function HomePage() {
                 intelligenti, aiutando il tuo business a crescere con innovazione e precisione.
               </p>
             </div>
-            {/* Spacer per permettere lo scroll mentre le card restano sticky */}
-            <div style={{ height: '100vh' }}></div>
+
+            {/* Spacer finale - permette all'ultima card di staccarsi e mantenere la posizione */}
+            <div style={{ height: '65vh' }}></div>
           </div>
         </div>
       </section>
