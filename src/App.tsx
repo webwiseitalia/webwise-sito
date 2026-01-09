@@ -87,6 +87,7 @@ function HomePage() {
   const serviziBlockRef = useRef<HTMLDivElement>(null)
   const serviziContentRef = useRef<HTMLDivElement>(null)
   const portfolioSectionRef = useRef<HTMLElement>(null)
+  const softwareSectionRef = useRef<HTMLDivElement>(null)
   const heroShaderRef = useRef<HTMLDivElement>(null)
   const dotShaderRef = useRef<DotShaderBackgroundRef>(null)
   const cardsContainerRef = useRef<HTMLDivElement>(null)
@@ -260,6 +261,61 @@ function HomePage() {
       fixedBackgroundTrigger.kill()
     }
   }, [hasSeenLoading])
+
+  // Effetto parallax: la sezione Portfolio sale sopra la sezione Servizi
+  // Pin sulla sezione servizi così che la sezione Portfolio la copra scrollando
+  useEffect(() => {
+    if (!portfolioSectionRef.current || !serviziSectionRef.current) return
+
+    const serviziSection = serviziSectionRef.current
+
+    // Pin la sezione servizi - resta ferma mentre la sezione Portfolio sale e la copre
+    const pinTrigger = ScrollTrigger.create({
+      trigger: serviziSection,
+      start: 'bottom bottom', // Inizia quando il bottom della sezione servizi raggiunge il bottom della viewport
+      end: '+=100%', // Dura per un'altezza viewport extra
+      pin: true,
+      pinSpacing: false, // Non aggiunge spazio - la sezione Portfolio riempie lo spazio
+    })
+
+    return () => {
+      pinTrigger.kill()
+    }
+  }, [])
+
+  // Animazione scala + fade per la sezione Software
+  useEffect(() => {
+    if (!softwareSectionRef.current) return
+
+    const softwareSection = softwareSectionRef.current
+
+    // Stato iniziale: più piccola e trasparente
+    gsap.set(softwareSection, {
+      scale: 0.8,
+      opacity: 0.3,
+      transformOrigin: 'center top'
+    })
+
+    // Animazione: cresce a scala 1 e opacity 1 mentre entra nella viewport
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: softwareSection,
+        start: 'top bottom', // Inizia quando il top della sezione entra dalla bottom della viewport
+        end: 'top top', // Finisce quando il top raggiunge il top della viewport - animazione più lunga
+        scrub: 1,
+      }
+    })
+
+    tl.to(softwareSection, {
+      scale: 1,
+      opacity: 1,
+      ease: 'none'
+    })
+
+    return () => {
+      tl.kill()
+    }
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -467,7 +523,7 @@ function HomePage() {
         ref={serviziSectionRef}
         id="servizi"
         className="w-full relative py-20"
-        style={{ overflow: 'clip', minHeight: '250vh' }}
+        style={{ minHeight: '250vh' }}
       >
         <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start" style={{ transformOrigin: 'center top' }}>
           {/* Colonna sinistra - sticky */}
@@ -653,12 +709,15 @@ function HomePage() {
       </section>
 
       {/* Sezione Portfolio - 1920x2580 */}
+      {/* z-index alto per passare sopra alla sezione servizi, ombra per effetto profondità */}
       <section
         ref={portfolioSectionRef}
         id="portfolio"
         className="w-full bg-black relative"
         style={{
-          aspectRatio: '1920 / 2580'
+          aspectRatio: '1920 / 2580',
+          zIndex: 20,
+          boxShadow: '0 -20px 50px rgba(0, 0, 0, 0.8)'
         }}
       >
         {/* Sottosezione 1: I Nostri Clienti - 1920x1260 */}
@@ -801,8 +860,10 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Sezione Software */}
-      <SoftwareSection />
+      {/* Sezione Software - animazione scala + fade */}
+      <div ref={softwareSectionRef}>
+        <SoftwareSection />
+      </div>
 
       {/* Sezione Careers */}
       <CareersSection />

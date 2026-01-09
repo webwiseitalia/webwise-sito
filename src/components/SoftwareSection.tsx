@@ -69,8 +69,8 @@ const softwares: Software[] = [
 export default function SoftwareSection() {
   return (
     <section id="software" className="w-full">
-      {/* Sezione NERA con testo piccolo a destra */}
-      <div className="w-full bg-black py-20">
+      {/* Sezione con testo piccolo a destra */}
+      <div className="w-full py-20">
         <div className="max-w-6xl mx-auto px-8">
           <div className="max-w-md ml-auto text-right">
             {/* Badge */}
@@ -121,8 +121,8 @@ export default function SoftwareSection() {
         </div>
       </div>
 
-      {/* Sezione GRIGIA con software - Full Width */}
-      <div className="w-full bg-black">
+      {/* Sezione con software - Full Width */}
+      <div className="w-full">
         {/* Header con callout text */}
         <div className="w-full px-6 lg:px-12 py-20 flex justify-center">
           <p className="text-2xl md:text-3xl lg:text-[42px] leading-tight text-white max-w-5xl text-center">
