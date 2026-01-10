@@ -1,9 +1,40 @@
 import { Link } from 'react-router-dom'
+import { Suspense, useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { useGLTF, Environment } from '@react-three/drei'
+// OrbitControls rimosso - ora l'icosaedro ruota automaticamente
+import * as THREE from 'three'
 import logoStud from '../assets/loghi scot/logo-stud.webp'
 import logoOrdo from '../assets/loghi scot/logo-ordo.webp'
 import logoTodo from '../assets/loghi scot/logo-todo.webp'
 import logoCash from '../assets/loghi scot/logo-cash.webp'
 import logoTool from '../assets/loghi scot/logo-tools.webp'
+import scotModel from '../assets/new-scot-3d.glb'
+
+function ScotModel() {
+  const { scene } = useGLTF(scotModel)
+  const icosahedronGroupRef = useRef<THREE.Object3D | null>(null)
+
+  // Cerca il gruppo che contiene l'icosaedro (quello con molti figli - Node[6] con 42 figli)
+  // L'icona centrale è Node[49]->Node[50] e resta ferma
+  if (!icosahedronGroupRef.current) {
+    scene.traverse((child) => {
+      // Il gruppo dell'icosaedro ha >30 figli (i segmenti del wireframe)
+      if (child.children && child.children.length > 30 && !icosahedronGroupRef.current) {
+        icosahedronGroupRef.current = child
+      }
+    })
+  }
+
+  // Animazione rotazione solo per il gruppo icosaedro
+  useFrame((_, delta) => {
+    if (icosahedronGroupRef.current) {
+      icosahedronGroupRef.current.rotation.y += delta * 0.5
+    }
+  })
+
+  return <primitive object={scene} scale={1.7} position={[0, 0.15, 0]} />
+}
 
 interface Software {
   id: string
@@ -54,9 +85,22 @@ const softwares: Software[] = [
 export default function SoftwareSection() {
   return (
     <section id="software" className="w-full">
-      {/* Sezione con testo piccolo a destra */}
+      {/* Sezione con testo piccolo a destra e render 3D a sinistra */}
       <div className="w-full py-20">
-        <div className="max-w-6xl mx-auto px-8">
+        <div className="max-w-6xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {/* Colonna sinistra - Render 3D */}
+          <div className="h-[400px] lg:h-[500px]">
+            <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+              <Suspense fallback={null}>
+                <ambientLight intensity={0.5} />
+                <directionalLight position={[10, 10, 5]} intensity={1} />
+                <ScotModel />
+                <Environment preset="city" />
+              </Suspense>
+            </Canvas>
+          </div>
+
+          {/* Colonna destra - Testo */}
           <div className="max-w-md ml-auto text-right">
             {/* Badge */}
             <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-4">
@@ -113,7 +157,7 @@ export default function SoftwareSection() {
           <div className="w-full px-10 lg:px-24 py-16 lg:py-20">
             <p className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight text-white font-semibold text-center">
               I nostri software alimentano decisioni in tempo reale,{' '}
-              <span className="text-gray-500">AI-driven</span> per aziende
+              <span className="text-[#2EBAEB]">AI-driven</span> per aziende
               e imprese, dalla produzione alla distribuzione.
             </p>
           </div>
@@ -146,7 +190,7 @@ export default function SoftwareSection() {
                 </div>
 
                 {/* Rettangolo azzurro che appare al hover - proporzioni 16:9 */}
-                <div className="hidden lg:flex col-span-4 justify-center items-center px-8">
+                <div className="hidden lg:flex col-span-4 justify-start items-center pl-4 pr-12">
                   <div className="w-full aspect-video bg-[#2EBAEB] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-sm" />
                 </div>
 

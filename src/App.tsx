@@ -879,19 +879,22 @@ function HomePage() {
         <div className="absolute inset-0 flex flex-col px-8 lg:px-24 py-16 lg:py-24">
           {/* Badge */}
           <span className="inline-flex items-center px-4 py-1.5 rounded-full border border-[#2EBAEB] text-[#2EBAEB] text-sm w-fit mb-4">
-            Come possiamo aiutarti
+            COMING SOON
           </span>
 
           {/* Titolo grande */}
           <h2 className="text-white font-medium leading-[1.1] max-w-5xl" style={{ fontSize: 'clamp(36px, 5.5vw, 72px)' }}>
-            Hallo! Wir sind Clou, deine Agentur in Luzern mit Fokus auf Branding, Purpose und Websites mit Wirkung.
+            Reservly è la piattaforma di prenotazione pensata per il business moderno.
           </h2>
 
           {/* Contenitore per descrizione e bottone - posizionato a destra e più in basso */}
           <div className="mt-auto ml-auto max-w-lg flex flex-col gap-6 pb-16 lg:pb-24">
             {/* Descrizione */}
-            <p className="text-white/90 text-lg lg:text-xl leading-relaxed">
-              In deinem Sinn, für dich, für deine Kund:innen und nicht zuletzt für uns, tun wir alles dafür, dass unsere Arbeit Sinn macht.
+            <p className="text-white/70 text-lg lg:text-xl leading-relaxed">
+              Una web app veloce e scalabile, affiancata da app mobile Flutter, progettata per semplificare le prenotazioni, automatizzare i flussi e migliorare l'esperienza di clienti e staff.
+            </p>
+            <p className="text-[#2EBAEB] text-lg lg:text-xl font-medium">
+              Meno gestione, più controllo. Tutto in un unico sistema.
             </p>
 
             {/* Bottone */}
