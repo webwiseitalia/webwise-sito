@@ -576,7 +576,7 @@ function HomePage() {
           </div>
 
           {/* Colonna destra - card servizi con sticky stacking */}
-          <div ref={cardsContainerRef} className="flex flex-col mt-[200px]">
+          <div ref={cardsContainerRef} className="flex flex-col mt-0">
             {/* Card Ecommerce */}
             <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '35vh', zIndex: 1 }}>
               <div className="flex items-start gap-4 mb-4">
