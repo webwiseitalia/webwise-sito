@@ -77,7 +77,9 @@ function HomePage() {
   const [, setShowHeroLogo] = useState(true)
   // Se abbiamo già visto il loading, mostra subito le particelle
   const [showParticleLogo, setShowParticleLogo] = useState(hasSeenLoading)
+  const [showCustomProjectsLine, setShowCustomProjectsLine] = useState(false) // Scritta "progetti custom"
   const heroLogoRef = useRef<HTMLDivElement>(null)
+  const customProjectsRef = useRef<HTMLDivElement>(null) // Ref per animare la scritta
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
@@ -130,6 +132,32 @@ function HomePage() {
 
   const isTypewriterActive = animationPhase === 'typewriter' || animationPhase === 'complete'
   const showFullContent = animationPhase === 'complete'
+
+  // Callback quando il logo fa snap-in/out nella sezione servizi
+  const handleLogoSnapComplete = useCallback((isSnapped: boolean) => {
+    setShowCustomProjectsLine(isSnapped)
+  }, [])
+
+  // Animazione fade in/out per la scritta "progetti custom"
+  useEffect(() => {
+    if (!customProjectsRef.current) return
+
+    // Cancella eventuali animazioni in corso per evitare conflitti
+    gsap.killTweensOf(customProjectsRef.current)
+
+    if (showCustomProjectsLine) {
+      // Fade in
+      gsap.to(customProjectsRef.current, {
+        opacity: 1,
+        duration: 0.4,
+        ease: 'power2.out',
+        overwrite: true
+      })
+    } else {
+      // Fade out istantaneo - deve scomparire immediatamente quando parte l'animazione di ritorno
+      gsap.set(customProjectsRef.current, { opacity: 0 })
+    }
+  }, [showCustomProjectsLine])
 
   // Mostra il ParticleLogo quando il loading è completato o se lo saltiamo
   useEffect(() => {
@@ -337,6 +365,7 @@ function HomePage() {
         serviziBlockRef={serviziBlockRef}
         heroLogoRef={heroLogoRef}
         isVisible={showParticleLogo}
+        onSnapComplete={handleLogoSnapComplete}
       />
 
 
@@ -502,18 +531,42 @@ function HomePage() {
         style={{ height: '35vh', overflow: 'clip' }}
       >
         <div className="relative max-w-7xl mx-auto px-8 h-full">
-          {/* Logo statico - posizionato in alto a sinistra, sticky */}
-          <div ref={serviziBlockRef} className="sticky" style={{ top: '20vh', paddingTop: '20px' }}>
+          {/* Logo + Linea con scritta custom */}
+          <div ref={serviziBlockRef} className="sticky flex items-center gap-8" style={{ top: '20vh', paddingTop: '20px' }}>
+            {/* Logo */}
             <img
               src={logoWebwiseCenter}
               alt="Webwise Logo"
-              className="invert"
+              className="invert flex-shrink-0"
               style={{
                 width: '125px',
                 height: '125px',
                 opacity: 0, // Controllato da ParticleLogo
               }}
             />
+
+            {/* Blocco destro: scritta + linea + CTA - con fade in/out */}
+            <div ref={customProjectsRef} className="flex-grow flex flex-col justify-center" style={{ opacity: 0 }}>
+              {/* Riga con scritta e CTA */}
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-white text-sm font-medium uppercase tracking-wide">
+                  REALIZZIAMO ANCHE PROGETTI CUSTOM SU MISURA
+                </p>
+                <a
+                  href="#contatti"
+                  className="flex items-center gap-1.5 text-white text-sm font-medium uppercase tracking-wide hover:text-[#2EBAEB] transition-colors group"
+                >
+                  <span>CONTATTACI</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                    <path d="M7 17L17 7" />
+                    <path d="M7 7h10v10" />
+                  </svg>
+                </a>
+              </div>
+
+              {/* Linea orizzontale */}
+              <div className="w-full h-px bg-white/50" />
+            </div>
           </div>
         </div>
       </section>
@@ -577,8 +630,53 @@ function HomePage() {
 
           {/* Colonna destra - card servizi con sticky stacking */}
           <div ref={cardsContainerRef} className="flex flex-col pt-0">
-            {/* Card Ecommerce */}
+            {/* Card SEO */}
             <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '20vh', zIndex: 1 }}>
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">SEO</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Google</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Posizionamento</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Ottimizzazione per i motori di ricerca e miglioramento del posizionamento su Google.
+              </p>
+            </div>
+
+            {/* Card Siti Web */}
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 20px)', zIndex: 2 }}>
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                    <path d="M3 9h18"></path>
+                    <path d="M9 21V9"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Siti Web</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Responsive</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Performanti</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Progettazione e sviluppo di siti web personalizzati, responsive e performanti.
+              </p>
+            </div>
+
+            {/* Card E-commerce */}
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 40px)', zIndex: 3 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -588,96 +686,66 @@ function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Ecommerce</h3>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">E-commerce</h3>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Shopify</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Integrazione gestionale</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Pagamenti</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Gestione prodotti</span>
                   </div>
                 </div>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Gestiamo un numero potenzialmente illimitato di prodotti, mantenendo la massima
-                flessibilità nel design. Sviluppiamo negozi online integrati e intelligenti, con la migliore
-                piattaforma sul mercato.
+                Realizzazione di negozi online completi, con sistemi di pagamento e gestione prodotti.
               </p>
             </div>
 
-            {/* Card Design */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 20px)', zIndex: 2 }}>
-              <div className="flex items-start gap-4 mb-4">
-                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="22" x2="2" y1="6" y2="6"></line>
-                    <line x1="22" x2="2" y1="18" y2="18"></line>
-                    <line x1="6" x2="6" y1="2" y2="22"></line>
-                    <line x1="18" x2="18" y1="2" y2="22"></line>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Design</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Vendita omnicanale</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Cloud</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Creiamo esperienze straordinarie per i tuoi utenti e interfacce moderne, belle e
-                funzionali. Seguiamo un processo di UX/UI Design che rispetta i migliori standard e
-                siamo creativi.
-              </p>
-            </div>
-
-            {/* Card Custom Software */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 40px)', zIndex: 3 }}>
-              <div className="flex items-start gap-4 mb-4">
-                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect>
-                    <rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect>
-                    <line x1="6" x2="6.01" y1="6" y2="6"></line>
-                    <line x1="6" x2="6.01" y1="18" y2="18"></line>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Custom Software</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Sicuro</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Personalizzato</span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Con un metodo studiato nei dettagli, arriviamo al risultato progettando insieme e
-                sviluppando il software in cloud di cui hai bisogno. Quasi tutto è possibile.
-              </p>
-            </div>
-
-            {/* Card Blockchain & Web3 */}
+            {/* Card Gestione Social */}
             <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 60px)', zIndex: 4 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m16 18 6-6-6-6"></path>
-                    <path d="m8 6-6 6 6 6"></path>
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Blockchain & Web3</h3>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Gestione Social</h3>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Cryptovalute</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Tecnologie decentralizzate</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Contenuti</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Crescita</span>
                   </div>
                 </div>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Sviluppiamo progetti direttamente su Blockchain o implementiamo in software
-                tradizionali funzionalità Web3.
+                Gestione professionale dei social media, creazione contenuti e crescita della presenza online.
               </p>
             </div>
 
-            {/* Card AI & Machine Learning */}
+            {/* Card App e Web App */}
             <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 80px)', zIndex: 5 }}>
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="7" height="12" x="2" y="6" rx="1"></rect>
+                    <rect width="7" height="12" x="15" y="6" rx="1"></rect>
+                    <path d="M9 6h6"></path>
+                    <path d="M9 18h6"></path>
+                    <path d="M9 12h6"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">App e Web App</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Mobile</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Su misura</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Sviluppo di applicazioni mobile e web su misura per aziende e progetti digitali.
+              </p>
+            </div>
+
+            {/* Card Automazioni e AI */}
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 100px)', zIndex: 6 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -690,16 +758,62 @@ function HomePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">AI & Machine Learning</h3>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Automazioni e AI</h3>
                   <div className="flex flex-wrap gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Multipiattaforma</span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">UX Design</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Intelligenza Artificiale</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Processi</span>
                   </div>
                 </div>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Soluzioni avanzate per automatizzare processi, analizzare dati e prendere decisioni
-                intelligenti, aiutando il tuo business a crescere con innovazione e precisione.
+                Automazione dei processi aziendali e integrazione di soluzioni basate su AI.
+              </p>
+            </div>
+
+            {/* Card ADS */}
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 120px)', zIndex: 7 }}>
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 3v18h18"></path>
+                    <path d="m19 9-5 5-4-4-3 3"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">ADS</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Google Ads</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Social Ads</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Gestione di campagne pubblicitarie su Google Ads e piattaforme social.
+              </p>
+            </div>
+
+            {/* Card Reservly */}
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 140px)', zIndex: 8 }}>
+              <div className="flex items-start gap-4 mb-4">
+                <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M8 2v4"></path>
+                    <path d="M16 2v4"></path>
+                    <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                    <path d="M3 10h18"></path>
+                    <path d="M9 16h6"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-white text-xl font-semibold mb-2 group-hover:text-[#2EBAEB] transition-colors">Reservly</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Prenotazioni</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#2EBAEB] text-white">Gestione appuntamenti</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Piattaforma di prenotazione per il business moderno: web app e app mobile per semplificare appuntamenti e automatizzare i flussi.
               </p>
             </div>
 
@@ -769,18 +883,18 @@ function HomePage() {
 
         {/* Sezione: Contattaci */}
         <div className="w-full relative py-24 lg:py-32 bg-gray-200 overflow-hidden z-10">
-          {/* Cerchio sfumato rosso in alto a sinistra */}
+          {/* Cerchio sfumato cyan in alto a destra */}
           <div
-            className="absolute -top-[300px] -left-[150px] w-[500px] h-[500px] rounded-full opacity-25 z-[1]"
+            className="absolute -top-[300px] -right-[150px] w-[500px] h-[500px] rounded-full opacity-35 z-[1]"
             style={{
               background: '#2EBAEB',
               filter: 'blur(200px)'
             }}
           />
 
-          {/* Cerchio sfumato cyan in basso a destra */}
+          {/* Cerchio sfumato cyan in basso a sinistra */}
           <div
-            className="absolute -bottom-[150px] right-0 w-[500px] h-[500px] rounded-full opacity-35 z-[1]"
+            className="absolute -bottom-[150px] left-0 w-[500px] h-[500px] rounded-full opacity-25 z-[1]"
             style={{
               background: '#2EBAEB',
               filter: 'blur(200px)'
@@ -788,29 +902,27 @@ function HomePage() {
           />
 
           {/* Contenuto */}
-          <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12 flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-16">
-            {/* Colonna sinistra - Badge */}
-            <div className="lg:w-1/3">
-              <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#2EBAEB] text-white text-xs font-medium">
-                Scrivici, è gratis!
+          <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12">
+            {/* Contenuto principale - allineato a destra */}
+            <div className="flex flex-col gap-4 max-w-2xl ml-auto text-right">
+              {/* Badge - stile come SCOT "Coming Soon" */}
+              <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit ml-auto">
+                SCRIVICI
               </span>
-            </div>
 
-            {/* Colonna destra - Contenuto */}
-            <div className="flex flex-col gap-4 lg:w-2/3">
-              <h4 className="text-3xl lg:text-4xl uppercase font-medium tracking-tight text-gray-900 leading-tight">
+              <h4 className="text-3xl lg:text-4xl uppercase font-bold tracking-tight text-gray-900 leading-tight">
                 Vuoi lavorare con noi?{' '}
-                <span className="text-gray-500">Raccontaci il tuo progetto</span>
+                <span className="text-[#2EBAEB]">Raccontaci il tuo progetto</span>
               </h4>
 
-              <p className="text-gray-600 leading-relaxed max-w-xl">
+              <p className="text-gray-600 leading-relaxed max-w-xl ml-auto">
                 Ogni percorso inizia con una chiamata conoscitiva, in cui potrai raccontarci quali sono le tue esigenze e ricevere i primi consigli sulla loro realizzazione.
               </p>
 
               {/* Bottone Contattaci */}
               <a
                 href="#contatti"
-                className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:-rotate-2 transition-all w-fit"
+                className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:-rotate-2 transition-all w-fit ml-auto"
               >
                 <span className="text-gray-900 font-medium">Contattaci</span>
                 <div className="relative flex p-2 overflow-hidden text-white bg-black rounded-full group-hover:bg-[#2EBAEB] transition-colors">
@@ -824,7 +936,7 @@ function HomePage() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="transition-all translate-y-0 group-hover:-translate-y-[105%]"
+                    className="transition-all translate-y-0 group-hover:-translate-y-[200%]"
                   >
                     <path d="M5 12h14" />
                     <path d="m12 5 7 7-7 7" />
@@ -839,7 +951,7 @@ function HomePage() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="absolute transition-all translate-y-[130%] group-hover:translate-y-0"
+                    className="absolute transition-all translate-y-[200%] group-hover:translate-y-0"
                   >
                     <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
                     <path d="m21.854 2.147-10.94 10.939" />
@@ -849,9 +961,9 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Icona stella/asterisco */}
+          {/* Icona stella/asterisco - ingrandita, esce dallo schermo in basso a sinistra */}
           <svg
-            className="absolute z-[1] right-6 lg:right-auto bottom-6 lg:bottom-10 lg:left-12 w-[120px] h-[120px] lg:w-[200px] lg:h-[200px] animate-spin-slow opacity-60"
+            className="absolute z-[1] -bottom-[100px] -left-[100px] lg:-bottom-[150px] lg:-left-[150px] w-[350px] h-[350px] lg:w-[500px] lg:h-[500px] animate-spin-slow opacity-40"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 72 72"
             fill="none"
@@ -859,7 +971,7 @@ function HomePage() {
           >
             <path
               d="M40 0H32V26.3432L13.3726 7.71573L7.71573 13.3726L26.3431 32H0V40H26.3432L7.71573 58.6274L13.3726 64.2843L32 45.6569V72H40V45.6569L58.6274 64.2843L64.2843 58.6274L45.6568 40H72V32H45.6569L64.2843 13.3726L58.6274 7.71573L40 26.3432V0Z"
-              fill="#d1d5db"
+              fill="#2EBAEB"
             />
           </svg>
         </div>

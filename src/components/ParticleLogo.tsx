@@ -23,6 +23,7 @@ interface ParticleLogoProps {
   serviziBlockRef: React.RefObject<HTMLDivElement | null>
   heroLogoRef: React.RefObject<HTMLDivElement | null>
   isVisible: boolean
+  onSnapComplete?: (isSnapped: boolean) => void // Callback quando lo snap-in/out è completato
 }
 
 export default function ParticleLogo({
@@ -32,12 +33,14 @@ export default function ParticleLogo({
   serviziBlockRef,
   heroLogoRef,
   isVisible,
+  onSnapComplete,
 }: ParticleLogoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<Particle[]>([])
   const animationFrameRef = useRef<number | null>(null)
   const progressRef = useRef({ phase1: 0, phase2: 0 })
   const isInitializedRef = useRef(false)
+  const wasSnappedRef = useRef(false) // Traccia lo stato precedente dello snap
 
   useEffect(() => {
     if (!isVisible) return
@@ -225,7 +228,21 @@ export default function ParticleLogo({
       // SEMPLIFICATO: Il logo statico servizi appare quando phase2 >= 0.98
       // Ora il trigger2 finisce in servizi1 (sopra la linea verde), quindi
       // quando phase2 = 1, il logo è nella sua posizione finale e non si muove più
-      if (phase2 >= 0.98) {
+      const isSnapped = phase2 >= 0.98
+
+      // La scritta deve scomparire SUBITO quando inizia lo snap-out (phase2 scende sotto 1)
+      // Quindi usiamo una soglia più alta per il fade out: appena phase2 < 1 nascondi la scritta
+      const showCustomLine = phase2 >= 0.995 // Soglia molto alta: nascondi appena parte l'animazione di ritorno
+
+      // Notifica il cambio di stato per la scritta (soglia più sensibile)
+      if (showCustomLine !== wasSnappedRef.current) {
+        wasSnappedRef.current = showCustomLine
+        if (onSnapComplete) {
+          onSnapComplete(showCustomLine)
+        }
+      }
+
+      if (isSnapped) {
         if (logoStatico) logoStatico.style.opacity = '1'
         if (midframeLogo) midframeLogo.style.opacity = '0'
         animationFrameRef.current = requestAnimationFrame(render)
