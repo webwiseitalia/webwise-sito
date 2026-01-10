@@ -576,9 +576,9 @@ function HomePage() {
           </div>
 
           {/* Colonna destra - card servizi con sticky stacking */}
-          <div ref={cardsContainerRef} className="flex flex-col mt-0">
+          <div ref={cardsContainerRef} className="flex flex-col pt-0">
             {/* Card Ecommerce */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '35vh', zIndex: 1 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '20vh', zIndex: 1 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -603,7 +603,7 @@ function HomePage() {
             </div>
 
             {/* Card Design */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 20px)', zIndex: 2 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 20px)', zIndex: 2 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -629,7 +629,7 @@ function HomePage() {
             </div>
 
             {/* Card Custom Software */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 40px)', zIndex: 3 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 40px)', zIndex: 3 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -654,7 +654,7 @@ function HomePage() {
             </div>
 
             {/* Card Blockchain & Web3 */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 60px)', zIndex: 4 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 60px)', zIndex: 4 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -677,7 +677,7 @@ function HomePage() {
             </div>
 
             {/* Card AI & Machine Learning */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(35vh + 80px)', zIndex: 5 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 80px)', zIndex: 5 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
