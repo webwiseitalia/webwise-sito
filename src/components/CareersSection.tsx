@@ -20,12 +20,17 @@ export default function CareersSection() {
       />
 
       {/* Contenuto */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12 flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-16">
-        {/* Colonna sinistra - Contenuto */}
-        <div className="flex flex-col gap-4 lg:w-2/3">
-          <h4 className="text-3xl lg:text-4xl uppercase font-medium tracking-tight text-gray-900 leading-tight">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12">
+        {/* Contenuto principale */}
+        <div className="flex flex-col gap-4 max-w-2xl">
+          {/* Badge - stile come SCOT "Coming Soon" */}
+          <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
+            STIAMO ASSUMENDO
+          </span>
+
+          <h4 className="text-3xl lg:text-4xl uppercase font-bold tracking-tight text-gray-900 leading-tight">
             Vuoi unirti al team?{' '}
-            <span className="text-gray-500">Mostraci il tuo talento</span>
+            <span className="text-[#2EBAEB]">Mostraci il tuo talento</span>
           </h4>
 
           <p className="text-gray-600 leading-relaxed max-w-xl">
@@ -74,18 +79,11 @@ export default function CareersSection() {
             </div>
           </a>
         </div>
-
-        {/* Colonna destra - Badge */}
-        <div className="lg:w-1/3 flex lg:justify-end">
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#2EBAEB] text-white text-xs font-medium">
-            Stiamo assumendo!
-          </span>
-        </div>
       </div>
 
-      {/* Icona stella/asterisco - posizionata a destra */}
+      {/* Icona stella/asterisco - ingrandita, esce dallo schermo in basso e a destra */}
       <svg
-        className="absolute z-[1] left-6 lg:left-auto bottom-6 lg:bottom-10 lg:right-12 w-[120px] h-[120px] lg:w-[200px] lg:h-[200px] animate-spin-slow opacity-60"
+        className="absolute z-[1] -bottom-[100px] -right-[100px] lg:-bottom-[150px] lg:-right-[150px] w-[350px] h-[350px] lg:w-[500px] lg:h-[500px] animate-spin-slow opacity-40"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 72 72"
         fill="none"
@@ -93,7 +91,7 @@ export default function CareersSection() {
       >
         <path
           d="M40 0H32V26.3432L13.3726 7.71573L7.71573 13.3726L26.3431 32H0V40H26.3432L7.71573 58.6274L13.3726 64.2843L32 45.6569V72H40V45.6569L58.6274 64.2843L64.2843 58.6274L45.6568 40H72V32H45.6569L64.2843 13.3726L58.6274 7.71573L40 26.3432V0Z"
-          fill="#d1d5db"
+          fill="#2EBAEB"
         />
       </svg>
     </section>

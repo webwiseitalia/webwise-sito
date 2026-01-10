@@ -767,7 +767,7 @@ function HomePage() {
           <ProjectsTable />
         </div>
 
-        {/* Sottosezione 4: Lavora con noi */}
+        {/* Sezione: Contattaci */}
         <div className="w-full relative py-24 lg:py-32 bg-gray-200 overflow-hidden z-10">
           {/* Cerchio sfumato rosso in alto a sinistra */}
           <div
@@ -870,7 +870,7 @@ function HomePage() {
         <SoftwareSection />
       </div>
 
-      {/* Sezione Careers */}
+      {/* Sezione: Lavora con noi */}
       <CareersSection />
 
       {/* Sezione Reservly */}
