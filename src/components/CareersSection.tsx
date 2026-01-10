@@ -54,7 +54,7 @@ export default function CareersSection() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="transition-all translate-y-0 group-hover:-translate-y-[105%]"
+                className="transition-all translate-y-0 group-hover:-translate-y-[200%]"
               >
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
@@ -69,7 +69,7 @@ export default function CareersSection() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="absolute transition-all translate-y-[130%] group-hover:translate-y-0"
+                className="absolute transition-all translate-y-[200%] group-hover:translate-y-0"
               >
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
