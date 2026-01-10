@@ -103,12 +103,17 @@ export default function SoftwareSection() {
           {/* Colonna destra - Testo */}
           <div className="max-w-md ml-auto text-right">
             {/* Badge */}
-            <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-4">
-              Come possiamo aiutarti
+            <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-6">
+              COMING SOON
             </span>
 
             {/* Titolo */}
-            <h3 className="text-white text-xl font-semibold mb-3">Servizi</h3>
+            <h3
+              className="text-white font-semibold mb-3 w-full"
+              style={{ fontFamily: 'Moderniz, sans-serif', fontSize: 'clamp(50px, 8vw, 90px)', lineHeight: '1' }}
+            >
+              SCOT
+            </h3>
 
             {/* Descrizione */}
             <p className="text-gray-400 text-sm leading-relaxed mb-6">

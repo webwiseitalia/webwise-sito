@@ -17,6 +17,7 @@ import ProjectPage from './pages/ProjectPage'
 import ScrollToTop from './components/ScrollToTop'
 import ParticleLogo from './components/ParticleLogo'
 import DotShaderBackground, { DotShaderBackgroundRef } from './components/DotShaderBackground'
+import InfiniteGrid from './components/InfiniteGrid'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -727,16 +728,18 @@ function HomePage() {
             aspectRatio: '1920 / 1260'
           }}
         >
+          {/* Infinite Grid Background */}
+          <InfiniteGrid />
           {/* Badge */}
-          <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-4">
+          <span className="relative z-10 text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-4">
             Con chi abbiamo lavorato
           </span>
 
           {/* Titolo */}
-          <h2 className="text-white text-4xl font-semibold mb-4">I nostri clienti</h2>
+          <h2 className="relative z-10 text-white text-4xl font-semibold mb-4">I nostri clienti</h2>
 
           {/* Descrizione */}
-          <p className="text-gray-400 text-center max-w-2xl leading-relaxed px-4">
+          <p className="relative z-10 text-gray-400 text-center max-w-2xl leading-relaxed px-4">
             Ci immedesimiamo nella visione dei nostri clienti, per comprendere e realizzare i loro
             obiettivi con la stessa cura e attenzione che dedicherebbero loro stessi. Questo
             approccio empatico ci permette di sviluppare soluzioni che rispecchiano non solo le
@@ -744,7 +747,9 @@ function HomePage() {
           </p>
 
           {/* Card 3D dei progetti - interattive */}
-          <ProjectCards3D />
+          <div className="relative z-10">
+            <ProjectCards3D />
+          </div>
         </div>
 
         {/* Sottosezione 2: Slider - 1920x200 */}
