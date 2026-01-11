@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import logoWebwise from '../assets/logo+scritta-webwise-off.webp'
 
 interface BurgerMenuProps {
@@ -8,6 +8,15 @@ interface BurgerMenuProps {
 export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+
+  // Chiudi immediatamente il menu quando il burger sta per scomparire (scroll verso hero)
+  useEffect(() => {
+    if (!isVisible && isOpen) {
+      // Chiusura istantanea senza animazione
+      setIsOpen(false)
+      setIsClosing(false)
+    }
+  }, [isVisible, isOpen])
 
   const toggleMenu = useCallback(() => {
     if (isOpen && !isClosing) {
