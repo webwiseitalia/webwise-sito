@@ -18,6 +18,7 @@ import ScrollToTop from './components/ScrollToTop'
 import ParticleLogo from './components/ParticleLogo'
 import DotShaderBackground, { DotShaderBackgroundRef } from './components/DotShaderBackground'
 import InfiniteGrid from './components/InfiniteGrid'
+import BurgerMenu from './components/BurgerMenu'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -78,6 +79,8 @@ function HomePage() {
   // Se abbiamo già visto il loading, mostra subito le particelle
   const [showParticleLogo, setShowParticleLogo] = useState(hasSeenLoading)
   const [showCustomProjectsLine, setShowCustomProjectsLine] = useState(false) // Scritta "progetti custom"
+  const [showBurger, setShowBurger] = useState(false) // Burger menu visibile dopo scroll
+  const [navbarCompression, setNavbarCompression] = useState(0) // 0 = normale, 1 = compressa
   const heroLogoRef = useRef<HTMLDivElement>(null)
   const customProjectsRef = useRef<HTMLDivElement>(null) // Ref per animare la scritta
   const navbarRef = useRef<HTMLElement>(null)
@@ -206,11 +209,30 @@ function HomePage() {
         } else if (dotShaderRef.current) {
           dotShaderRef.current.setFillAmount(0)
         }
+
+        // Mostra/nascondi burger in base allo scroll
+        // Appare quando progress > 0.05 (appena inizia lo scroll)
+        if (self.progress > 0.05) {
+          setShowBurger(true)
+        } else {
+          setShowBurger(false)
+        }
+
+        // Compressione navbar: 0-1 basata sul progress dello scroll
+        // La navbar si comprime mentre si scrolla
+        setNavbarCompression(self.progress)
       },
       onLeave: () => {
         // Quando lo zoom finisce, assicura scala 2x
         shader.style.transform = `scale(2)`
         if (dotShaderRef.current) dotShaderRef.current.setFillAmount(1)
+        setShowBurger(true) // Burger sempre visibile dopo la hero
+        setNavbarCompression(1) // Navbar completamente compressa
+      },
+      onEnterBack: () => {
+        // Quando si torna verso la hero, nascondi burger e decomprimi navbar
+        setShowBurger(false)
+        setNavbarCompression(0)
       }
     })
 
@@ -375,8 +397,11 @@ function HomePage() {
         className="relative z-[100]"
         style={{ opacity: hasSeenLoading || !showLoading ? 1 : 0 }}
       >
-        <Navbar />
+        <Navbar compressionProgress={navbarCompression} />
       </nav>
+
+      {/* Burger Menu - appare quando si scrolla dalla hero */}
+      <BurgerMenu isVisible={showBurger} />
 
       {/* Hero Section - 1920x1080 con sfondo nero */}
       <section
