@@ -11,7 +11,10 @@ const DotMaterial = shaderMaterial(
     rotation: 0,
     gridSize: 50,
     dotOpacity: 0.05,
-    fillAmount: 0.0
+    fillAmount: 0.0,
+    mousePos: new THREE.Vector2(-1, -1),
+    glowRadius: 0.15,
+    glowIntensity: 0.4
   },
   /* glsl */ `
     void main() {
@@ -26,6 +29,9 @@ const DotMaterial = shaderMaterial(
     uniform float gridSize;
     uniform float dotOpacity;
     uniform float fillAmount;
+    uniform vec2 mousePos;
+    uniform float glowRadius;
+    uniform float glowIntensity;
 
     vec2 rotate(vec2 uv, float angle) {
         float s = sin(angle);
@@ -73,8 +79,17 @@ const DotMaterial = shaderMaterial(
 
       float smoothDot = smoothstep(0.05, 0.0, sdfDot);
 
-      // Static composition - no animations
-      vec3 composition = mix(bgColor, dotColor, smoothDot * combinedMask * dotOpacity);
+      // Mouse glow effect - dots illuminate near cursor
+      // Inverti Y del mouse per matchare le coordinate shader (origine in basso)
+      vec2 adjustedMousePos = vec2(mousePos.x, 1.0 - mousePos.y);
+      float mouseDistance = length(screenUv - adjustedMousePos);
+      float mouseGlow = smoothstep(glowRadius, 0.0, mouseDistance);
+
+      // Aumenta l'opacità dei dots vicino al mouse
+      float finalOpacity = dotOpacity + (mouseGlow * glowIntensity);
+
+      // Static composition with mouse glow
+      vec3 composition = mix(bgColor, dotColor, smoothDot * combinedMask * finalOpacity);
 
       gl_FragColor = vec4(composition, 1.0);
 
@@ -87,6 +102,8 @@ const DotMaterial = shaderMaterial(
 // Interfaccia per il ref esposto
 export interface DotShaderBackgroundRef {
   setFillAmount: (value: number) => void
+  setScale: (scale: number) => void
+  setFlipped: (flipped: boolean) => void
 }
 
 // Componente Scene che usa dimensioni fisse
@@ -149,34 +166,122 @@ const DotShaderBackground = forwardRef<DotShaderBackgroundRef>((_, ref) => {
   })
 
   const materialRef = useRef<typeof DotMaterial | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  // Esponi il metodo setFillAmount
+  // Smoothed mouse position
+  const smoothedMouse = useRef({ x: -1, y: -1 })
+  const targetMouse = useRef({ x: -1, y: -1 })
+  const animationRef = useRef<number | null>(null)
+  const currentScale = useRef(1)
+  const isFlipped = useRef(false)
+
+  // Esponi il metodo setFillAmount, setScale e setFlipped
   useImperativeHandle(ref, () => ({
     setFillAmount: (value: number) => {
       if (materialRef.current && materialRef.current.uniforms) {
         materialRef.current.uniforms.fillAmount.value = value
       }
+    },
+    setScale: (scale: number) => {
+      currentScale.current = scale
+    },
+    setFlipped: (flipped: boolean) => {
+      isFlipped.current = flipped
     }
   }))
 
+  // Animation loop per smooth mouse - più reattivo
+  useEffect(() => {
+    const animate = () => {
+      const smoothing = 0.25 // Più alto = più reattivo
+
+      smoothedMouse.current.x += (targetMouse.current.x - smoothedMouse.current.x) * smoothing
+      smoothedMouse.current.y += (targetMouse.current.y - smoothedMouse.current.y) * smoothing
+
+      // Aggiorna direttamente l'uniform
+      if (materialRef.current && materialRef.current.uniforms) {
+        materialRef.current.uniforms.mousePos.value.set(
+          smoothedMouse.current.x,
+          smoothedMouse.current.y
+        )
+      }
+
+      animationRef.current = requestAnimationFrame(animate)
+    }
+
+    animationRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [])
+
+  // Mouse tracking diretto sul documento
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const scale = currentScale.current
+      const flipped = isFlipped.current
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+
+      // Centro della viewport
+      const centerX = viewportWidth / 2
+      const centerY = viewportHeight / 2
+
+      // Posizione mouse relativa al centro
+      const relX = e.clientX - centerX
+      let relY = e.clientY - centerY
+
+      // Se il canvas è flippato, inverti la Y relativa
+      if (flipped) {
+        relY = -relY
+      }
+
+      // Compensa la scala (il canvas è scalato dal centro)
+      const compensatedX = centerX + (relX / scale)
+      const compensatedY = centerY + (relY / scale)
+
+      // Normalizza a 0-1
+      targetMouse.current.x = compensatedX / viewportWidth
+      targetMouse.current.y = compensatedY / viewportHeight
+    }
+
+    const handleMouseLeave = () => {
+      targetMouse.current.x = -1
+      targetMouse.current.y = -1
+    }
+
+    document.addEventListener('mousemove', handleMouseMove, { passive: true })
+    document.addEventListener('mouseleave', handleMouseLeave)
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [])
+
   return (
-    <Canvas
-      // Disabilita il resize automatico del canvas durante lo scroll
-      resize={{ scroll: false }}
-      gl={{
-        antialias: true,
-        powerPreference: 'high-performance',
-        outputColorSpace: THREE.SRGBColorSpace,
-        toneMapping: THREE.NoToneMapping
-      }}
-      style={{ width: '100%', height: '100%' }}
-    >
-      <Scene
-        fixedWidth={dimensionsRef.current.width}
-        fixedHeight={dimensionsRef.current.height}
-        materialRef={materialRef}
-      />
-    </Canvas>
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+      <Canvas
+        // Disabilita il resize automatico del canvas durante lo scroll
+        resize={{ scroll: false }}
+        gl={{
+          antialias: true,
+          powerPreference: 'high-performance',
+          outputColorSpace: THREE.SRGBColorSpace,
+          toneMapping: THREE.NoToneMapping
+        }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <Scene
+          fixedWidth={dimensionsRef.current.width}
+          fixedHeight={dimensionsRef.current.height}
+          materialRef={materialRef}
+        />
+      </Canvas>
+    </div>
   )
 })
 
