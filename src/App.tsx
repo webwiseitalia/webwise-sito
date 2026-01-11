@@ -201,12 +201,6 @@ function HomePage() {
         const scale = 1 + self.progress // 1 → 2
         shader.style.transform = `scale(${scale})`
 
-        // Aggiorna scala per correzione coordinate mouse (non flippato durante zoom in)
-        if (dotShaderRef.current) {
-          dotShaderRef.current.setScale(scale)
-          dotShaderRef.current.setFlipped(false)
-        }
-
         // fillAmount cresce verso la fine dello zoom
         if (self.progress > 0.7 && dotShaderRef.current) {
           const fillProgress = (self.progress - 0.7) / 0.3
@@ -231,10 +225,7 @@ function HomePage() {
       onLeave: () => {
         // Quando lo zoom finisce, assicura scala 2x
         shader.style.transform = `scale(2)`
-        if (dotShaderRef.current) {
-          dotShaderRef.current.setFillAmount(1)
-          dotShaderRef.current.setScale(2)
-        }
+        if (dotShaderRef.current) dotShaderRef.current.setFillAmount(1)
         setShowBurger(true) // Burger sempre visibile dopo la hero
         setNavbarCompression(1) // Navbar completamente compressa
       },
@@ -252,8 +243,7 @@ function HomePage() {
       end: 'bottom-=33% center',
       onUpdate: (self) => {
         // Background fermo a scala 2x, il flip avviene a metà
-        const isFlipped = self.progress >= 0.5
-        if (!isFlipped) {
+        if (self.progress < 0.5) {
           shader.style.transform = `scale(2)`
         } else {
           shader.style.transform = `scale(2) scaleY(-1)`
@@ -262,17 +252,13 @@ function HomePage() {
         // fillAmount resta al massimo durante la zona statica
         if (dotShaderRef.current) {
           dotShaderRef.current.setFillAmount(1)
-          dotShaderRef.current.setScale(2)
-          dotShaderRef.current.setFlipped(isFlipped)
         }
       },
       onLeave: () => {
         shader.style.transform = `scale(2) scaleY(-1)`
-        if (dotShaderRef.current) dotShaderRef.current.setFlipped(true)
       },
       onEnterBack: () => {
         shader.style.transform = `scale(2) scaleY(-1)`
-        if (dotShaderRef.current) dotShaderRef.current.setFlipped(true)
       }
     })
 
@@ -287,12 +273,6 @@ function HomePage() {
         const scale = 2 - self.progress // 2 → 1
         shader.style.transform = `scale(${scale}) scaleY(-1)`
 
-        // Aggiorna scala e flip per correzione coordinate mouse
-        if (dotShaderRef.current) {
-          dotShaderRef.current.setScale(scale)
-          dotShaderRef.current.setFlipped(true)
-        }
-
         // fillAmount decresce all'inizio del de-zoom
         if (self.progress < 0.3 && dotShaderRef.current) {
           const fillProgress = 1 - (self.progress / 0.3)
@@ -305,16 +285,23 @@ function HomePage() {
       onEnter: () => {
         // Quando inizia il de-zoom
         shader.style.transform = `scale(2) scaleY(-1)`
-        if (dotShaderRef.current) dotShaderRef.current.setFlipped(true)
-      },
-      onLeave: () => {
-        // Zoom out completato - assicura stato finale corretto
+      }
+    })
+
+    // Trigger 4: Background FISSO durante animazione card (servizi1 → fine servizi2)
+    // Il background resta bloccato a scale(1) mentre le card scorrono sopra
+    const fixedBackgroundTrigger = ScrollTrigger.create({
+      trigger: servizi1Section,
+      start: 'top top',
+      endTrigger: serviziSection,
+      end: 'bottom bottom',
+      onEnter: () => {
+        // Blocca il background a scala 1 (flippato)
         shader.style.transform = `scale(1) scaleY(-1)`
-        if (dotShaderRef.current) {
-          dotShaderRef.current.setFillAmount(0)
-          dotShaderRef.current.setScale(1)
-          dotShaderRef.current.setFlipped(true)
-        }
+        if (dotShaderRef.current) dotShaderRef.current.setFillAmount(0)
+      },
+      onLeaveBack: () => {
+        // Tornando indietro, lascia che zoomOutTrigger gestisca l'animazione
       }
     })
 
@@ -322,6 +309,7 @@ function HomePage() {
       zoomInTrigger.kill()
       staticTrigger.kill()
       zoomOutTrigger.kill()
+      fixedBackgroundTrigger.kill()
     }
   }, [hasSeenLoading])
 
@@ -381,7 +369,7 @@ function HomePage() {
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
+    <div className="min-h-screen flex flex-col">
       {/* Loading Screen - mostra solo la prima volta */}
       {!hasSeenLoading && (
         <LoadingScreen
