@@ -13,8 +13,8 @@ const DotMaterial = shaderMaterial(
     dotOpacity: 0.05,
     fillAmount: 0.0,
     mousePos: new THREE.Vector2(-1, -1),
-    glowRadius: 0.15,
-    glowIntensity: 0.4
+    glowRadius: 0.06,
+    glowIntensity: 0.9
   },
   /* glsl */ `
     void main() {
@@ -79,11 +79,16 @@ const DotMaterial = shaderMaterial(
 
       float smoothDot = smoothstep(0.05, 0.0, sdfDot);
 
-      // Mouse glow effect - dots illuminate near cursor
+      // Mouse glow effect - dots illuminate near cursor (sharp edge)
       // Inverti Y del mouse per matchare le coordinate shader (origine in basso)
       vec2 adjustedMousePos = vec2(mousePos.x, 1.0 - mousePos.y);
-      float mouseDistance = length(screenUv - adjustedMousePos);
-      float mouseGlow = smoothstep(glowRadius, 0.0, mouseDistance);
+      vec2 diff = screenUv - adjustedMousePos;
+      diff.x *= resolution.x / resolution.y; // Corregge aspect ratio per cerchio perfetto
+      float mouseDistance = length(diff);
+
+      // Effetto sharp: smoothstep con range molto stretto + pow per bordi netti
+      float rawGlow = smoothstep(glowRadius, glowRadius * 0.3, mouseDistance);
+      float mouseGlow = pow(rawGlow, 0.25); // Esponente basso = transizione più brusca
 
       // Aumenta l'opacità dei dots vicino al mouse
       float finalOpacity = dotOpacity + (mouseGlow * glowIntensity);

@@ -306,27 +306,15 @@ function HomePage() {
         // Quando inizia il de-zoom
         shader.style.transform = `scale(2) scaleY(-1)`
         if (dotShaderRef.current) dotShaderRef.current.setFlipped(true)
-      }
-    })
-
-    // Trigger 4: Background FISSO durante animazione card (servizi1 → fine servizi2)
-    // Il background resta bloccato a scale(1) mentre le card scorrono sopra
-    const fixedBackgroundTrigger = ScrollTrigger.create({
-      trigger: servizi1Section,
-      start: 'top top',
-      endTrigger: serviziSection,
-      end: 'bottom bottom',
-      onEnter: () => {
-        // Blocca il background a scala 1 (flippato)
+      },
+      onLeave: () => {
+        // Zoom out completato - assicura stato finale corretto
         shader.style.transform = `scale(1) scaleY(-1)`
         if (dotShaderRef.current) {
           dotShaderRef.current.setFillAmount(0)
           dotShaderRef.current.setScale(1)
           dotShaderRef.current.setFlipped(true)
         }
-      },
-      onLeaveBack: () => {
-        // Tornando indietro, lascia che zoomOutTrigger gestisca l'animazione
       }
     })
 
@@ -334,7 +322,6 @@ function HomePage() {
       zoomInTrigger.kill()
       staticTrigger.kill()
       zoomOutTrigger.kill()
-      fixedBackgroundTrigger.kill()
     }
   }, [hasSeenLoading])
 
