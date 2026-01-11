@@ -369,7 +369,7 @@ function HomePage() {
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       {/* Loading Screen - mostra solo la prima volta */}
       {!hasSeenLoading && (
         <LoadingScreen
