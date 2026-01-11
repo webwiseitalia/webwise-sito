@@ -16,6 +16,16 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+/* Nascondi scrollbar mantenendo lo scroll */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 /* Animazione rotazione lenta per icona stella */
 @keyframes spin-slow {
   from {

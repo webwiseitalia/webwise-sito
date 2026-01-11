@@ -411,16 +411,19 @@ function HomePage() {
           aspectRatio: '1920 / 1080'
         }}
       >
-        {/* Sfondo unico - zoom in/out con flip al centro */}
-        <div
-          ref={heroShaderRef}
-          className="fixed inset-0 z-0"
-          style={{
-            mixBlendMode: 'screen',
-            transformOrigin: 'center center',
-          }}
-        >
-          <DotShaderBackground ref={dotShaderRef} />
+        {/* Wrapper per contenere overflow durante lo zoom */}
+        <div className="fixed inset-0 z-0 overflow-hidden">
+          {/* Sfondo unico - zoom in/out con flip al centro */}
+          <div
+            ref={heroShaderRef}
+            className="absolute inset-0"
+            style={{
+              mixBlendMode: 'screen',
+              transformOrigin: 'center center',
+            }}
+          >
+            <DotShaderBackground ref={dotShaderRef} />
+          </div>
         </div>
 
         <div className="flex flex-col items-center text-center px-4 relative z-10">
