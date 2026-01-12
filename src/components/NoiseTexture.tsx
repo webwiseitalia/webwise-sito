@@ -14,25 +14,28 @@ export default function NoiseTexture({ className = '', opacity = 0.15 }: NoiseTe
     const container = containerRef.current
     if (!container) return
 
+    // Usa il parent element (la sezione) per catturare gli eventi mouse
+    // così funziona anche quando c'è contenuto sopra con z-index
+    const parent = container.parentElement
+    if (!parent) return
+
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect()
       setMousePos({
         x: e.clientX - rect.left,
         y: e.clientY - rect.top
       })
+      setIsHovering(true)
     }
 
-    const handleMouseEnter = () => setIsHovering(true)
     const handleMouseLeave = () => setIsHovering(false)
 
-    container.addEventListener('mousemove', handleMouseMove)
-    container.addEventListener('mouseenter', handleMouseEnter)
-    container.addEventListener('mouseleave', handleMouseLeave)
+    parent.addEventListener('mousemove', handleMouseMove)
+    parent.addEventListener('mouseleave', handleMouseLeave)
 
     return () => {
-      container.removeEventListener('mousemove', handleMouseMove)
-      container.removeEventListener('mouseenter', handleMouseEnter)
-      container.removeEventListener('mouseleave', handleMouseLeave)
+      parent.removeEventListener('mousemove', handleMouseMove)
+      parent.removeEventListener('mouseleave', handleMouseLeave)
     }
   }, [])
 

@@ -1021,7 +1021,10 @@ function HomePage() {
           aspectRatio: '1920 / 1080'
         }}
       >
-        <div className="absolute inset-0 flex flex-col px-8 lg:px-24 py-16 lg:py-24">
+        {/* Background con noise e griglia interattiva */}
+        <NoiseTexture />
+
+        <div className="absolute inset-0 flex flex-col px-8 lg:px-24 py-16 lg:py-24 z-10">
           {/* Badge */}
           <span className="inline-flex items-center px-4 py-1.5 rounded-full border border-[#2EBAEB] text-[#2EBAEB] text-sm w-fit mb-4">
             COMING SOON
