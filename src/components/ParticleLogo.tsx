@@ -23,7 +23,8 @@ interface ParticleLogoProps {
   serviziBlockRef: React.RefObject<HTMLDivElement | null>
   heroLogoRef: React.RefObject<HTMLDivElement | null>
   isVisible: boolean
-  onSnapComplete?: (isSnapped: boolean) => void // Callback quando lo snap-in/out è completato
+  onSnapComplete?: (isSnapped: boolean) => void // Callback quando lo snap-in/out è completato (servizi1)
+  onMidframeNitido?: (isNitido: boolean) => void // Callback quando il logo è nitido nel midframe
 }
 
 export default function ParticleLogo({
@@ -34,6 +35,7 @@ export default function ParticleLogo({
   heroLogoRef,
   isVisible,
   onSnapComplete,
+  onMidframeNitido,
 }: ParticleLogoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<Particle[]>([])
@@ -41,6 +43,7 @@ export default function ParticleLogo({
   const progressRef = useRef({ phase1: 0, phase2: 0 })
   const isInitializedRef = useRef(false)
   const wasSnappedRef = useRef(false) // Traccia lo stato precedente dello snap
+  const wasInCenterZoneRef = useRef(false) // Traccia lo stato precedente della zona centrale (logo nitido)
 
   useEffect(() => {
     if (!isVisible) return
@@ -254,6 +257,14 @@ export default function ParticleLogo({
       // Il logo nitido appare SOLO quando le particelle sono completamente ferme (dissolveAmount = 0)
       // Zona centrale: phase1 = 1 e phase2 = 0 (o molto vicino)
       const inCenterZone = phase1 >= 0.98 && phase2 <= 0.02
+
+      // Notifica il cambio di stato per il contenuto midframe (descrizioni)
+      if (inCenterZone !== wasInCenterZoneRef.current) {
+        wasInCenterZoneRef.current = inCenterZone
+        if (onMidframeNitido) {
+          onMidframeNitido(inCenterZone)
+        }
+      }
 
       if (midframeLogo) {
         // Logo nitido visibile solo nella zona centrale, istantaneamente (no fade)

@@ -40,26 +40,45 @@ function TypewriterText({
   speed?: number
 }) {
   const containerRef = useRef<HTMLSpanElement>(null)
+  const ctxRef = useRef<gsap.Context | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
 
+    // Cleanup del context precedente
+    if (ctxRef.current) {
+      ctxRef.current.revert()
+      ctxRef.current = null
+    }
+
     const chars = containerRef.current.querySelectorAll('.char')
 
     if (isVisible) {
-      // Animazione typewriter in entrata
-      gsap.set(chars, { opacity: 0 })
-      gsap.to(chars, {
-        opacity: 1,
-        duration: 0.05,
-        stagger: speed,
-        delay: delay,
-        ease: 'none',
+      // Crea un nuovo context GSAP per gestire meglio il cleanup
+      ctxRef.current = gsap.context(() => {
+        gsap.set(chars, { opacity: 0 })
+        gsap.to(chars, {
+          opacity: 1,
+          duration: 0.05,
+          stagger: speed,
+          delay: delay,
+          ease: 'none',
+        })
       })
     } else {
-      // Reset istantaneo in uscita
+      // Reset istantaneo - forza opacity 0 su tutti i caratteri
       gsap.killTweensOf(chars)
-      gsap.set(chars, { opacity: 0 })
+      chars.forEach(char => {
+        (char as HTMLElement).style.opacity = '0'
+      })
+    }
+
+    // Cleanup quando il componente si smonta
+    return () => {
+      if (ctxRef.current) {
+        ctxRef.current.revert()
+        ctxRef.current = null
+      }
     }
   }, [isVisible, delay, speed])
 
@@ -86,11 +105,18 @@ function HomePage() {
   // Se abbiamo già visto il loading, mostra subito le particelle
   const [showParticleLogo, setShowParticleLogo] = useState(hasSeenLoading)
   const [showCustomProjectsLine, setShowCustomProjectsLine] = useState(false) // Scritta "progetti custom"
+  const [showMidframeContent, setShowMidframeContent] = useState(false) // Contenuto midframe (descrizioni)
   const [showBurger, setShowBurger] = useState(false) // Burger menu visibile dopo scroll
   const [navbarCompression, setNavbarCompression] = useState(0) // 0 = normale, 1 = compressa
   const heroLogoRef = useRef<HTMLDivElement>(null)
   const customProjectsRef = useRef<HTMLDivElement>(null) // Ref per animare la scritta
   const lineRef = useRef<HTMLDivElement>(null) // Ref per animare la linea loading
+  const midframeLineLeftRef1 = useRef<HTMLDivElement>(null) // Linea sinistra 1 (Webwise)
+  const midframeLineLeftRef2 = useRef<HTMLDivElement>(null) // Linea sinistra 2 (Reservly)
+  const midframeLineRightRef = useRef<HTMLDivElement>(null) // Linea destra (SCOT)
+  const midframeObliqueLeftRef1 = useRef<HTMLDivElement>(null) // Linea obliqua sinistra 1
+  const midframeObliqueLeftRef2 = useRef<HTMLDivElement>(null) // Linea obliqua sinistra 2
+  const midframeObliqueRightRef = useRef<HTMLDivElement>(null) // Linea obliqua destra
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
@@ -174,6 +200,68 @@ function HomePage() {
       gsap.set(lineRef.current, { width: '0%' })
     }
   }, [showCustomProjectsLine])
+
+  // Animazione linee midframe - si espandono dal centro verso l'esterno
+  useEffect(() => {
+    const horizontalLines = [midframeLineLeftRef1.current, midframeLineLeftRef2.current, midframeLineRightRef.current]
+    const obliqueLines = [midframeObliqueLeftRef1.current, midframeObliqueLeftRef2.current, midframeObliqueRightRef.current]
+    const allLines = [...horizontalLines, ...obliqueLines]
+
+    allLines.forEach(line => {
+      if (line) gsap.killTweensOf(line)
+    })
+
+    if (showMidframeContent) {
+      // Linee orizzontali sinistra: si espandono verso sinistra
+      if (midframeLineLeftRef1.current) {
+        gsap.fromTo(midframeLineLeftRef1.current,
+          { width: '0%' },
+          { width: '100%', duration: 1, ease: 'power2.out', overwrite: true }
+        )
+      }
+      if (midframeLineLeftRef2.current) {
+        gsap.fromTo(midframeLineLeftRef2.current,
+          { width: '0%' },
+          { width: '100%', duration: 1, ease: 'power2.out', overwrite: true, delay: 0.1 }
+        )
+      }
+      // Linea orizzontale destra: si espande verso destra
+      if (midframeLineRightRef.current) {
+        gsap.fromTo(midframeLineRightRef.current,
+          { width: '0%' },
+          { width: '100%', duration: 1, ease: 'power2.out', overwrite: true }
+        )
+      }
+
+      // Linee oblique - partono con un piccolo delay dopo le orizzontali
+      if (midframeObliqueLeftRef1.current) {
+        gsap.fromTo(midframeObliqueLeftRef1.current,
+          { width: '0px' },
+          { width: '80px', duration: 0.6, ease: 'power2.out', overwrite: true, delay: 0.3 }
+        )
+      }
+      if (midframeObliqueLeftRef2.current) {
+        gsap.fromTo(midframeObliqueLeftRef2.current,
+          { width: '0px' },
+          { width: '80px', duration: 0.6, ease: 'power2.out', overwrite: true, delay: 0.4 }
+        )
+      }
+      if (midframeObliqueRightRef.current) {
+        gsap.fromTo(midframeObliqueRightRef.current,
+          { width: '0px' },
+          { width: '80px', duration: 0.6, ease: 'power2.out', overwrite: true, delay: 0.3 }
+        )
+      }
+    } else {
+      // Reset istantaneo
+      horizontalLines.forEach(line => {
+        if (line) gsap.set(line, { width: '0%' })
+      })
+      obliqueLines.forEach(line => {
+        if (line) gsap.set(line, { width: '0px' })
+      })
+    }
+  }, [showMidframeContent])
 
   // Mostra il ParticleLogo quando il loading è completato o se lo saltiamo
   useEffect(() => {
@@ -274,6 +362,9 @@ function HomePage() {
         shader.style.transform = `scale(2) scaleY(-1)`
       }
     })
+
+    // NOTA: Il contenuto midframe (descrizioni) è ora controllato direttamente dal ParticleLogo
+    // tramite il callback onMidframeNitido, così si sincronizza perfettamente con lo snap automatico
 
     // Trigger 3: Zoom OUT (dopo logo nitido → servizi)
     // Stesso startpoint del ParticleLogo fase 2: 'bottom-=33% center'
@@ -401,6 +492,7 @@ function HomePage() {
         heroLogoRef={heroLogoRef}
         isVisible={showParticleLogo}
         onSnapComplete={handleLogoSnapComplete}
+        onMidframeNitido={setShowMidframeContent}
       />
 
 
@@ -579,9 +671,155 @@ function HomePage() {
         }}
       >
         {/* Nessuno sfondo qui - lo zoom continua sugli sfondi hero/servizi */}
-        {/* Placeholder invisibile per mantenere le proporzioni */}
-        <div style={{ width: '437px', height: '437px' }} className="relative z-10" />
       </section>
+
+      {/* Descrizioni midframe - FIXED, posizionate rispetto al logo 546px centrato */}
+      {/* Appaiono/spariscono in sincronia con la zona "logo nitido" del ParticleLogo */}
+      <div
+        className="fixed inset-0 pointer-events-none flex items-center justify-center"
+        style={{
+          zIndex: 42, // Sopra il logo midframe (z-index 41)
+          opacity: showMidframeContent ? 1 : 0,
+          transition: 'opacity 0.15s ease'
+        }}
+      >
+        <div className="flex items-center justify-center gap-16">
+          {/* Colonna sinistra - 2 descrizioni: una in alto, una in basso (allineate con top/bottom del logo 546px) */}
+          <div className="flex flex-col justify-between items-end text-right" style={{ width: '450px', height: '546px' }}>
+            {/* Descrizione 1: Webwise e servizi - allineata con il TOP del logo */}
+            <div className="flex flex-col items-end">
+              <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
+                <TypewriterText
+                  text="SOLUZIONI DIGITALI SU MISURA"
+                  isVisible={showMidframeContent}
+                  delay={0}
+                  speed={0.025}
+                />
+              </p>
+              <p className="text-white/60 text-sm max-w-[380px] mb-4">
+                <TypewriterText
+                  text="Sviluppo web, app, automazioni e strategie digitali per far crescere il tuo business."
+                  isVisible={showMidframeContent}
+                  delay={0.3}
+                  speed={0.015}
+                />
+              </p>
+              {/* Contenitore linee - orizzontale + obliqua attaccate */}
+              <div className="w-full flex justify-end items-center relative">
+                {/* Linea orizzontale */}
+                <div
+                  ref={midframeLineLeftRef1}
+                  style={{ width: '0%', height: '2px' }}
+                  className="bg-white/60"
+                />
+                {/* Linea obliqua - posizionata all'estremità destra (verso il logo) */}
+                <div
+                  ref={midframeObliqueLeftRef1}
+                  className="bg-white/60 absolute"
+                  style={{
+                    width: '0px',
+                    height: '2px',
+                    left: '100%',
+                    top: '50%',
+                    transform: 'translateY(-50%) rotate(45deg)',
+                    transformOrigin: 'left center'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Descrizione 2: Reservly - allineata con il BOTTOM del logo */}
+            <div className="flex flex-col items-end">
+              <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
+                <TypewriterText
+                  text="RESERVLY"
+                  isVisible={showMidframeContent}
+                  delay={0.1}
+                  speed={0.04}
+                />
+              </p>
+              <p className="text-white/60 text-sm max-w-[380px] mb-4">
+                <TypewriterText
+                  text="La piattaforma di prenotazione per il business moderno. Semplifica appuntamenti e automatizza i flussi."
+                  isVisible={showMidframeContent}
+                  delay={0.4}
+                  speed={0.015}
+                />
+              </p>
+              {/* Contenitore linee - orizzontale + obliqua attaccate */}
+              <div className="w-full flex justify-end items-center relative">
+                {/* Linea orizzontale */}
+                <div
+                  ref={midframeLineLeftRef2}
+                  style={{ width: '0%', height: '2px' }}
+                  className="bg-white/60"
+                />
+                {/* Linea obliqua - posizionata all'estremità destra (verso il logo) */}
+                <div
+                  ref={midframeObliqueLeftRef2}
+                  className="bg-white/60 absolute"
+                  style={{
+                    width: '0px',
+                    height: '2px',
+                    left: '100%',
+                    top: '50%',
+                    transform: 'translateY(-50%) rotate(-45deg)',
+                    transformOrigin: 'left center'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Spazio per il logo centrale - 546px come il logo nitido */}
+          <div style={{ width: '546px', height: '546px' }} />
+
+          {/* Colonna destra - 1 descrizione centrata verticalmente con il CENTRO del logo */}
+          <div className="flex flex-col justify-center items-start text-left" style={{ width: '450px', height: '546px' }}>
+            {/* Descrizione: SCOT */}
+            <div className="flex flex-col items-start">
+              <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
+                <TypewriterText
+                  text="SCOT"
+                  isVisible={showMidframeContent}
+                  delay={0}
+                  speed={0.08}
+                />
+              </p>
+              <p className="text-white/60 text-sm max-w-[380px] mb-4">
+                <TypewriterText
+                  text="Il gestionale intelligente per aziende moderne. Organizza, monitora e scala il tuo business con l'AI."
+                  isVisible={showMidframeContent}
+                  delay={0.3}
+                  speed={0.015}
+                />
+              </p>
+              {/* Contenitore linee - orizzontale + obliqua attaccate */}
+              <div className="w-full flex justify-start items-center relative">
+                {/* Linea obliqua - posizionata all'estremità sinistra (verso il logo) */}
+                <div
+                  ref={midframeObliqueRightRef}
+                  className="bg-white/60 absolute"
+                  style={{
+                    width: '0px',
+                    height: '2px',
+                    right: '100%',
+                    top: '50%',
+                    transform: 'translateY(-50%) rotate(45deg)',
+                    transformOrigin: 'right center'
+                  }}
+                />
+                {/* Linea orizzontale */}
+                <div
+                  ref={midframeLineRightRef}
+                  style={{ width: '0%', height: '2px' }}
+                  className="bg-white/60"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Sezione Servizi 1 - SOPRA la linea verde (35vh) - contiene SOLO il logo */}
       {/* Il logo arriva qui con l'animazione da midframe e rimane fisso */}
