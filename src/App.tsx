@@ -555,7 +555,11 @@ function HomePage() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  style={{ transform: 'rotate(-45deg)' }}
+                  style={{
+                    transform: 'rotate(-45deg)',
+                    opacity: isTypewriterActive ? 1 : 0,
+                    transition: 'opacity 0.3s ease 0.96s'
+                  }}
                 >
                   <path d="M5 12h14" />
                   <path d="m12 5 7 7-7 7" />
