@@ -17,7 +17,7 @@ import ProjectPage from './pages/ProjectPage'
 import ScrollToTop from './components/ScrollToTop'
 import ParticleLogo from './components/ParticleLogo'
 import DotShaderBackground, { DotShaderBackgroundRef } from './components/DotShaderBackground'
-import InfiniteGrid from './components/InfiniteGrid'
+import NoiseTexture from './components/NoiseTexture'
 import BurgerMenu from './components/BurgerMenu'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
@@ -871,7 +871,7 @@ function HomePage() {
           }}
         >
           {/* Infinite Grid Background */}
-          <InfiniteGrid />
+          <NoiseTexture />
           {/* Badge */}
           <span className="relative z-10 text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-4">
             Con chi abbiamo lavorato
