@@ -11,7 +11,10 @@ const DotMaterial = shaderMaterial(
     rotation: 0,
     gridSize: 50,
     dotOpacity: 0.05,
-    fillAmount: 0.0
+    fillAmount: 0.0,
+    mousePos: new THREE.Vector2(0.5, 0.5),
+    glowRadius: 0.08,
+    glowIntensity: 0.8
   },
   /* glsl */ `
     void main() {
@@ -26,6 +29,9 @@ const DotMaterial = shaderMaterial(
     uniform float gridSize;
     uniform float dotOpacity;
     uniform float fillAmount;
+    uniform vec2 mousePos;
+    uniform float glowRadius;
+    uniform float glowIntensity;
 
     vec2 rotate(vec2 uv, float angle) {
         float s = sin(angle);
@@ -73,8 +79,21 @@ const DotMaterial = shaderMaterial(
 
       float smoothDot = smoothstep(0.05, 0.0, sdfDot);
 
-      // Static composition - no animations
-      vec3 composition = mix(bgColor, dotColor, smoothDot * combinedMask * dotOpacity);
+      // Mouse glow effect - illumina i puntini vicino al cursore
+      vec2 adjustedMousePos = vec2(mousePos.x, 1.0 - mousePos.y);
+      vec2 diff = screenUv - adjustedMousePos;
+      diff.x *= resolution.x / resolution.y; // Correzione aspect ratio per cerchio perfetto
+      float mouseDistance = length(diff);
+
+      // Effetto sharp con bordi netti
+      float rawGlow = smoothstep(glowRadius, glowRadius * 0.3, mouseDistance);
+      float mouseGlow = pow(rawGlow, 0.25);
+
+      // Opacità finale: base + glow del mouse
+      float finalOpacity = dotOpacity + (mouseGlow * glowIntensity);
+
+      // Static composition con mouse glow
+      vec3 composition = mix(bgColor, dotColor, smoothDot * combinedMask * finalOpacity);
 
       gl_FragColor = vec4(composition, 1.0);
 
@@ -149,6 +168,13 @@ const DotShaderBackground = forwardRef<DotShaderBackgroundRef>((_, ref) => {
   })
 
   const materialRef = useRef<typeof DotMaterial | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Mouse tracking con smoothing
+  const targetMouse = useRef({ x: 0.5, y: 0.5 })
+  const currentMouse = useRef({ x: 0.5, y: 0.5 })
+  const rawMouse = useRef({ x: 0, y: 0 }) // Posizione raw del mouse in pixel
+  const animationFrameRef = useRef<number>()
 
   // Esponi il metodo setFillAmount
   useImperativeHandle(ref, () => ({
@@ -159,24 +185,116 @@ const DotShaderBackground = forwardRef<DotShaderBackgroundRef>((_, ref) => {
     }
   }))
 
+  // Funzione per estrarre scala e flip dalla matrice CSS
+  const getTransformFromParent = (): { scale: number; flipped: boolean } => {
+    if (!containerRef.current) return { scale: 1, flipped: false }
+
+    // Risali al parent che ha la trasformazione (heroShaderRef)
+    const parent = containerRef.current.parentElement
+    if (!parent) return { scale: 1, flipped: false }
+
+    const style = window.getComputedStyle(parent)
+    const transform = style.transform
+
+    if (!transform || transform === 'none') {
+      return { scale: 1, flipped: false }
+    }
+
+    // Parse della matrice CSS: matrix(a, b, c, d, tx, ty)
+    const matrixMatch = transform.match(/matrix\(([^)]+)\)/)
+    if (!matrixMatch) return { scale: 1, flipped: false }
+
+    const values = matrixMatch[1].split(',').map(v => parseFloat(v.trim()))
+    // a = values[0], d = values[3]
+    // scale = |a|, flipped = d < 0
+    const scaleX = Math.abs(values[0])
+    const scaleY = values[3]
+    const flipped = scaleY < 0
+
+    return { scale: scaleX, flipped }
+  }
+
+  // Mouse tracking effect
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      rawMouse.current.x = e.clientX
+      rawMouse.current.y = e.clientY
+    }
+
+    // Animation loop per smooth mouse movement
+    const animate = () => {
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      const centerX = viewportWidth / 2
+      const centerY = viewportHeight / 2
+
+      // Ottieni trasformazioni correnti dal parent CSS
+      const { scale, flipped } = getTransformFromParent()
+
+      // Calcola posizione relativa al centro
+      let relX = rawMouse.current.x - centerX
+      let relY = rawMouse.current.y - centerY
+
+      // Compensa per la scala: quando il bg è scalato 2x, il mouse deve muoversi "di più"
+      const compensatedX = centerX + (relX / scale)
+      let compensatedY = centerY + (relY / scale)
+
+      // Compensa per il flip: quando flippato, inverti Y rispetto al centro
+      if (flipped) {
+        compensatedY = centerY - (relY / scale)
+      }
+
+      // Normalizza a 0-1
+      targetMouse.current.x = compensatedX / viewportWidth
+      targetMouse.current.y = compensatedY / viewportHeight
+
+      // Smoothing
+      const smoothing = 0.15
+      currentMouse.current.x += (targetMouse.current.x - currentMouse.current.x) * smoothing
+      currentMouse.current.y += (targetMouse.current.y - currentMouse.current.y) * smoothing
+
+      // Aggiorna uniform del mouse
+      if (materialRef.current && materialRef.current.uniforms) {
+        materialRef.current.uniforms.mousePos.value.set(
+          currentMouse.current.x,
+          currentMouse.current.y
+        )
+      }
+
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    animationFrameRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [])
+
   return (
-    <Canvas
-      // Disabilita il resize automatico del canvas durante lo scroll
-      resize={{ scroll: false }}
-      gl={{
-        antialias: true,
-        powerPreference: 'high-performance',
-        outputColorSpace: THREE.SRGBColorSpace,
-        toneMapping: THREE.NoToneMapping
-      }}
-      style={{ width: '100%', height: '100%' }}
-    >
-      <Scene
-        fixedWidth={dimensionsRef.current.width}
-        fixedHeight={dimensionsRef.current.height}
-        materialRef={materialRef}
-      />
-    </Canvas>
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+      <Canvas
+        // Disabilita il resize automatico del canvas durante lo scroll
+        resize={{ scroll: false }}
+        gl={{
+          antialias: true,
+          powerPreference: 'high-performance',
+          outputColorSpace: THREE.SRGBColorSpace,
+          toneMapping: THREE.NoToneMapping
+        }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <Scene
+          fixedWidth={dimensionsRef.current.width}
+          fixedHeight={dimensionsRef.current.height}
+          materialRef={materialRef}
+        />
+      </Canvas>
+    </div>
   )
 })
 
