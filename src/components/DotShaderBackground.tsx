@@ -3,6 +3,9 @@ import { Canvas, useThree } from '@react-three/fiber'
 import { shaderMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 
+// Numero di punti nella scia
+const TRAIL_LENGTH = 12
+
 const DotMaterial = shaderMaterial(
   {
     resolution: new THREE.Vector2(),
@@ -13,8 +16,11 @@ const DotMaterial = shaderMaterial(
     dotOpacity: 0.05,
     fillAmount: 0.0,
     mousePos: new THREE.Vector2(0.5, 0.5),
-    glowRadius: 0.08,
-    glowIntensity: 0.8
+    glowRadius: 0.06,
+    glowIntensity: 0.9,
+    // Trail positions (array di vec2)
+    trailPositions: Array(TRAIL_LENGTH).fill(null).map(() => new THREE.Vector2(0.5, 0.5)),
+    trailLength: TRAIL_LENGTH
   },
   /* glsl */ `
     void main() {
@@ -32,6 +38,8 @@ const DotMaterial = shaderMaterial(
     uniform vec2 mousePos;
     uniform float glowRadius;
     uniform float glowIntensity;
+    uniform vec2 trailPositions[${TRAIL_LENGTH}];
+    uniform int trailLength;
 
     vec2 rotate(vec2 uv, float angle) {
         float s = sin(angle);
@@ -48,6 +56,22 @@ const DotMaterial = shaderMaterial(
 
     float sdfCircle(vec2 p, float r) {
         return length(p - 0.5) - r;
+    }
+
+    // Calcola la distanza da un segmento di linea (per la scia continua)
+    float sdfLine(vec2 p, vec2 a, vec2 b) {
+        vec2 pa = p - a;
+        vec2 ba = b - a;
+        float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+        return length(pa - ba * h);
+    }
+
+    // Restituisce anche la posizione lungo il segmento (0-1)
+    float sdfLineWithT(vec2 p, vec2 a, vec2 b, out float t) {
+        vec2 pa = p - a;
+        vec2 ba = b - a;
+        t = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+        return length(pa - ba * t);
     }
 
     void main() {
@@ -70,27 +94,56 @@ const DotMaterial = shaderMaterial(
       float combinedMask = screenMask * adjustedCircleMask;
 
       // Static dot size based on position only
-      // Anche la dimensione dei pallini deve essere uniforme quando fillAmount = 1
       float originalDotSize = min(pow(circleMaskCenter, 2.0) * 0.3, 0.3);
-      float uniformDotSize = 0.15; // Dimensione uniforme per i pallini
+      float uniformDotSize = 0.15;
       float dotSize = mix(originalDotSize, uniformDotSize, fillAmount);
 
       float sdfDot = sdfCircle(gridUv, dotSize);
-
       float smoothDot = smoothstep(0.05, 0.0, sdfDot);
 
-      // Mouse glow effect - illumina i puntini vicino al cursore
-      vec2 adjustedMousePos = vec2(mousePos.x, 1.0 - mousePos.y);
-      vec2 diff = screenUv - adjustedMousePos;
-      diff.x *= resolution.x / resolution.y; // Correzione aspect ratio per cerchio perfetto
-      float mouseDistance = length(diff);
+      // Calcola il glow combinato dalla posizione attuale e dalla scia continua
+      float totalGlow = 0.0;
+      float aspectRatio = resolution.x / resolution.y;
 
-      // Effetto sharp con bordi netti
-      float rawGlow = smoothstep(glowRadius, glowRadius * 0.3, mouseDistance);
-      float mouseGlow = pow(rawGlow, 0.25);
+      // Prepara le coordinate con aspect ratio corretto
+      vec2 adjustedScreenUv = screenUv;
+      adjustedScreenUv.x *= aspectRatio;
 
-      // Opacità finale: base + glow del mouse
-      float finalOpacity = dotOpacity + (mouseGlow * glowIntensity);
+      // Glow dalla posizione attuale del mouse (più forte)
+      vec2 adjustedMousePos = vec2(mousePos.x * aspectRatio, 1.0 - mousePos.y);
+      float mouseDistance = length(adjustedScreenUv - adjustedMousePos);
+
+      // Effetto accensione uniforme - step più netto
+      float mainGlow = smoothstep(glowRadius, glowRadius * 0.7, mouseDistance);
+      totalGlow = mainGlow;
+
+      // Scia continua: calcola la distanza da ogni segmento della scia
+      for (int i = 0; i < ${TRAIL_LENGTH - 1}; i++) {
+        // Punti del segmento corrente
+        vec2 pointA = vec2(trailPositions[i].x * aspectRatio, 1.0 - trailPositions[i].y);
+        vec2 pointB = vec2(trailPositions[i + 1].x * aspectRatio, 1.0 - trailPositions[i + 1].y);
+
+        // Calcola distanza dal segmento e posizione lungo di esso
+        float t;
+        float segmentDist = sdfLineWithT(adjustedScreenUv, pointA, pointB, t);
+
+        // Intensità decrescente lungo la scia
+        // i=0 è il segmento più vicino al mouse, i=TRAIL_LENGTH-2 è il più lontano
+        float segmentProgress = (float(i) + t) / float(${TRAIL_LENGTH});
+        float trailIntensity = 1.0 - segmentProgress;
+        trailIntensity = pow(trailIntensity, 1.2); // Curva morbida
+
+        // Raggio che si assottiglia lungo la scia (effetto cometa)
+        float trailRadius = glowRadius * (0.9 - segmentProgress * 0.5);
+
+        // Glow del segmento
+        float segmentGlow = smoothstep(trailRadius, trailRadius * 0.5, segmentDist) * trailIntensity * 0.6;
+
+        totalGlow = max(totalGlow, segmentGlow);
+      }
+
+      // Opacità finale: base + glow combinato
+      float finalOpacity = dotOpacity + (totalGlow * glowIntensity);
 
       // Static composition con mouse glow
       vec3 composition = mix(bgColor, dotColor, smoothDot * combinedMask * finalOpacity);
@@ -173,8 +226,14 @@ const DotShaderBackground = forwardRef<DotShaderBackgroundRef>((_, ref) => {
   // Mouse tracking con smoothing
   const targetMouse = useRef({ x: 0.5, y: 0.5 })
   const currentMouse = useRef({ x: 0.5, y: 0.5 })
-  const rawMouse = useRef({ x: 0, y: 0 }) // Posizione raw del mouse in pixel
+  const rawMouse = useRef({ x: 0, y: 0 })
   const animationFrameRef = useRef<number>()
+
+  // Trail tracking - memorizza le ultime posizioni
+  const trailPositions = useRef<Array<{ x: number; y: number }>>(
+    Array(TRAIL_LENGTH).fill(null).map(() => ({ x: 0.5, y: 0.5 }))
+  )
+  const frameCounter = useRef(0)
 
   // Esponi il metodo setFillAmount
   useImperativeHandle(ref, () => ({
@@ -189,7 +248,6 @@ const DotShaderBackground = forwardRef<DotShaderBackgroundRef>((_, ref) => {
   const getTransformFromParent = (): { scale: number; flipped: boolean } => {
     if (!containerRef.current) return { scale: 1, flipped: false }
 
-    // Risali al parent che ha la trasformazione (heroShaderRef)
     const parent = containerRef.current.parentElement
     if (!parent) return { scale: 1, flipped: false }
 
@@ -200,13 +258,10 @@ const DotShaderBackground = forwardRef<DotShaderBackgroundRef>((_, ref) => {
       return { scale: 1, flipped: false }
     }
 
-    // Parse della matrice CSS: matrix(a, b, c, d, tx, ty)
     const matrixMatch = transform.match(/matrix\(([^)]+)\)/)
     if (!matrixMatch) return { scale: 1, flipped: false }
 
     const values = matrixMatch[1].split(',').map(v => parseFloat(v.trim()))
-    // a = values[0], d = values[3]
-    // scale = |a|, flipped = d < 0
     const scaleX = Math.abs(values[0])
     const scaleY = values[3]
     const flipped = scaleY < 0
@@ -228,37 +283,56 @@ const DotShaderBackground = forwardRef<DotShaderBackgroundRef>((_, ref) => {
       const centerX = viewportWidth / 2
       const centerY = viewportHeight / 2
 
-      // Ottieni trasformazioni correnti dal parent CSS
       const { scale, flipped } = getTransformFromParent()
 
-      // Calcola posizione relativa al centro
       let relX = rawMouse.current.x - centerX
       let relY = rawMouse.current.y - centerY
 
-      // Compensa per la scala: quando il bg è scalato 2x, il mouse deve muoversi "di più"
       const compensatedX = centerX + (relX / scale)
       let compensatedY = centerY + (relY / scale)
 
-      // Compensa per il flip: quando flippato, inverti Y rispetto al centro
       if (flipped) {
         compensatedY = centerY - (relY / scale)
       }
 
-      // Normalizza a 0-1
       targetMouse.current.x = compensatedX / viewportWidth
       targetMouse.current.y = compensatedY / viewportHeight
 
-      // Smoothing
+      // Smoothing per il movimento principale
       const smoothing = 0.15
       currentMouse.current.x += (targetMouse.current.x - currentMouse.current.x) * smoothing
       currentMouse.current.y += (targetMouse.current.y - currentMouse.current.y) * smoothing
 
-      // Aggiorna uniform del mouse
+      // Aggiorna la scia ogni 3 frame per un effetto più fluido
+      frameCounter.current++
+      if (frameCounter.current >= 3) {
+        frameCounter.current = 0
+
+        // Shifta le posizioni della scia
+        for (let i = TRAIL_LENGTH - 1; i > 0; i--) {
+          trailPositions.current[i] = { ...trailPositions.current[i - 1] }
+        }
+        // Aggiungi la nuova posizione all'inizio
+        trailPositions.current[0] = {
+          x: currentMouse.current.x,
+          y: currentMouse.current.y
+        }
+      }
+
+      // Aggiorna uniforms
       if (materialRef.current && materialRef.current.uniforms) {
         materialRef.current.uniforms.mousePos.value.set(
           currentMouse.current.x,
           currentMouse.current.y
         )
+
+        // Aggiorna le posizioni della scia nello shader
+        for (let i = 0; i < TRAIL_LENGTH; i++) {
+          materialRef.current.uniforms.trailPositions.value[i].set(
+            trailPositions.current[i].x,
+            trailPositions.current[i].y
+          )
+        }
       }
 
       animationFrameRef.current = requestAnimationFrame(animate)
@@ -278,7 +352,6 @@ const DotShaderBackground = forwardRef<DotShaderBackgroundRef>((_, ref) => {
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
       <Canvas
-        // Disabilita il resize automatico del canvas durante lo scroll
         resize={{ scroll: false }}
         gl={{
           antialias: true,
