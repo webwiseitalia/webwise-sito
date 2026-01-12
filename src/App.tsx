@@ -42,18 +42,25 @@ function TypewriterText({
   const containerRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
-    if (!isVisible || !containerRef.current) return
+    if (!containerRef.current) return
 
     const chars = containerRef.current.querySelectorAll('.char')
-    gsap.set(chars, { opacity: 0 })
 
-    gsap.to(chars, {
-      opacity: 1,
-      duration: 0.05,
-      stagger: speed,
-      delay: delay,
-      ease: 'none',
-    })
+    if (isVisible) {
+      // Animazione typewriter in entrata
+      gsap.set(chars, { opacity: 0 })
+      gsap.to(chars, {
+        opacity: 1,
+        duration: 0.05,
+        stagger: speed,
+        delay: delay,
+        ease: 'none',
+      })
+    } else {
+      // Reset istantaneo in uscita
+      gsap.killTweensOf(chars)
+      gsap.set(chars, { opacity: 0 })
+    }
   }, [isVisible, delay, speed])
 
   return (
@@ -83,6 +90,7 @@ function HomePage() {
   const [navbarCompression, setNavbarCompression] = useState(0) // 0 = normale, 1 = compressa
   const heroLogoRef = useRef<HTMLDivElement>(null)
   const customProjectsRef = useRef<HTMLDivElement>(null) // Ref per animare la scritta
+  const lineRef = useRef<HTMLDivElement>(null) // Ref per animare la linea loading
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
@@ -141,24 +149,29 @@ function HomePage() {
     setShowCustomProjectsLine(isSnapped)
   }, [])
 
-  // Animazione fade in/out per la scritta "progetti custom"
+  // Animazione sincronizzata per scritta "progetti custom" e linea loading
+  // Durata totale: 1 secondo - linea e typewriter finiscono insieme
   useEffect(() => {
-    if (!customProjectsRef.current) return
+    if (!lineRef.current) return
 
     // Cancella eventuali animazioni in corso per evitare conflitti
-    gsap.killTweensOf(customProjectsRef.current)
+    gsap.killTweensOf(lineRef.current)
 
     if (showCustomProjectsLine) {
-      // Fade in
-      gsap.to(customProjectsRef.current, {
-        opacity: 1,
-        duration: 0.4,
-        ease: 'power2.out',
-        overwrite: true
-      })
+      // Animazione linea loading: da 0% a 100% in 1 secondo
+      // Le scritte TypewriterText si animano automaticamente tramite isVisible
+      gsap.fromTo(lineRef.current,
+        { width: '0%' },
+        {
+          width: '100%',
+          duration: 1,
+          ease: 'power2.out',
+          overwrite: true
+        }
+      )
     } else {
-      // Fade out istantaneo - deve scomparire immediatamente quando parte l'animazione di ritorno
-      gsap.set(customProjectsRef.current, { opacity: 0 })
+      // Reset istantaneo - nessuna animazione per evitare bug
+      gsap.set(lineRef.current, { width: '0%' })
     }
   }, [showCustomProjectsLine])
 
@@ -588,27 +601,45 @@ function HomePage() {
               }}
             />
 
-            {/* Blocco destro: scritta + linea + CTA - con fade in/out */}
-            <div ref={customProjectsRef} className="flex-grow flex flex-col justify-center" style={{ opacity: 0 }}>
+            {/* Blocco destro: scritta + linea + CTA - con animazioni sincronizzate */}
+            <div ref={customProjectsRef} className="flex-grow flex flex-col justify-center" style={{ opacity: 1 }}>
               {/* Riga con scritta e CTA */}
               <div className="flex items-center justify-between mb-3">
                 <p className="text-white text-sm font-medium uppercase tracking-wide">
-                  REALIZZIAMO ANCHE PROGETTI CUSTOM SU MISURA
+                  <TypewriterText
+                    text="REALIZZIAMO ANCHE PROGETTI CUSTOM SU MISURA"
+                    isVisible={showCustomProjectsLine}
+                    delay={0}
+                    speed={0.023}
+                  />
                 </p>
                 <a
                   href="#contatti"
                   className="flex items-center gap-1.5 text-white text-sm font-medium uppercase tracking-wide hover:text-[#2EBAEB] transition-colors group"
                 >
-                  <span>CONTATTACI</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                  <span>
+                    <TypewriterText
+                      text="CONTATTACI"
+                      isVisible={showCustomProjectsLine}
+                      delay={0}
+                      speed={0.1}
+                    />
+                  </span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" style={{ opacity: showCustomProjectsLine ? 1 : 0, transition: showCustomProjectsLine ? 'opacity 0.3s ease 0.9s' : 'none' }}>
                     <path d="M7 17L17 7" />
                     <path d="M7 7h10v10" />
                   </svg>
                 </a>
               </div>
 
-              {/* Linea orizzontale */}
-              <div className="w-full h-px bg-white/50" />
+              {/* Linea orizzontale - animazione loading da 0% a 100% */}
+              <div className="w-full h-px">
+                <div
+                  ref={lineRef}
+                  className="h-full bg-white/50"
+                  style={{ width: '0%' }}
+                />
+              </div>
             </div>
           </div>
         </div>
