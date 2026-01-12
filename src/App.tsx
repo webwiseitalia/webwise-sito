@@ -112,10 +112,12 @@ function HomePage() {
   const customProjectsRef = useRef<HTMLDivElement>(null) // Ref per animare la scritta
   const lineRef = useRef<HTMLDivElement>(null) // Ref per animare la linea loading
   const midframeLineLeftRef1 = useRef<HTMLDivElement>(null) // Linea sinistra 1 (Webwise)
-  const midframeLineLeftRef2 = useRef<HTMLDivElement>(null) // Linea sinistra 2 (Reservly)
+  const midframeLineLeftRef2 = useRef<HTMLDivElement>(null) // Linea sinistra 2 (centrale)
+  const midframeLineLeftRef3 = useRef<HTMLDivElement>(null) // Linea sinistra 3 (Reservly)
   const midframeLineRightRef = useRef<HTMLDivElement>(null) // Linea destra (SCOT)
   const midframeObliqueLeftRef1 = useRef<HTMLDivElement>(null) // Linea obliqua sinistra 1
-  const midframeObliqueLeftRef2 = useRef<HTMLDivElement>(null) // Linea obliqua sinistra 2
+  const midframeObliqueLeftRef2 = useRef<HTMLDivElement>(null) // Linea obliqua sinistra 2 (centrale)
+  const midframeObliqueLeftRef3 = useRef<HTMLDivElement>(null) // Linea obliqua sinistra 3
   const midframeObliqueRightRef = useRef<HTMLDivElement>(null) // Linea obliqua destra
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
@@ -203,8 +205,8 @@ function HomePage() {
 
   // Animazione linee midframe - si espandono dal centro verso l'esterno
   useEffect(() => {
-    const horizontalLines = [midframeLineLeftRef1.current, midframeLineLeftRef2.current, midframeLineRightRef.current]
-    const obliqueLines = [midframeObliqueLeftRef1.current, midframeObliqueLeftRef2.current, midframeObliqueRightRef.current]
+    const horizontalLines = [midframeLineLeftRef1.current, midframeLineLeftRef2.current, midframeLineLeftRef3.current, midframeLineRightRef.current]
+    const obliqueLines = [midframeObliqueLeftRef1.current, midframeObliqueLeftRef2.current, midframeObliqueLeftRef3.current, midframeObliqueRightRef.current]
     const allLines = [...horizontalLines, ...obliqueLines]
 
     allLines.forEach(line => {
@@ -221,6 +223,12 @@ function HomePage() {
       }
       if (midframeLineLeftRef2.current) {
         gsap.fromTo(midframeLineLeftRef2.current,
+          { width: '0%' },
+          { width: '100%', duration: 1, ease: 'power2.out', overwrite: true, delay: 0.05 }
+        )
+      }
+      if (midframeLineLeftRef3.current) {
+        gsap.fromTo(midframeLineLeftRef3.current,
           { width: '0%' },
           { width: '100%', duration: 1, ease: 'power2.out', overwrite: true, delay: 0.1 }
         )
@@ -242,6 +250,12 @@ function HomePage() {
       }
       if (midframeObliqueLeftRef2.current) {
         gsap.fromTo(midframeObliqueLeftRef2.current,
+          { width: '0px' },
+          { width: '80px', duration: 0.6, ease: 'power2.out', overwrite: true, delay: 0.35 }
+        )
+      }
+      if (midframeObliqueLeftRef3.current) {
+        gsap.fromTo(midframeObliqueLeftRef3.current,
           { width: '0px' },
           { width: '80px', duration: 0.6, ease: 'power2.out', overwrite: true, delay: 0.4 }
         )
@@ -684,9 +698,9 @@ function HomePage() {
         }}
       >
         <div className="flex items-center justify-center gap-16">
-          {/* Colonna sinistra - 2 descrizioni: una in alto, una in basso (allineate con top/bottom del logo 546px) */}
+          {/* Colonna sinistra - 2 descrizioni: una in alto, una in basso */}
           <div className="flex flex-col justify-between items-end text-right" style={{ width: '450px', height: '546px' }}>
-            {/* Descrizione 1: Webwise e servizi - allineata con il TOP del logo */}
+            {/* Descrizione 1: Webwise e servizi - in alto */}
             <div className="flex flex-col items-end">
               <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
                 <TypewriterText
@@ -712,7 +726,7 @@ function HomePage() {
                   style={{ width: '0%', height: '2px' }}
                   className="bg-white/60"
                 />
-                {/* Linea obliqua - posizionata all'estremità destra (verso il logo) */}
+                {/* Linea obliqua - punta verso il logo (in basso a destra) */}
                 <div
                   ref={midframeObliqueLeftRef1}
                   className="bg-white/60 absolute"
@@ -728,7 +742,7 @@ function HomePage() {
               </div>
             </div>
 
-            {/* Descrizione 2: Reservly - allineata con il BOTTOM del logo */}
+            {/* Descrizione 2: Reservly - in basso */}
             <div className="flex flex-col items-end">
               <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
                 <TypewriterText
@@ -754,7 +768,7 @@ function HomePage() {
                   style={{ width: '0%', height: '2px' }}
                   className="bg-white/60"
                 />
-                {/* Linea obliqua - posizionata all'estremità destra (verso il logo) */}
+                {/* Linea obliqua - punta verso il logo (in alto a destra) */}
                 <div
                   ref={midframeObliqueLeftRef2}
                   className="bg-white/60 absolute"
@@ -774,21 +788,21 @@ function HomePage() {
           {/* Spazio per il logo centrale - 546px come il logo nitido */}
           <div style={{ width: '546px', height: '546px' }} />
 
-          {/* Colonna destra - 1 descrizione centrata verticalmente con il CENTRO del logo */}
-          <div className="flex flex-col justify-center items-start text-left" style={{ width: '450px', height: '546px' }}>
-            {/* Descrizione: SCOT */}
+          {/* Colonna destra - 2 descrizioni: una centrata, una con linea verso l'alto */}
+          <div className="flex flex-col justify-between items-start text-left" style={{ width: '450px', height: '546px' }}>
+            {/* Descrizione 1: WEBWISE STUDIO - in alto con linea verso il basso */}
             <div className="flex flex-col items-start">
               <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
                 <TypewriterText
-                  text="SCOT"
+                  text="WEBWISE STUDIO"
                   isVisible={showMidframeContent}
                   delay={0}
-                  speed={0.08}
+                  speed={0.04}
                 />
               </p>
               <p className="text-white/60 text-sm max-w-[380px] mb-4">
                 <TypewriterText
-                  text="Il gestionale intelligente per aziende moderne. Organizza, monitora e scala il tuo business con l'AI."
+                  text="Crea il tuo sito web con l'intelligenza artificiale. Semplice, veloce, professionale."
                   isVisible={showMidframeContent}
                   delay={0.3}
                   speed={0.015}
@@ -796,7 +810,49 @@ function HomePage() {
               </p>
               {/* Contenitore linee - orizzontale + obliqua attaccate */}
               <div className="w-full flex justify-start items-center relative">
-                {/* Linea obliqua - posizionata all'estremità sinistra (verso il logo) */}
+                {/* Linea obliqua - punta verso il logo (in basso a sinistra) */}
+                <div
+                  ref={midframeObliqueLeftRef3}
+                  className="bg-white/60 absolute"
+                  style={{
+                    width: '0px',
+                    height: '2px',
+                    right: '100%',
+                    top: '50%',
+                    transform: 'translateY(-50%) rotate(-45deg)',
+                    transformOrigin: 'right center'
+                  }}
+                />
+                {/* Linea orizzontale */}
+                <div
+                  ref={midframeLineLeftRef3}
+                  style={{ width: '0%', height: '2px' }}
+                  className="bg-white/60"
+                />
+              </div>
+            </div>
+
+            {/* Descrizione 2: SCOT - in basso con linea verso l'alto */}
+            <div className="flex flex-col items-start">
+              <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
+                <TypewriterText
+                  text="SCOT"
+                  isVisible={showMidframeContent}
+                  delay={0.1}
+                  speed={0.08}
+                />
+              </p>
+              <p className="text-white/60 text-sm max-w-[380px] mb-4">
+                <TypewriterText
+                  text="Il gestionale intelligente per aziende moderne. Organizza, monitora e scala il tuo business con l'AI."
+                  isVisible={showMidframeContent}
+                  delay={0.4}
+                  speed={0.015}
+                />
+              </p>
+              {/* Contenitore linee - orizzontale + obliqua attaccate */}
+              <div className="w-full flex justify-start items-center relative">
+                {/* Linea obliqua - punta verso il logo (in alto a sinistra) */}
                 <div
                   ref={midframeObliqueRightRef}
                   className="bg-white/60 absolute"
