@@ -525,13 +525,28 @@ function HomePage() {
                   speed={0.012}
                 />
               </p>
-              <p style={{ paddingLeft: '60px', whiteSpace: 'nowrap' }}>
+              <p style={{ paddingLeft: '60px', whiteSpace: 'nowrap' }} className="flex items-center gap-2">
                 <TypewriterText
-                  text="→ EFFICENCY"
+                  text="EFFICENCY"
                   isVisible={isTypewriterActive}
                   delay={0.85}
                   speed={0.012}
                 />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="30"
+                  height="30"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ transform: 'rotate(-45deg)' }}
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
               </p>
             </div>
           </div>
