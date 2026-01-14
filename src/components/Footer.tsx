@@ -3,9 +3,67 @@ import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-black min-h-screen relative" style={{ padding: '80px 50px 40px 50px' }}>
+    <footer className="w-full bg-black relative" style={{ padding: '80px 50px 40px 50px', minHeight: '90vh' }}>
+      {/* Contenitore cerchi - overflow-hidden solo in basso */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          right: 0,
+          top: '-50%',
+          bottom: 0,
+          width: '50%',
+          overflow: 'hidden',
+          zIndex: 1
+        }}
+      >
+        {/* Cerchi concentrici animati */}
+        <div
+          className="absolute"
+          style={{
+            right: '-450px',
+            top: '60%',
+            transform: 'translateY(-50%)'
+          }}
+        >
+          {/* Cerchio esterno - ruota in senso orario */}
+          <div
+            className="rounded-full"
+            style={{
+              width: '900px',
+              height: '900px',
+              border: '2px dashed rgba(255, 255, 255, 0.15)',
+              animation: 'spin-clockwise 40s linear infinite'
+            }}
+          />
+          {/* Cerchio interno - ruota in senso antiorario */}
+          <div
+            className="rounded-full"
+            style={{
+              width: '600px',
+              height: '600px',
+              border: '2px dashed rgba(255, 255, 255, 0.15)',
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              animation: 'spin-counter 30s linear infinite'
+            }}
+          />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes spin-clockwise {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes spin-counter {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to { transform: translate(-50%, -50%) rotate(-360deg); }
+        }
+      `}</style>
       {/* Contenuto principale - flex tra titolo e colonne */}
-      <div className="flex justify-between">
+      <div className="flex justify-between relative" style={{ zIndex: 2 }}>
         {/* Colonna sinistra - Titolo ENORME */}
         <div className="flex flex-col" style={{ maxWidth: '65%' }}>
           <h2 className="text-white font-extralight tracking-tight leading-none" style={{ fontSize: 'clamp(60px, 8vw, 140px)' }}>
@@ -76,7 +134,7 @@ export default function Footer() {
       </div>
 
       {/* Sezione inferiore - PRIVACY/CAREERS a sinistra, Logo grande a destra */}
-      <div className="absolute bottom-0 left-0 right-0 flex justify-between items-end" style={{ padding: '0 50px 40px 50px' }}>
+      <div className="absolute bottom-0 left-0 right-0 flex justify-between items-end" style={{ padding: '0 50px 40px 50px', zIndex: 2 }}>
         {/* PRIVACY e CAREERS */}
         <div className="flex items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-[#2EBAEB]"></div>
