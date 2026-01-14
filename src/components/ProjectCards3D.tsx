@@ -94,7 +94,7 @@ export default function ProjectCards3D() {
               )}
               <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div
-                className="absolute bottom-0 left-0 right-0 p-4 text-white font-semibold text-lg opacity-0 group-hover:opacity-100 transition-all transform translate-y-4 group-hover:translate-y-0"
+                className="absolute top-0 left-0 right-0 p-4 text-white font-semibold text-lg opacity-0 group-hover:opacity-100 transition-all transform -translate-y-4 group-hover:translate-y-0"
                 style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
               >
                 {project.name}
