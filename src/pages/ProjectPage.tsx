@@ -6,7 +6,7 @@ import Footer from '../components/Footer'
 export default function ProjectPage() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
   const project = projectSlug ? getProjectBySlug(projectSlug) : undefined
-  const relatedProjects = projectSlug ? getRelatedProjects(projectSlug, 3) : []
+  const relatedProjects = projectSlug ? getRelatedProjects(projectSlug, 2) : []
 
   if (!project) {
     return (
@@ -25,273 +25,309 @@ export default function ProjectPage() {
     <div className="min-h-screen bg-black">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative w-full bg-black pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          {/* Hero Image / Mockup */}
-          <div className="relative w-full aspect-video bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl overflow-hidden mb-12 flex items-center justify-center">
-            {project.heroImage ? (
-              <img
-                src={project.heroImage}
-                alt={project.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="text-center">
-                <div className="w-32 h-32 mx-auto mb-6 rounded-2xl bg-[#2EBAEB]/20 flex items-center justify-center">
-                  <span className="text-6xl">💻</span>
-                </div>
-                <h2 className="text-white text-3xl font-bold">{project.name}</h2>
-              </div>
+      {/* Hero Section - Full Width Image */}
+      <section className="relative w-full h-[70vh] bg-black">
+        {project.heroImage ? (
+          <img
+            src={project.heroImage}
+            alt={project.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-[#111]" />
+        )}
+        {/* Gradient overlay bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+      </section>
+
+      {/* Project Title Section */}
+      <section className="w-full bg-black" style={{ padding: '80px 50px' }}>
+        <div>
+          {/* Back link */}
+          <Link
+            to="/#portfolio"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-12 text-sm"
+          >
+            <span>←</span>
+            <span>TUTTI I PROGETTI</span>
+          </Link>
+
+          {/* Title and Meta */}
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16">
+            <h1 className="text-white font-extralight tracking-tight leading-none" style={{ fontSize: 'clamp(48px, 8vw, 120px)' }}>
+              {project.name.toUpperCase()}
+            </h1>
+
+            {project.link && (
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white rounded-full transition-colors shrink-0"
+                style={{ padding: '18px 40px', fontSize: '14px' }}
+              >
+                VISITA IL SITO <span>↗</span>
+              </a>
             )}
           </div>
 
-          {/* Info Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-            {/* Colonna Sinistra - Dettagli */}
-            <div className="flex flex-col gap-6">
-              {/* Info Cards */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
-                  <span className="text-gray-500 text-xs uppercase tracking-wider">Cliente</span>
-                  <p className="text-white font-semibold mt-1">{project.client}</p>
-                </div>
-                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
-                  <span className="text-gray-500 text-xs uppercase tracking-wider">Anno</span>
-                  <p className="text-white font-semibold mt-1">{project.year}</p>
-                </div>
-                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
-                  <span className="text-gray-500 text-xs uppercase tracking-wider">Servizio</span>
-                  <p className="text-white font-semibold mt-1">{project.service}</p>
-                </div>
-                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
-                  <span className="text-gray-500 text-xs uppercase tracking-wider">Settore</span>
-                  <p className="text-white font-semibold mt-1">{project.industry}</p>
-                </div>
-              </div>
-
-              {/* Link al sito */}
-              {project.link && (
-                <a
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 bg-[#2EBAEB] hover:bg-[#2EBAEB]/80 text-white font-medium px-6 py-3 rounded-full transition-all hover:-rotate-1 w-fit group"
-                >
-                  <span>Visita il sito</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="group-hover:translate-x-1 transition-transform"
-                  >
-                    <path d="M7 7h10v10" />
-                    <path d="M7 17 17 7" />
-                  </svg>
-                </a>
-              )}
-            </div>
-
-            {/* Colonna Destra - Titolo e Descrizione */}
+          {/* Info Row */}
+          <div className="flex flex-wrap gap-x-16 gap-y-6 border-t border-white/10 pt-8">
             <div>
-              <h1 className="text-white text-4xl lg:text-5xl font-bold mb-6">{project.name}</h1>
-              <p className="text-gray-400 text-lg leading-relaxed">{project.description}</p>
+              <span className="text-gray-500 text-xs tracking-wider block mb-2">CLIENTE</span>
+              <span className="text-white text-sm">{project.client}</span>
+            </div>
+            {project.location && (
+              <div>
+                <span className="text-gray-500 text-xs tracking-wider block mb-2">LUOGO</span>
+                <span className="text-white text-sm">{project.location}</span>
+              </div>
+            )}
+            <div>
+              <span className="text-gray-500 text-xs tracking-wider block mb-2">ANNO</span>
+              <span className="text-white text-sm">{project.year}</span>
+            </div>
+            <div>
+              <span className="text-gray-500 text-xs tracking-wider block mb-2">SERVIZIO</span>
+              <span className="text-white text-sm">{project.service}</span>
+            </div>
+            <div>
+              <span className="text-gray-500 text-xs tracking-wider block mb-2">SETTORE</span>
+              <span className="text-white text-sm">{project.industry}</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Sezione Informazioni Cliente - Sfondo Nero */}
-      <section className="w-full bg-black py-20 lg:py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          {/* Titolo sezione */}
-          <div className="mb-12">
-            <span className="text-[#2EBAEB] text-sm uppercase tracking-wider">Informazioni cliente</span>
-            <p className="text-white text-xl lg:text-2xl leading-relaxed mt-4 max-w-4xl">
-              {project.fullDescription}
-            </p>
+      {/* Description Section */}
+      <section className="w-full bg-black" style={{ padding: '0 50px 100px 50px' }}>
+        <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div>
+              <span className="text-gray-500 text-xs tracking-wider">IL PROGETTO</span>
+            </div>
+            <div>
+              <p className="text-white text-xl lg:text-2xl font-light leading-relaxed whitespace-pre-line">
+                {project.fullDescription}
+              </p>
+            </div>
           </div>
+        </div>
+      </section>
 
-          {/* Gallery Images */}
-          {project.galleryImages.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      {/* Gallery Section */}
+      <section className="w-full bg-black" style={{ padding: '0 50px 100px 50px' }}>
+        <div>
+          {project.galleryImages.length > 0 ? (
+            <div className="space-y-6">
               {project.galleryImages.map((img, index) => (
-                <div
-                  key={index}
-                  className={`rounded-xl overflow-hidden ${index === 0 ? 'md:col-span-2 aspect-video' : 'aspect-square'}`}
-                >
-                  <img src={img} alt={`${project.name} screenshot ${index + 1}`} className="w-full h-full object-cover" />
+                <div key={index} className="w-full">
+                  <img
+                    src={img}
+                    alt={`${project.name} - ${index + 1}`}
+                    className="w-full h-auto"
+                  />
                 </div>
               ))}
             </div>
-          )}
-
-          {/* Placeholder Gallery se non ci sono immagini */}
-          {project.galleryImages.length === 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-              <div className="md:col-span-2 aspect-video bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl flex items-center justify-center">
-                <span className="text-gray-600 text-lg">Preview del progetto</span>
-              </div>
-              <div className="aspect-square bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl flex items-center justify-center">
-                <span className="text-gray-600">Screenshot 1</span>
-              </div>
-              <div className="aspect-square bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl flex items-center justify-center">
-                <span className="text-gray-600">Screenshot 2</span>
-              </div>
+          ) : (
+            <div className="w-full aspect-[16/9] bg-[#111] flex items-center justify-center">
+              <span className="text-gray-600 text-sm tracking-wider">IMMAGINI IN ARRIVO</span>
             </div>
           )}
         </div>
       </section>
 
-      {/* Sezione Tecnologie - Sfondo Grigio Scuro */}
-      <section className="w-full bg-[#1a1a1a] py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <span className="text-[#2EBAEB] text-sm uppercase tracking-wider">Tecnologie utilizzate</span>
-          <p className="text-gray-400 mt-4 mb-10 max-w-2xl">
-            Il sito è stato sviluppato con un frontend moderno utilizzando le seguenti tecnologie
-            selezionate per garantire performance, scalabilità e manutenibilità.
-          </p>
-
-          {/* Grid Tecnologie */}
-          <div className="flex flex-wrap gap-4">
-            {project.technologies.map((tech, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 bg-black/50 border border-gray-800 rounded-xl px-5 py-3 hover:border-[#2EBAEB]/50 transition-colors"
-              >
-                <span className="text-2xl">{tech.icon}</span>
-                <span className="text-white font-medium">{tech.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="w-full bg-gray-200 py-20 lg:py-28 relative overflow-hidden">
-        {/* Cerchi sfumati decorativi */}
-        <div
-          className="absolute -top-[200px] -left-[100px] w-[400px] h-[400px] rounded-full opacity-25"
-          style={{ background: '#2EBAEB', filter: 'blur(150px)' }}
-        />
-        <div
-          className="absolute -bottom-[100px] right-0 w-[400px] h-[400px] rounded-full opacity-30"
-          style={{ background: '#2EBAEB', filter: 'blur(150px)' }}
-        />
-
-        <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-12 text-center">
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#2EBAEB] text-white text-xs font-medium mb-6">
-            Vuoi lavorare con noi?
-          </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Mandaci un messaggio
-          </h2>
-          <p className="text-gray-600 mb-8 max-w-xl mx-auto">
-            Raccontaci il tuo progetto e scopri come possiamo aiutarti a realizzarlo.
-            Ogni grande idea merita di essere ascoltata.
-          </p>
-          <a
-            href="#contatti"
-            className="inline-flex items-center gap-3 bg-black hover:bg-gray-900 text-white font-medium px-8 py-4 rounded-full transition-all hover:-rotate-1 group"
-          >
-            <span>Contattaci</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="group-hover:translate-x-1 transition-transform"
-            >
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
-          </a>
-        </div>
-      </section>
-
-      {/* Related Projects */}
-      <section className="w-full bg-black py-20 lg:py-28">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="flex items-center justify-between mb-12">
+      {/* Technologies Section */}
+      <section className="w-full bg-black border-t border-white/10" style={{ padding: '80px 50px' }}>
+        <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <div>
-              <span className="text-[#2EBAEB] text-sm uppercase tracking-wider">Scopri altri</span>
-              <h2 className="text-white text-3xl lg:text-4xl font-bold mt-2">Progetti simili</h2>
+              <span className="text-gray-500 text-xs tracking-wider">TECNOLOGIE</span>
             </div>
-            <Link
-              to="/#portfolio"
-              className="hidden md:flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
-            >
-              <span>Vedi tutti</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="group-hover:translate-x-1 transition-transform"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-
-          {/* Grid Progetti Correlati */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {relatedProjects.map((relatedProject) => (
-              <Link
-                key={relatedProject.id}
-                to={`/progetti/${relatedProject.slug}`}
-                className="group relative aspect-[4/3] bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl overflow-hidden"
-              >
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-
-                {/* Content */}
-                <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                  <span className="text-[#2EBAEB] text-sm mb-2">{relatedProject.category}</span>
-                  <h3 className="text-white text-xl font-bold group-hover:text-[#2EBAEB] transition-colors">
-                    {relatedProject.name}
-                  </h3>
-                </div>
-
-                {/* Arrow */}
-                <div className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M7 7h10v10" />
-                    <path d="M7 17 17 7" />
-                  </svg>
-                </div>
-              </Link>
-            ))}
+            <div className="flex flex-wrap gap-4">
+              {project.technologies.map((tech, index) => (
+                <span
+                  key={index}
+                  className="text-white text-sm border border-white/20 rounded-full px-5 py-2"
+                >
+                  {tech.name}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Results Section */}
+      {project.results && (
+        <section className="w-full bg-black border-t border-white/10" style={{ padding: '80px 50px' }}>
+          <div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+              <div>
+                <span className="text-gray-500 text-xs tracking-wider">RISULTATI</span>
+              </div>
+              <div>
+                <p className="text-white text-xl lg:text-2xl font-light leading-relaxed">
+                  {project.results}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Next Projects Section */}
+      {relatedProjects.length > 0 && (
+        <section className="w-full bg-black border-t border-white/10" style={{ padding: '80px 50px' }}>
+          <div>
+            <div className="flex items-center justify-between mb-16">
+              <span className="text-gray-500 text-xs tracking-wider">ALTRI PROGETTI</span>
+              <Link
+                to="/#portfolio"
+                className="text-gray-500 hover:text-white text-xs tracking-wider transition-colors"
+              >
+                VEDI TUTTI →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {relatedProjects.map((relatedProject) => (
+                <Link
+                  key={relatedProject.id}
+                  to={`/progetti/${relatedProject.slug}`}
+                  className="group block"
+                >
+                  <div className="aspect-[16/10] bg-[#111] mb-6 overflow-hidden">
+                    {relatedProject.heroImage ? (
+                      <img
+                        src={relatedProject.heroImage}
+                        alt={relatedProject.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-gray-600 text-sm">{relatedProject.name}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-white text-2xl font-light group-hover:text-[#2EBAEB] transition-colors">
+                      {relatedProject.name}
+                    </h3>
+                    <span className="text-gray-500 text-sm">{relatedProject.year}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Sezione Contattaci */}
+      <div className="w-full relative py-24 lg:py-32 bg-gray-200 overflow-hidden z-10">
+        {/* Cerchio sfumato cyan in alto a destra */}
+        <div
+          className="absolute -top-[300px] -right-[150px] w-[500px] h-[500px] rounded-full opacity-35 z-[1]"
+          style={{
+            background: '#2EBAEB',
+            filter: 'blur(200px)'
+          }}
+        />
+
+        {/* Cerchio sfumato cyan in basso a sinistra */}
+        <div
+          className="absolute -bottom-[150px] left-0 w-[500px] h-[500px] rounded-full opacity-25 z-[1]"
+          style={{
+            background: '#2EBAEB',
+            filter: 'blur(200px)'
+          }}
+        />
+
+        {/* Contenuto */}
+        <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12">
+          {/* Contenuto principale - allineato a destra */}
+          <div className="flex flex-col gap-4 max-w-2xl ml-auto text-right">
+            {/* Badge */}
+            <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit ml-auto">
+              SCRIVICI
+            </span>
+
+            <h4 className="text-3xl lg:text-4xl uppercase font-bold tracking-tight text-gray-900 leading-tight">
+              Vuoi lavorare con noi?{' '}
+              <span className="text-[#2EBAEB]">Raccontaci il tuo progetto</span>
+            </h4>
+
+            <p className="text-gray-600 leading-relaxed max-w-xl ml-auto">
+              Ogni percorso inizia con una chiamata conoscitiva, in cui potrai raccontarci quali sono le tue esigenze e ricevere i primi consigli sulla loro realizzazione.
+            </p>
+
+            {/* Bottone Contattaci */}
+            <a
+              href="/#contatti"
+              className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:-rotate-2 transition-all w-fit ml-auto"
+            >
+              <span className="text-gray-900 font-medium">Contattaci</span>
+              <div className="relative flex p-2 overflow-hidden text-white bg-black rounded-full group-hover:bg-[#2EBAEB] transition-colors">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="transition-all translate-y-0 group-hover:-translate-y-[200%]"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="absolute transition-all translate-y-[200%] group-hover:translate-y-0"
+                >
+                  <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
+                  <path d="m21.854 2.147-10.94 10.939" />
+                </svg>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        {/* Icona stella/asterisco */}
+        <svg
+          className="absolute z-[1] -bottom-[100px] -left-[100px] lg:-bottom-[150px] lg:-left-[150px] w-[350px] h-[350px] lg:w-[500px] lg:h-[500px] animate-spin-slow opacity-40"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 72 72"
+          fill="none"
+          style={{ animationDuration: '20s' }}
+        >
+          <path
+            d="M40 0H32V26.3432L13.3726 7.71573L7.71573 13.3726L26.3431 32H0V40H26.3432L7.71573 58.6274L13.3726 64.2843L32 45.6569V72H40V45.6569L58.6274 64.2843L64.2843 58.6274L45.6568 40H72V32H45.6569L64.2843 13.3726L58.6274 7.71573L40 26.3432V0Z"
+            fill="#2EBAEB"
+          />
+        </svg>
+
+        <style>{`
+          @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+          .animate-spin-slow {
+            animation: spin-slow 20s linear infinite;
+          }
+        `}</style>
+      </div>
 
       <Footer />
     </div>

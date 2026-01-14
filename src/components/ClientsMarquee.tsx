@@ -4,14 +4,9 @@ interface Client {
 }
 
 const clients: Client[] = [
-  { name: 'Quercetti', href: 'https://www.quercettistore.com' },
+  { name: 'Macelleria Marcheto', href: 'https://macelleriamarcheto.it' },
   { name: 'Medusa', href: 'https://www.medusauth.xyz/' },
-  { name: 'Gali', href: 'https://galievr.it' },
-  { name: 'Enercade', href: 'https://enercade.com/' },
-  { name: 'TopGear', href: 'https://topgearitalia.com/' },
-  { name: 'Bozo Collective', href: '#' },
-  { name: 'Blugestiam', href: 'https://blugestiam.com/' },
-  { name: 'Magic Dreams', href: 'https://magicdreams.store/' },
+  { name: 'Quercetti', href: 'https://www.quercettistore.com' },
 ]
 
 export default function ClientsMarquee() {

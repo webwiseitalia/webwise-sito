@@ -4,6 +4,7 @@ export interface Project {
   slug: string
   name: string
   client: string
+  location?: string
   year: string
   industry: string
   service: string
@@ -19,29 +20,34 @@ export interface Project {
     color: string
   }[]
   link?: string
+  results?: string
 }
 
 export const projects: Project[] = [
   {
     id: '1',
-    slug: 'consorzio-vado',
-    name: 'Consorzio Vadò',
-    client: 'Consorzio Vadò',
-    year: '2025',
-    industry: 'Industry',
-    service: 'Web Development',
+    slug: 'macelleria-marcheto',
+    name: 'Macelleria Marcheto',
+    client: 'Macelleria Marcheto',
+    location: 'Malonno (BS)',
+    year: '2024',
+    industry: 'Food & Ristorazione',
+    service: 'Web Design, Sviluppo sito web',
     category: 'Website',
-    tools: ['React', 'Tailwind'],
-    description: 'Piattaforma web moderna per il consorzio industriale Vadò, con focus su user experience e performance.',
-    fullDescription: 'Abbiamo sviluppato una piattaforma web completamente custom per il Consorzio Vadò, un importante polo industriale italiano. Il progetto ha richiesto un\'attenta analisi delle esigenze degli utenti e una progettazione UX/UI orientata alla semplicità d\'uso. La piattaforma integra un sistema di gestione contenuti headless e offre performance ottimali grazie all\'utilizzo di tecnologie moderne come React e Tailwind CSS.',
+    tools: ['React', 'Vite', 'JavaScript'],
+    description: 'Sito web ufficiale per una delle macellerie-ristoranti più apprezzate della Val Camonica, punto di riferimento per chi cerca vera carne di altissima qualità.',
+    fullDescription: 'Macelleria Marcheto rappresenta l\'eccellenza nella lavorazione e nella degustazione della carne a Malonno. La qualità del prodotto, l\'atmosfera autentica del locale e il personale super coinvolgente rendono l\'esperienza unica, tanto da essere diventata anche la sede della nostra cena aziendale.\n\nUn luogo già molto conosciuto e apprezzato offline, capace di sorprendere chiunque vi entri per la prima volta. L\'obiettivo era creare una presenza digitale coerente con la qualità e la notorietà della realtà offline: un punto di riferimento online ufficiale che comunicasse identità, atmosfera e qualità del locale.\n\nAbbiamo progettato e sviluppato un sito web moderno, chiaro e orientato all\'esperienza dell\'utente. La struttura è stata studiata per accompagnare il visitatore dalla scoperta del locale fino al contatto e alla prenotazione, valorizzando ogni aspetto dell\'esperienza offerta.',
     heroImage: '',
     galleryImages: [],
     technologies: [
-      { name: 'React', icon: '⚛️', color: '#61DAFB' },
-      { name: 'Tailwind', icon: '🎨', color: '#06B6D4' },
-      { name: 'TypeScript', icon: '📘', color: '#3178C6' },
+      { name: 'React', icon: '', color: '#61DAFB' },
+      { name: 'Vite', icon: '', color: '#646CFF' },
+      { name: 'JavaScript', icon: '', color: '#F7DF1E' },
+      { name: 'HTML5', icon: '', color: '#E34F26' },
+      { name: 'CSS3', icon: '', color: '#1572B6' },
     ],
-    link: 'https://consorziovado.it'
+    link: 'https://macelleriamarcheto.it',
+    results: 'Dopo il lancio del sito web, Macelleria Marcheto registra circa 1.000 visite mensili. Le visite si traducono in richieste di informazioni e prenotazioni, rendendo la comunicazione più chiara, efficace e coerente con la qualità del locale.'
   },
   {
     id: '2',
@@ -85,27 +91,6 @@ export const projects: Project[] = [
       { name: 'JavaScript', icon: '📜', color: '#F7DF1E' },
     ],
     link: 'https://quercetti.com'
-  },
-  {
-    id: '4',
-    slug: 'top-gear',
-    name: 'Top Gear',
-    client: 'Top Gear Italia',
-    year: '2022',
-    industry: 'Automotive',
-    service: 'Web Development',
-    category: 'Website',
-    tools: ['Drupal', 'PHP'],
-    description: 'Portale editoriale per il magazine automobilistico con sistema di gestione contenuti avanzato.',
-    fullDescription: 'Top Gear Italia ci ha affidato lo sviluppo del loro portale editoriale, un progetto complesso che richiede la gestione di migliaia di articoli, recensioni auto e contenuti multimediali. Abbiamo implementato un CMS custom basato su Drupal con funzionalità avanzate di categorizzazione, ricerca e SEO. Il sito supporta alti volumi di traffico e offre un\'esperienza di lettura ottimale su tutti i dispositivi.',
-    heroImage: '',
-    galleryImages: [],
-    technologies: [
-      { name: 'Drupal', icon: '💧', color: '#0678BE' },
-      { name: 'PHP', icon: '🐘', color: '#777BB4' },
-      { name: 'MySQL', icon: '🗄️', color: '#4479A1' },
-    ],
-    link: 'https://topgear.it'
   },
 ]
 
