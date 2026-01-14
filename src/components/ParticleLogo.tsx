@@ -44,6 +44,8 @@ export default function ParticleLogo({
   const isInitializedRef = useRef(false)
   const wasSnappedRef = useRef(false) // Traccia lo stato precedente dello snap
   const wasInCenterZoneRef = useRef(false) // Traccia lo stato precedente della zona centrale (logo nitido)
+  const mousePosRef = useRef({ x: 0.5, y: 0.5 }) // Posizione mouse normalizzata per tilt 3D
+  const tiltRef = useRef({ x: 0, y: 0 }) // Valori tilt attuali (con smoothing)
 
   useEffect(() => {
     if (!isVisible) return
@@ -269,6 +271,27 @@ export default function ParticleLogo({
       if (midframeLogo) {
         // Logo nitido visibile solo nella zona centrale, istantaneamente (no fade)
         midframeLogo.style.opacity = inCenterZone ? '1' : '0'
+
+        // Applica effetto 3D tilt solo quando il logo è nitido (inCenterZone)
+        if (inCenterZone) {
+          // Smoothing per movimento fluido
+          const smoothing = 0.08
+          tiltRef.current.x += (mousePosRef.current.x - tiltRef.current.x) * smoothing
+          tiltRef.current.y += (mousePosRef.current.y - tiltRef.current.y) * smoothing
+
+          // Calcola rotazione (max ±8 gradi)
+          const maxRotation = 8
+          const rotateY = (tiltRef.current.x - 0.5) * maxRotation * 2
+          const rotateX = -(tiltRef.current.y - 0.5) * maxRotation * 2
+
+          midframeLogo.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
+          midframeLogo.style.transition = 'opacity 0s'
+        } else {
+          // Reset tilt quando esce dalla zona centrale
+          tiltRef.current.x = 0.5
+          tiltRef.current.y = 0.5
+          midframeLogo.style.transform = 'translate(-50%, -50%)'
+        }
       }
 
       if (inCenterZone) {
@@ -406,6 +429,13 @@ export default function ParticleLogo({
 
     window.addEventListener('wheel', handleWheel, { passive: false })
 
+    // Mouse tracking per effetto tilt 3D
+    const handleMouseMove = (e: MouseEvent) => {
+      mousePosRef.current.x = e.clientX / window.innerWidth
+      mousePosRef.current.y = e.clientY / window.innerHeight
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+
     const setupTriggers = () => {
       if (!heroSectionRef.current || !midframeSectionRef.current || !servizi1SectionRef.current) return
 
@@ -441,6 +471,7 @@ export default function ParticleLogo({
     return () => {
       window.removeEventListener('resize', resizeCanvas)
       window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('mousemove', handleMouseMove)
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
