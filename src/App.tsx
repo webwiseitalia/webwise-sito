@@ -19,6 +19,7 @@ import ParticleLogo from './components/ParticleLogo'
 import DotShaderBackground, { DotShaderBackgroundRef } from './components/DotShaderBackground'
 import NoiseTexture from './components/NoiseTexture'
 import BurgerMenu from './components/BurgerMenu'
+import { projects } from './data/projects'
 import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -546,8 +547,8 @@ function HomePage() {
         </div>
 
         <div className="flex flex-col items-center text-center px-4 relative z-10">
-          {/* Titolo principale - Inter SemiBold 75px */}
-          <div className="text-white font-semibold tracking-tight" style={{ fontSize: '75px', lineHeight: '1.1' }}>
+          {/* Titolo principale - responsive: 24px mobile, 40px tablet, 75px desktop */}
+          <div className="text-white font-semibold tracking-tight text-[24px] sm:text-[40px] lg:text-[75px]" style={{ lineHeight: '1.1' }}>
             <p>
               <TypewriterText
                 text="WEBWISE"
@@ -582,13 +583,13 @@ function HomePage() {
             </p>
           </div>
 
-          {/* Sezione inferiore con logo al centro */}
-          <div className="flex items-center justify-center gap-8 mt-12" style={{ fontSize: '30px' }}>
-            {/* Colonna sinistra */}
+          {/* Sezione inferiore con logo al centro - responsive */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mt-8 md:mt-12 text-[14px] sm:text-[20px] lg:text-[30px]">
+            {/* Colonna sinistra - nascosta su mobile piccolo */}
             <div
               ref={leftColumnRef}
-              className="text-white font-semibold text-right tracking-wide"
-              style={{ minWidth: '280px' }}
+              className="hidden sm:block text-white font-semibold text-right tracking-wide"
+              style={{ minWidth: '180px' }}
             >
               <p style={{ whiteSpace: 'nowrap' }}>
                 <TypewriterText
@@ -605,7 +606,7 @@ function HomePage() {
                   delay={0.85}
                   speed={0.012}
                 />
-                <span style={{ marginLeft: '100px' }}>
+                <span className="ml-8 lg:ml-[100px]">
                   <TypewriterText
                     text="WORK"
                     isVisible={isTypewriterActive}
@@ -616,25 +617,23 @@ function HomePage() {
               </p>
             </div>
 
-            {/* Logo centrale - 125x125px con dimensioni fisse per evitare shift durante le animazioni */}
-            <div ref={heroLogoRef} className="flex items-center justify-center flex-shrink-0" style={{ width: '125px', height: '125px' }}>
+            {/* Logo centrale - responsive */}
+            <div ref={heroLogoRef} className="flex items-center justify-center flex-shrink-0 w-[60px] h-[60px] sm:w-[80px] sm:h-[80px] lg:w-[125px] lg:h-[125px]">
               <img
                 src={logoWebwiseCenter}
                 alt="Webwise Logo"
-                className="invert"
+                className="invert w-full h-full"
                 style={{
-                  width: '125px',
-                  height: '125px',
                   opacity: hasSeenLoading ? 1 : 0,
                 }}
               />
             </div>
 
-            {/* Colonna destra */}
+            {/* Colonna destra - nascosta su mobile piccolo */}
             <div
               ref={rightColumnRef}
-              className="text-white font-semibold text-left tracking-wide"
-              style={{ minWidth: '280px' }}
+              className="hidden sm:block text-white font-semibold text-left tracking-wide"
+              style={{ minWidth: '180px' }}
             >
               <p>
                 <TypewriterText
@@ -644,7 +643,7 @@ function HomePage() {
                   speed={0.012}
                 />
               </p>
-              <p style={{ paddingLeft: '60px', whiteSpace: 'nowrap' }} className="flex items-center gap-2">
+              <p className="flex items-center gap-2 pl-4 lg:pl-[60px]" style={{ whiteSpace: 'nowrap' }}>
                 <TypewriterText
                   text="EFFICENCY"
                   isVisible={isTypewriterActive}
@@ -653,8 +652,7 @@ function HomePage() {
                 />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="30"
-                  height="30"
+                  className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px] lg:w-[30px] lg:h-[30px]"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -673,6 +671,16 @@ function HomePage() {
               </p>
             </div>
           </div>
+
+          {/* Versione mobile - solo "EST. 2022" sotto il logo */}
+          <p className="sm:hidden text-white/70 text-xs font-medium mt-4">
+            <TypewriterText
+              text="EST. 2022"
+              isVisible={isTypewriterActive}
+              delay={0.5}
+              speed={0.02}
+            />
+          </p>
         </div>
       </section>
 
@@ -689,8 +697,9 @@ function HomePage() {
 
       {/* Descrizioni midframe - FIXED, posizionate rispetto al logo 546px centrato */}
       {/* Appaiono/spariscono in sincronia con la zona "logo nitido" del ParticleLogo */}
+      {/* NASCOSTO su mobile (lg:flex) */}
       <div
-        className="fixed inset-0 pointer-events-none flex items-center justify-center"
+        className="fixed inset-0 pointer-events-none hidden lg:flex items-center justify-center"
         style={{
           zIndex: 42, // Sopra il logo midframe (z-index 41)
           opacity: showMidframeContent ? 1 : 0,
@@ -881,7 +890,7 @@ function HomePage() {
       {/* Il logo arriva qui con l'animazione da midframe e rimane fisso */}
       <section
         ref={servizi1SectionRef}
-        className="w-full relative"
+        className="w-full relative hidden md:block"
         style={{ height: '35vh', overflow: 'clip' }}
       >
         <div className="relative max-w-7xl mx-auto px-8 h-full">
@@ -945,15 +954,15 @@ function HomePage() {
 
       {/* Sezione Servizi 2 - SOTTO la linea verde - contiene card e contenuto */}
       {/* L'altezza minima garantisce che le card sticky abbiano abbastanza spazio per restare in posizione */}
+      {/* Su mobile: altezza auto, no sticky */}
       <section
         ref={serviziSectionRef}
         id="servizi"
-        className="w-full relative py-20"
-        style={{ minHeight: '250vh' }}
+        className="w-full relative py-12 lg:py-20 min-h-0 md:min-h-[250vh]"
       >
-        <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start" style={{ transformOrigin: 'center top' }}>
-          {/* Colonna sinistra - sticky */}
-          <div className="flex flex-col gap-4 h-fit relative sticky" style={{ top: '20vh' }}>
+        <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start" style={{ transformOrigin: 'center top' }}>
+          {/* Colonna sinistra - sticky su tablet e desktop */}
+          <div className="flex flex-col gap-4 h-fit relative md:sticky" style={{ top: '20vh' }}>
             {/* Badge */}
             <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
               Come possiamo aiutarti
@@ -1000,10 +1009,10 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Colonna destra - card servizi con sticky stacking */}
-          <div ref={cardsContainerRef} className="flex flex-col pt-0">
+          {/* Colonna destra - card servizi con sticky stacking (tablet e desktop) */}
+          <div ref={cardsContainerRef} className="flex flex-col pt-0 gap-4 md:gap-0">
             {/* Card SEO */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '20vh', zIndex: 1 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group md:sticky mb-0 md:mb-[200px]" style={{ top: '20vh', zIndex: 1 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1025,7 +1034,7 @@ function HomePage() {
             </div>
 
             {/* Card Siti Web */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 20px)', zIndex: 2 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group md:sticky mb-0 md:mb-[200px]" style={{ top: 'calc(20vh + 20px)', zIndex: 2 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1048,7 +1057,7 @@ function HomePage() {
             </div>
 
             {/* Card E-commerce */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 40px)', zIndex: 3 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group md:sticky mb-0 md:mb-[200px]" style={{ top: 'calc(20vh + 40px)', zIndex: 3 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1071,7 +1080,7 @@ function HomePage() {
             </div>
 
             {/* Card Gestione Social */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 60px)', zIndex: 4 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group md:sticky mb-0 md:mb-[200px]" style={{ top: 'calc(20vh + 60px)', zIndex: 4 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1092,7 +1101,7 @@ function HomePage() {
             </div>
 
             {/* Card App e Web App */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 80px)', zIndex: 5 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group md:sticky mb-0 md:mb-[200px]" style={{ top: 'calc(20vh + 80px)', zIndex: 5 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1117,7 +1126,7 @@ function HomePage() {
             </div>
 
             {/* Card Automazioni e AI */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 100px)', zIndex: 6 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group md:sticky mb-0 md:mb-[200px]" style={{ top: 'calc(20vh + 100px)', zIndex: 6 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1143,7 +1152,7 @@ function HomePage() {
             </div>
 
             {/* Card ADS */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 120px)', zIndex: 7 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group md:sticky mb-0 md:mb-[200px]" style={{ top: 'calc(20vh + 120px)', zIndex: 7 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1165,7 +1174,7 @@ function HomePage() {
             </div>
 
             {/* Card Reservly */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 140px)', zIndex: 8 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group md:sticky mb-0 md:mb-[200px]" style={{ top: 'calc(20vh + 140px)', zIndex: 8 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1189,31 +1198,26 @@ function HomePage() {
               </p>
             </div>
 
-            {/* Spacer finale - permette all'ultima card di staccarsi e mantenere la posizione */}
-            <div style={{ height: '65vh' }}></div>
+            {/* Spacer finale - permette all'ultima card di staccarsi e mantenere la posizione (tablet e desktop) */}
+            <div className="hidden md:block" style={{ height: '65vh' }}></div>
           </div>
         </div>
       </section>
 
-      {/* Sezione Portfolio - 1920x2580 */}
+      {/* Sezione Portfolio */}
       {/* z-index alto per passare sopra alla sezione servizi, ombra per effetto profondità */}
+      {/* Su mobile: niente aspect-ratio fisso */}
       <section
         ref={portfolioSectionRef}
         id="portfolio"
         className="w-full bg-black relative"
         style={{
-          aspectRatio: '1920 / 2580',
           zIndex: 20,
           boxShadow: '0 -20px 50px rgba(0, 0, 0, 0.8)'
         }}
       >
-        {/* Sottosezione 1: I Nostri Clienti - 1920x1260 */}
-        <div
-          className="w-full relative flex flex-col items-center pt-16"
-          style={{
-            aspectRatio: '1920 / 1260'
-          }}
-        >
+        {/* Sottosezione 1: I Nostri Clienti */}
+        <div className="w-full relative flex flex-col items-center py-12 lg:py-16 px-4">
           {/* Infinite Grid Background */}
           <NoiseTexture />
           {/* Badge */}
@@ -1222,29 +1226,47 @@ function HomePage() {
           </span>
 
           {/* Titolo */}
-          <h2 className="relative z-10 text-white text-4xl font-semibold mb-4">I nostri clienti</h2>
+          <h2 className="relative z-10 text-white text-2xl lg:text-4xl font-semibold mb-4 text-center">I nostri clienti</h2>
 
           {/* Descrizione */}
-          <p className="relative z-10 text-gray-400 text-center max-w-2xl leading-relaxed px-4">
+          <p className="relative z-10 text-gray-400 text-center max-w-2xl leading-relaxed px-4 text-sm lg:text-base">
             Ci immedesimiamo nella visione dei nostri clienti, per comprendere e realizzare i loro
             obiettivi con la stessa cura e attenzione che dedicherebbero loro stessi. Questo
             approccio empatico ci permette di sviluppare soluzioni che rispecchiano non solo le
             esigenze, ma anche l'identità e le aspirazioni di chi ci sceglie come partner.
           </p>
 
-          {/* Card 3D dei progetti - interattive */}
-          <div className="relative z-10">
+          {/* Card 3D dei progetti - solo desktop */}
+          <div className="relative z-10 hidden lg:block">
             <ProjectCards3D />
+          </div>
+
+          {/* Versione mobile - lista semplice dei progetti */}
+          <div className="lg:hidden w-full mt-8 flex flex-col gap-4">
+            {projects.slice(0, 3).map((project) => (
+              <Link
+                key={project.id}
+                to={`/progetti/${project.slug}`}
+                className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-4 flex items-center gap-4"
+              >
+                <div className="w-16 h-16 bg-[#2EBAEB]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#2EBAEB] text-2xl font-bold">{project.name.charAt(0)}</span>
+                </div>
+                <div className="flex-grow">
+                  <h3 className="text-white font-semibold">{project.name}</h3>
+                  <p className="text-gray-500 text-sm">{project.industry}</p>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              </Link>
+            ))}
           </div>
         </div>
 
-        {/* Sottosezione 2: Slider - 1920x200 */}
-        <div
-          className="w-full relative bg-black"
-          style={{
-            aspectRatio: '1920 / 200'
-          }}
-        >
+        {/* Sottosezione 2: Slider - solo desktop */}
+        <div className="w-full relative bg-black h-24 lg:h-auto hidden lg:block" style={{ aspectRatio: '1920 / 200' }}>
           <ClientsMarquee />
         </div>
 
