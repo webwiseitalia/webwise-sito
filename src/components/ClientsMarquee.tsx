@@ -5,8 +5,8 @@ interface Client {
 
 const clients: Client[] = [
   { name: 'Macelleria Marcheto', href: 'https://macelleriamarcheto.it' },
-  { name: 'Medusa', href: 'https://www.medusauth.xyz/' },
-  { name: 'Quercetti', href: 'https://www.quercettistore.com' },
+  { name: '3B Padel', href: 'https://3bpadel.it' },
+  { name: 'Aurora Ristorante', href: 'https://ristoranteaurora.it' },
 ]
 
 export default function ClientsMarquee() {
