@@ -15,7 +15,7 @@ import ReservlyPage from './pages/ReservlyPage'
 import CareersPage from './pages/CareersPage'
 import ProjectPage from './pages/ProjectPage'
 import ScrollToTop from './components/ScrollToTop'
-// ParticleLogo rimosso per versione mobile-friendly
+import ParticleLogo from './components/ParticleLogo'
 import DotShaderBackground, { DotShaderBackgroundRef } from './components/DotShaderBackground'
 import NoiseTexture from './components/NoiseTexture'
 import BurgerMenu from './components/BurgerMenu'
@@ -102,12 +102,23 @@ function HomePage() {
   )
   const [showLoading, setShowLoading] = useState(!hasSeenLoading)
   const [, setShowHeroLogo] = useState(true)
-  // Stati semplificati - particelle rimosse
+  // Se abbiamo già visto il loading, mostra subito le particelle
+  const [showParticleLogo, setShowParticleLogo] = useState(hasSeenLoading)
+  const [showCustomProjectsLine, setShowCustomProjectsLine] = useState(false) // Scritta "progetti custom"
+  const [showMidframeContent, setShowMidframeContent] = useState(false) // Contenuto midframe (descrizioni)
   const [showBurger, setShowBurger] = useState(false) // Burger menu visibile dopo scroll
   const [navbarCompression, setNavbarCompression] = useState(0) // 0 = normale, 1 = compressa
   const heroLogoRef = useRef<HTMLDivElement>(null)
-  const customProjectsRef = useRef<HTMLDivElement>(null)
-  // Refs per linee midframe rimossi - sezione semplificata
+  const customProjectsRef = useRef<HTMLDivElement>(null) // Ref per animare la scritta
+  const lineRef = useRef<HTMLDivElement>(null) // Ref per animare la linea loading
+  const midframeLineLeftRef1 = useRef<HTMLDivElement>(null) // Linea sinistra 1 (Webwise)
+  const midframeLineLeftRef2 = useRef<HTMLDivElement>(null) // Linea sinistra 2 (centrale)
+  const midframeLineLeftRef3 = useRef<HTMLDivElement>(null) // Linea sinistra 3 (Reservly)
+  const midframeLineRightRef = useRef<HTMLDivElement>(null) // Linea destra (SCOT)
+  const midframeObliqueLeftRef1 = useRef<HTMLDivElement>(null) // Linea obliqua sinistra 1
+  const midframeObliqueLeftRef2 = useRef<HTMLDivElement>(null) // Linea obliqua sinistra 2 (centrale)
+  const midframeObliqueLeftRef3 = useRef<HTMLDivElement>(null) // Linea obliqua sinistra 3
+  const midframeObliqueRightRef = useRef<HTMLDivElement>(null) // Linea obliqua destra
   const navbarRef = useRef<HTMLElement>(null)
   const leftColumnRef = useRef<HTMLDivElement>(null)
   const rightColumnRef = useRef<HTMLDivElement>(null)
@@ -159,8 +170,122 @@ function HomePage() {
   }, [])
 
   const isTypewriterActive = animationPhase === 'typewriter' || animationPhase === 'complete'
+  const showFullContent = animationPhase === 'complete'
 
-  // Animazioni midframe rimosse - sezione semplificata per mobile
+  // Callback quando il logo fa snap-in/out nella sezione servizi
+  const handleLogoSnapComplete = useCallback((isSnapped: boolean) => {
+    setShowCustomProjectsLine(isSnapped)
+  }, [])
+
+  // Animazione sincronizzata per scritta "progetti custom" e linea loading
+  // Durata totale: 1 secondo - linea e typewriter finiscono insieme
+  useEffect(() => {
+    if (!lineRef.current) return
+
+    // Cancella eventuali animazioni in corso per evitare conflitti
+    gsap.killTweensOf(lineRef.current)
+
+    if (showCustomProjectsLine) {
+      // Animazione linea loading: da 0% a 100% in 1 secondo
+      // Le scritte TypewriterText si animano automaticamente tramite isVisible
+      gsap.fromTo(lineRef.current,
+        { width: '0%' },
+        {
+          width: '100%',
+          duration: 1,
+          ease: 'power2.out',
+          overwrite: true
+        }
+      )
+    } else {
+      // Reset istantaneo - nessuna animazione per evitare bug
+      gsap.set(lineRef.current, { width: '0%' })
+    }
+  }, [showCustomProjectsLine])
+
+  // Animazione linee midframe - si espandono dal centro verso l'esterno
+  useEffect(() => {
+    const horizontalLines = [midframeLineLeftRef1.current, midframeLineLeftRef2.current, midframeLineLeftRef3.current, midframeLineRightRef.current]
+    const obliqueLines = [midframeObliqueLeftRef1.current, midframeObliqueLeftRef2.current, midframeObliqueLeftRef3.current, midframeObliqueRightRef.current]
+    const allLines = [...horizontalLines, ...obliqueLines]
+
+    allLines.forEach(line => {
+      if (line) gsap.killTweensOf(line)
+    })
+
+    if (showMidframeContent) {
+      // Linee orizzontali sinistra: si espandono verso sinistra
+      if (midframeLineLeftRef1.current) {
+        gsap.fromTo(midframeLineLeftRef1.current,
+          { width: '0%' },
+          { width: '100%', duration: 1, ease: 'power2.out', overwrite: true }
+        )
+      }
+      if (midframeLineLeftRef2.current) {
+        gsap.fromTo(midframeLineLeftRef2.current,
+          { width: '0%' },
+          { width: '100%', duration: 1, ease: 'power2.out', overwrite: true, delay: 0.05 }
+        )
+      }
+      if (midframeLineLeftRef3.current) {
+        gsap.fromTo(midframeLineLeftRef3.current,
+          { width: '0%' },
+          { width: '100%', duration: 1, ease: 'power2.out', overwrite: true, delay: 0.1 }
+        )
+      }
+      // Linea orizzontale destra: si espande verso destra
+      if (midframeLineRightRef.current) {
+        gsap.fromTo(midframeLineRightRef.current,
+          { width: '0%' },
+          { width: '100%', duration: 1, ease: 'power2.out', overwrite: true }
+        )
+      }
+
+      // Linee oblique - partono con un piccolo delay dopo le orizzontali
+      if (midframeObliqueLeftRef1.current) {
+        gsap.fromTo(midframeObliqueLeftRef1.current,
+          { width: '0px' },
+          { width: '80px', duration: 0.6, ease: 'power2.out', overwrite: true, delay: 0.3 }
+        )
+      }
+      if (midframeObliqueLeftRef2.current) {
+        gsap.fromTo(midframeObliqueLeftRef2.current,
+          { width: '0px' },
+          { width: '80px', duration: 0.6, ease: 'power2.out', overwrite: true, delay: 0.35 }
+        )
+      }
+      if (midframeObliqueLeftRef3.current) {
+        gsap.fromTo(midframeObliqueLeftRef3.current,
+          { width: '0px' },
+          { width: '80px', duration: 0.6, ease: 'power2.out', overwrite: true, delay: 0.4 }
+        )
+      }
+      if (midframeObliqueRightRef.current) {
+        gsap.fromTo(midframeObliqueRightRef.current,
+          { width: '0px' },
+          { width: '80px', duration: 0.6, ease: 'power2.out', overwrite: true, delay: 0.3 }
+        )
+      }
+    } else {
+      // Reset istantaneo
+      horizontalLines.forEach(line => {
+        if (line) gsap.set(line, { width: '0%' })
+      })
+      obliqueLines.forEach(line => {
+        if (line) gsap.set(line, { width: '0px' })
+      })
+    }
+  }, [showMidframeContent])
+
+  // Mostra il ParticleLogo quando il loading è completato o se lo saltiamo
+  useEffect(() => {
+    if (!showLoading) {
+      // Piccolo delay per assicurarsi che il DOM sia pronto
+      setTimeout(() => {
+        setShowParticleLogo(true)
+      }, 100)
+    }
+  }, [showLoading])
 
   // ScrollTrigger per effetto parallax con ZOOM IN/OUT
   // Sincronizzato con ParticleLogo usando gli stessi endpoint:
@@ -372,7 +497,17 @@ function HomePage() {
         />
       )}
 
-      {/* ParticleLogo rimosso - versione semplificata per mobile */}
+      {/* ParticleLogo - effetto dissolve/particelle durante lo scroll */}
+      <ParticleLogo
+        heroSectionRef={heroSectionRef}
+        midframeSectionRef={logoSectionRef}
+        servizi1SectionRef={servizi1SectionRef}
+        serviziBlockRef={serviziBlockRef}
+        heroLogoRef={heroLogoRef}
+        isVisible={showParticleLogo}
+        onSnapComplete={handleLogoSnapComplete}
+        onMidframeNitido={setShowMidframeContent}
+      />
 
 
       {/* Navbar fixed */}
@@ -412,8 +547,8 @@ function HomePage() {
         </div>
 
         <div className="flex flex-col items-center text-center px-4 relative z-10">
-          {/* Titolo principale - responsive */}
-          <div className="text-white font-semibold tracking-tight" style={{ fontSize: 'clamp(28px, 8vw, 75px)', lineHeight: '1.1' }}>
+          {/* Titolo principale - Inter SemiBold 75px */}
+          <div className="text-white font-semibold tracking-tight" style={{ fontSize: '75px', lineHeight: '1.1' }}>
             <p>
               <TypewriterText
                 text="WEBWISE"
@@ -448,8 +583,8 @@ function HomePage() {
             </p>
           </div>
 
-          {/* Sezione inferiore con logo al centro - nascosta su mobile */}
-          <div className="hidden lg:flex items-center justify-center gap-8 mt-12" style={{ fontSize: '30px' }}>
+          {/* Sezione inferiore con logo al centro */}
+          <div className="flex items-center justify-center gap-8 mt-12" style={{ fontSize: '30px' }}>
             {/* Colonna sinistra */}
             <div
               ref={leftColumnRef}
@@ -542,121 +677,268 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Sezione Logo Centrale - semplificata senza particelle */}
+      {/* Sezione Logo Centrale - estesa per mantenere il logo nitido visibile più a lungo */}
       <section
         ref={logoSectionRef}
-        className="w-full bg-transparent flex items-center justify-center relative overflow-hidden py-16 lg:py-24"
+        className="w-full bg-transparent flex items-center justify-center relative overflow-hidden"
         style={{
-          minHeight: '80vh'
+          aspectRatio: '1920 / 1080'  // Altezza originale (1x)
         }}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full">
-          {/* Layout desktop: 3 colonne, mobile: verticale */}
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
-            {/* Colonna sinistra - nascosta su mobile */}
-            <div className="hidden lg:flex flex-col justify-between items-end text-right gap-16" style={{ width: '350px' }}>
-              {/* Descrizione 1 */}
-              <div className="flex flex-col items-end">
-                <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">SOLUZIONI DIGITALI SU MISURA</p>
-                <p className="text-white/60 text-sm max-w-[320px]">
-                  Sviluppo web, app, automazioni e strategie digitali per far crescere il tuo business.
-                </p>
-              </div>
-              {/* Descrizione 2 */}
-              <div className="flex flex-col items-end">
-                <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">RESERVLY</p>
-                <p className="text-white/60 text-sm max-w-[320px]">
-                  La piattaforma di prenotazione per il business moderno. Semplifica appuntamenti e automatizza i flussi.
-                </p>
+        {/* Nessuno sfondo qui - lo zoom continua sugli sfondi hero/servizi */}
+      </section>
+
+      {/* Descrizioni midframe - FIXED, posizionate rispetto al logo 546px centrato */}
+      {/* Appaiono/spariscono in sincronia con la zona "logo nitido" del ParticleLogo */}
+      <div
+        className="fixed inset-0 pointer-events-none flex items-center justify-center"
+        style={{
+          zIndex: 42, // Sopra il logo midframe (z-index 41)
+          opacity: showMidframeContent ? 1 : 0,
+          transition: 'opacity 0.15s ease'
+        }}
+      >
+        <div className="flex items-center justify-center gap-16">
+          {/* Colonna sinistra - 2 descrizioni: una in alto, una in basso */}
+          <div className="flex flex-col justify-between items-end text-right" style={{ width: '450px', height: '546px' }}>
+            {/* Descrizione 1: Webwise e servizi - in alto */}
+            <div className="flex flex-col items-end">
+              <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
+                <TypewriterText
+                  text="SOLUZIONI DIGITALI SU MISURA"
+                  isVisible={showMidframeContent}
+                  delay={0}
+                  speed={0.025}
+                />
+              </p>
+              <p className="text-white/60 text-sm max-w-[380px] mb-4">
+                <TypewriterText
+                  text="Sviluppo web, app, automazioni e strategie digitali per far crescere il tuo business."
+                  isVisible={showMidframeContent}
+                  delay={0.3}
+                  speed={0.015}
+                />
+              </p>
+              {/* Contenitore linee - orizzontale + obliqua attaccate */}
+              <div className="w-full flex justify-end items-center relative">
+                {/* Linea orizzontale */}
+                <div
+                  ref={midframeLineLeftRef1}
+                  style={{ width: '0%', height: '2px' }}
+                  className="bg-white/60"
+                />
+                {/* Linea obliqua - punta verso il logo (in basso a destra) */}
+                <div
+                  ref={midframeObliqueLeftRef1}
+                  className="bg-white/60 absolute"
+                  style={{
+                    width: '0px',
+                    height: '2px',
+                    left: '100%',
+                    top: '50%',
+                    transform: 'translateY(-50%) rotate(45deg)',
+                    transformOrigin: 'left center'
+                  }}
+                />
               </div>
             </div>
 
-            {/* Logo centrale */}
-            <div className="flex-shrink-0">
-              <img
-                src={logoWebwiseCenter}
-                alt="Webwise Logo"
-                className="invert w-48 h-48 lg:w-80 lg:h-80"
-              />
-            </div>
-
-            {/* Colonna destra - nascosta su mobile */}
-            <div className="hidden lg:flex flex-col justify-between items-start text-left gap-16" style={{ width: '350px' }}>
-              {/* Descrizione 1 */}
-              <div className="flex flex-col items-start">
-                <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">WEBWISE STUDIO</p>
-                <p className="text-white/60 text-sm max-w-[320px]">
-                  Crea il tuo sito web con l'intelligenza artificiale. Semplice, veloce, professionale.
-                </p>
-              </div>
-              {/* Descrizione 2 */}
-              <div className="flex flex-col items-start">
-                <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">SCOT</p>
-                <p className="text-white/60 text-sm max-w-[320px]">
-                  Il gestionale intelligente per aziende moderne. Organizza, monitora e scala il tuo business con l'AI.
-                </p>
+            {/* Descrizione 2: Reservly - in basso */}
+            <div className="flex flex-col items-end">
+              <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
+                <TypewriterText
+                  text="RESERVLY"
+                  isVisible={showMidframeContent}
+                  delay={0.1}
+                  speed={0.04}
+                />
+              </p>
+              <p className="text-white/60 text-sm max-w-[380px] mb-4">
+                <TypewriterText
+                  text="La piattaforma di prenotazione per il business moderno. Semplifica appuntamenti e automatizza i flussi."
+                  isVisible={showMidframeContent}
+                  delay={0.4}
+                  speed={0.015}
+                />
+              </p>
+              {/* Contenitore linee - orizzontale + obliqua attaccate */}
+              <div className="w-full flex justify-end items-center relative">
+                {/* Linea orizzontale */}
+                <div
+                  ref={midframeLineLeftRef2}
+                  style={{ width: '0%', height: '2px' }}
+                  className="bg-white/60"
+                />
+                {/* Linea obliqua - punta verso il logo (in alto a destra) */}
+                <div
+                  ref={midframeObliqueLeftRef2}
+                  className="bg-white/60 absolute"
+                  style={{
+                    width: '0px',
+                    height: '2px',
+                    left: '100%',
+                    top: '50%',
+                    transform: 'translateY(-50%) rotate(-45deg)',
+                    transformOrigin: 'left center'
+                  }}
+                />
               </div>
             </div>
           </div>
 
-          {/* Versione mobile delle descrizioni - sotto il logo */}
-          <div className="lg:hidden grid grid-cols-2 gap-6 mt-12">
-            <div className="text-center">
-              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1">SOLUZIONI DIGITALI</p>
-              <p className="text-white/50 text-xs">Web, app e automazioni per il tuo business.</p>
+          {/* Spazio per il logo centrale - 546px come il logo nitido */}
+          <div style={{ width: '546px', height: '546px' }} />
+
+          {/* Colonna destra - 2 descrizioni: una centrata, una con linea verso l'alto */}
+          <div className="flex flex-col justify-between items-start text-left" style={{ width: '450px', height: '546px' }}>
+            {/* Descrizione 1: WEBWISE STUDIO - in alto con linea verso il basso */}
+            <div className="flex flex-col items-start">
+              <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
+                <TypewriterText
+                  text="WEBWISE STUDIO"
+                  isVisible={showMidframeContent}
+                  delay={0}
+                  speed={0.04}
+                />
+              </p>
+              <p className="text-white/60 text-sm max-w-[380px] mb-4">
+                <TypewriterText
+                  text="Crea il tuo sito web con l'intelligenza artificiale. Semplice, veloce, professionale."
+                  isVisible={showMidframeContent}
+                  delay={0.3}
+                  speed={0.015}
+                />
+              </p>
+              {/* Contenitore linee - orizzontale + obliqua attaccate */}
+              <div className="w-full flex justify-start items-center relative">
+                {/* Linea obliqua - punta verso il logo (in basso a sinistra) */}
+                <div
+                  ref={midframeObliqueLeftRef3}
+                  className="bg-white/60 absolute"
+                  style={{
+                    width: '0px',
+                    height: '2px',
+                    right: '100%',
+                    top: '50%',
+                    transform: 'translateY(-50%) rotate(-45deg)',
+                    transformOrigin: 'right center'
+                  }}
+                />
+                {/* Linea orizzontale */}
+                <div
+                  ref={midframeLineLeftRef3}
+                  style={{ width: '0%', height: '2px' }}
+                  className="bg-white/60"
+                />
+              </div>
             </div>
-            <div className="text-center">
-              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1">WEBWISE STUDIO</p>
-              <p className="text-white/50 text-xs">Crea siti web con l'AI.</p>
-            </div>
-            <div className="text-center">
-              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1">RESERVLY</p>
-              <p className="text-white/50 text-xs">Prenotazioni automatizzate.</p>
-            </div>
-            <div className="text-center">
-              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1">SCOT</p>
-              <p className="text-white/50 text-xs">Gestionale AI per aziende.</p>
+
+            {/* Descrizione 2: SCOT - in basso con linea verso l'alto */}
+            <div className="flex flex-col items-start">
+              <p className="text-white/80 text-base font-semibold uppercase tracking-wide mb-2">
+                <TypewriterText
+                  text="SCOT"
+                  isVisible={showMidframeContent}
+                  delay={0.1}
+                  speed={0.08}
+                />
+              </p>
+              <p className="text-white/60 text-sm max-w-[380px] mb-4">
+                <TypewriterText
+                  text="Il gestionale intelligente per aziende moderne. Organizza, monitora e scala il tuo business con l'AI."
+                  isVisible={showMidframeContent}
+                  delay={0.4}
+                  speed={0.015}
+                />
+              </p>
+              {/* Contenitore linee - orizzontale + obliqua attaccate */}
+              <div className="w-full flex justify-start items-center relative">
+                {/* Linea obliqua - punta verso il logo (in alto a sinistra) */}
+                <div
+                  ref={midframeObliqueRightRef}
+                  className="bg-white/60 absolute"
+                  style={{
+                    width: '0px',
+                    height: '2px',
+                    right: '100%',
+                    top: '50%',
+                    transform: 'translateY(-50%) rotate(45deg)',
+                    transformOrigin: 'right center'
+                  }}
+                />
+                {/* Linea orizzontale */}
+                <div
+                  ref={midframeLineRightRef}
+                  style={{ width: '0%', height: '2px' }}
+                  className="bg-white/60"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Sezione Servizi 1 - versione semplificata responsive */}
+      {/* Sezione Servizi 1 - SOPRA la linea verde (35vh) - contiene SOLO il logo */}
+      {/* Il logo arriva qui con l'animazione da midframe e rimane fisso */}
       <section
         ref={servizi1SectionRef}
-        className="w-full relative py-8 lg:py-12"
+        className="w-full relative"
+        style={{ height: '35vh', overflow: 'clip' }}
       >
-        <div className="relative max-w-7xl mx-auto px-4 lg:px-8">
+        <div className="relative max-w-7xl mx-auto px-8 h-full">
           {/* Logo + Linea con scritta custom */}
-          <div ref={serviziBlockRef} className="flex flex-col lg:flex-row items-center lg:items-center gap-4 lg:gap-8">
-            {/* Logo - più piccolo su mobile */}
+          <div ref={serviziBlockRef} className="sticky flex items-center gap-8" style={{ top: '20vh', paddingTop: '20px' }}>
+            {/* Logo */}
             <img
               src={logoWebwiseCenter}
               alt="Webwise Logo"
-              className="invert flex-shrink-0 w-16 h-16 lg:w-[125px] lg:h-[125px]"
+              className="invert flex-shrink-0"
+              style={{
+                width: '125px',
+                height: '125px',
+                opacity: 0, // Controllato da ParticleLogo
+              }}
             />
 
-            {/* Blocco destro: scritta + linea + CTA */}
-            <div ref={customProjectsRef} className="flex-grow flex flex-col justify-center w-full">
-              {/* Riga con scritta e CTA - stack su mobile */}
-              <div className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-2 lg:gap-0 mb-3">
-                <p className="text-white text-xs lg:text-sm font-medium uppercase tracking-wide text-center lg:text-left">
-                  REALIZZIAMO ANCHE PROGETTI CUSTOM SU MISURA
+            {/* Blocco destro: scritta + linea + CTA - con animazioni sincronizzate */}
+            <div ref={customProjectsRef} className="flex-grow flex flex-col justify-center" style={{ opacity: 1 }}>
+              {/* Riga con scritta e CTA */}
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-white text-sm font-medium uppercase tracking-wide">
+                  <TypewriterText
+                    text="REALIZZIAMO ANCHE PROGETTI CUSTOM SU MISURA"
+                    isVisible={showCustomProjectsLine}
+                    delay={0}
+                    speed={0.023}
+                  />
                 </p>
                 <a
                   href="#contatti"
-                  className="flex items-center gap-1.5 text-white text-xs lg:text-sm font-medium uppercase tracking-wide hover:text-[#2EBAEB] transition-colors group"
+                  className="flex items-center gap-1.5 text-white text-sm font-medium uppercase tracking-wide hover:text-[#2EBAEB] transition-colors group"
                 >
-                  <span>CONTATTACI</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                  <span>
+                    <TypewriterText
+                      text="CONTATTACI"
+                      isVisible={showCustomProjectsLine}
+                      delay={0}
+                      speed={0.1}
+                    />
+                  </span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" style={{ opacity: showCustomProjectsLine ? 1 : 0, transition: showCustomProjectsLine ? 'opacity 0.3s ease 0.9s' : 'none' }}>
                     <path d="M7 17L17 7" />
                     <path d="M7 7h10v10" />
                   </svg>
                 </a>
               </div>
 
-              {/* Linea orizzontale - sempre visibile */}
-              <div className="w-full h-px bg-white/30" />
+              {/* Linea orizzontale - animazione loading da 0% a 100% */}
+              <div className="w-full h-px">
+                <div
+                  ref={lineRef}
+                  className="h-full bg-white/50"
+                  style={{ width: '0%' }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -667,12 +949,12 @@ function HomePage() {
       <section
         ref={serviziSectionRef}
         id="servizi"
-        className="w-full relative py-12 lg:py-20"
+        className="w-full relative py-20"
         style={{ minHeight: '250vh' }}
       >
-        <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start" style={{ transformOrigin: 'center top' }}>
-          {/* Colonna sinistra - sticky su desktop, normale su mobile */}
-          <div className="flex flex-col gap-4 h-fit relative lg:sticky" style={{ top: '20vh' }}>
+        <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start" style={{ transformOrigin: 'center top' }}>
+          {/* Colonna sinistra - sticky */}
+          <div className="flex flex-col gap-4 h-fit relative sticky" style={{ top: '20vh' }}>
             {/* Badge */}
             <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
               Come possiamo aiutarti
@@ -721,29 +1003,8 @@ function HomePage() {
 
           {/* Colonna destra - card servizi con sticky stacking */}
           <div ref={cardsContainerRef} className="flex flex-col pt-0">
-            {/* CSS per posizioni sticky responsive */}
-            <style>{`
-              .service-card-1 { top: 10px; }
-              .service-card-2 { top: 20px; }
-              .service-card-3 { top: 30px; }
-              .service-card-4 { top: 40px; }
-              .service-card-5 { top: 50px; }
-              .service-card-6 { top: 60px; }
-              .service-card-7 { top: 70px; }
-              .service-card-8 { top: 80px; }
-              @media (min-width: 1024px) {
-                .service-card-1 { top: 20vh; }
-                .service-card-2 { top: calc(20vh + 20px); }
-                .service-card-3 { top: calc(20vh + 40px); }
-                .service-card-4 { top: calc(20vh + 60px); }
-                .service-card-5 { top: calc(20vh + 80px); }
-                .service-card-6 { top: calc(20vh + 100px); }
-                .service-card-7 { top: calc(20vh + 120px); }
-                .service-card-8 { top: calc(20vh + 140px); }
-              }
-            `}</style>
             {/* Card SEO */}
-            <div className="service-card service-card-1 bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group sticky mb-[100px] lg:mb-[200px]" style={{ zIndex: 1 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: '20vh', zIndex: 1 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -765,7 +1026,7 @@ function HomePage() {
             </div>
 
             {/* Card Siti Web */}
-            <div className="service-card service-card-2 bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group sticky mb-[100px] lg:mb-[200px]" style={{ zIndex: 2 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 20px)', zIndex: 2 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -788,7 +1049,7 @@ function HomePage() {
             </div>
 
             {/* Card E-commerce */}
-            <div className="service-card service-card-3 bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group sticky mb-[100px] lg:mb-[200px]" style={{ zIndex: 3 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 40px)', zIndex: 3 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -811,7 +1072,7 @@ function HomePage() {
             </div>
 
             {/* Card Gestione Social */}
-            <div className="service-card service-card-4 bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group sticky mb-[100px] lg:mb-[200px]" style={{ zIndex: 4 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 60px)', zIndex: 4 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -832,7 +1093,7 @@ function HomePage() {
             </div>
 
             {/* Card App e Web App */}
-            <div className="service-card service-card-5 bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group sticky mb-[100px] lg:mb-[200px]" style={{ zIndex: 5 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 80px)', zIndex: 5 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -857,7 +1118,7 @@ function HomePage() {
             </div>
 
             {/* Card Automazioni e AI */}
-            <div className="service-card service-card-6 bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group sticky mb-[100px] lg:mb-[200px]" style={{ zIndex: 6 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 100px)', zIndex: 6 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -883,7 +1144,7 @@ function HomePage() {
             </div>
 
             {/* Card ADS */}
-            <div className="service-card service-card-7 bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group sticky mb-[100px] lg:mb-[200px]" style={{ zIndex: 7 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 120px)', zIndex: 7 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -905,7 +1166,7 @@ function HomePage() {
             </div>
 
             {/* Card Reservly */}
-            <div className="service-card service-card-8 bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group sticky mb-[100px] lg:mb-[200px]" style={{ zIndex: 8 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 140px)', zIndex: 8 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -930,25 +1191,30 @@ function HomePage() {
             </div>
 
             {/* Spacer finale - permette all'ultima card di staccarsi e mantenere la posizione */}
-            <div style={{ height: '40vh' }} className="lg:hidden"></div>
-            <div style={{ height: '65vh' }} className="hidden lg:block"></div>
+            <div style={{ height: '65vh' }}></div>
           </div>
         </div>
       </section>
 
-      {/* Sezione Portfolio */}
+      {/* Sezione Portfolio - 1920x2580 */}
       {/* z-index alto per passare sopra alla sezione servizi, ombra per effetto profondità */}
       <section
         ref={portfolioSectionRef}
         id="portfolio"
         className="w-full bg-black relative"
         style={{
+          aspectRatio: '1920 / 2580',
           zIndex: 20,
           boxShadow: '0 -20px 50px rgba(0, 0, 0, 0.8)'
         }}
       >
-        {/* Sottosezione 1: I Nostri Clienti */}
-        <div className="w-full relative flex flex-col items-center py-12 lg:py-16">
+        {/* Sottosezione 1: I Nostri Clienti - 1920x1260 */}
+        <div
+          className="w-full relative flex flex-col items-center pt-16"
+          style={{
+            aspectRatio: '1920 / 1260'
+          }}
+        >
           {/* Infinite Grid Background */}
           <NoiseTexture />
           {/* Badge */}
@@ -957,10 +1223,10 @@ function HomePage() {
           </span>
 
           {/* Titolo */}
-          <h2 className="relative z-10 text-white text-2xl lg:text-4xl font-semibold mb-4 text-center">I nostri clienti</h2>
+          <h2 className="relative z-10 text-white text-4xl font-semibold mb-4">I nostri clienti</h2>
 
           {/* Descrizione */}
-          <p className="relative z-10 text-gray-400 text-center max-w-2xl leading-relaxed px-4 text-sm lg:text-base">
+          <p className="relative z-10 text-gray-400 text-center max-w-2xl leading-relaxed px-4">
             Ci immedesimiamo nella visione dei nostri clienti, per comprendere e realizzare i loro
             obiettivi con la stessa cura e attenzione che dedicherebbero loro stessi. Questo
             approccio empatico ci permette di sviluppare soluzioni che rispecchiano non solo le
@@ -973,8 +1239,13 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Sottosezione 2: Slider */}
-        <div className="w-full relative bg-black py-8 lg:py-12 h-32 lg:h-40">
+        {/* Sottosezione 2: Slider - 1920x200 */}
+        <div
+          className="w-full relative bg-black"
+          style={{
+            aspectRatio: '1920 / 200'
+          }}
+        >
           <ClientsMarquee />
         </div>
 
@@ -984,7 +1255,7 @@ function HomePage() {
         </div>
 
         {/* Sezione: Contattaci */}
-        <div className="w-full relative py-12 lg:py-32 bg-gray-200 overflow-hidden z-10">
+        <div className="w-full relative py-24 lg:py-32 bg-gray-200 overflow-hidden z-10">
           {/* Cerchio sfumato cyan in alto a destra */}
           <div
             className="absolute -top-[300px] -right-[150px] w-[500px] h-[500px] rounded-full opacity-35 z-[1]"
@@ -1004,27 +1275,27 @@ function HomePage() {
           />
 
           {/* Contenuto */}
-          <div className="relative z-10 max-w-6xl mx-auto px-4 lg:px-12">
-            {/* Contenuto principale - centrato su mobile, allineato a destra su desktop */}
-            <div className="flex flex-col gap-4 max-w-2xl mx-auto lg:ml-auto lg:mr-0 text-center lg:text-right">
+          <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12">
+            {/* Contenuto principale - allineato a destra */}
+            <div className="flex flex-col gap-4 max-w-2xl ml-auto text-right">
               {/* Badge - stile come SCOT "Coming Soon" */}
-              <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit mx-auto lg:ml-auto lg:mr-0">
+              <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit ml-auto">
                 SCRIVICI
               </span>
 
-              <h4 className="text-2xl lg:text-4xl uppercase font-bold tracking-tight text-gray-900 leading-tight">
+              <h4 className="text-3xl lg:text-4xl uppercase font-bold tracking-tight text-gray-900 leading-tight">
                 Vuoi lavorare con noi?{' '}
                 <span className="text-[#2EBAEB]">Raccontaci il tuo progetto</span>
               </h4>
 
-              <p className="text-gray-600 leading-relaxed max-w-xl mx-auto lg:ml-auto lg:mr-0 text-sm lg:text-base">
+              <p className="text-gray-600 leading-relaxed max-w-xl ml-auto">
                 Ogni percorso inizia con una chiamata conoscitiva, in cui potrai raccontarci quali sono le tue esigenze e ricevere i primi consigli sulla loro realizzazione.
               </p>
 
               {/* Bottone Contattaci */}
               <a
                 href="#contatti"
-                className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:-rotate-2 transition-all w-fit mx-auto lg:ml-auto lg:mr-0"
+                className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:-rotate-2 transition-all w-fit ml-auto"
               >
                 <span className="text-gray-900 font-medium">Contattaci</span>
                 <div className="relative flex p-2 overflow-hidden text-white bg-black rounded-full group-hover:bg-[#2EBAEB] transition-colors">

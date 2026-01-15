@@ -37,12 +37,16 @@ export default function ClientsMarquee() {
         }}
       >
         {duplicatedClients.map((client, index) => (
-          <div key={index} className="mx-2 lg:mx-4 flex-shrink-0">
+          <div key={index} className="mx-4 flex-shrink-0">
             <a
               href={client.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center border border-gray-700/50 rounded-lg bg-gradient-to-b from-gray-800/50 to-gray-900/30 aspect-video group hover:border-gray-600 transition-all overflow-hidden cursor-pointer w-[140px] h-[78px] lg:w-[200px] lg:h-[112px]"
+              className="flex items-center justify-center border border-gray-700/50 rounded-lg bg-gradient-to-b from-gray-800/50 to-gray-900/30 aspect-video group hover:border-gray-600 transition-all overflow-hidden cursor-pointer"
+              style={{
+                width: '200px',
+                height: '112px'
+              }}
               onClick={(e) => { if (client.href === '#') e.preventDefault() }}
             >
               {client.image ? (
