@@ -524,6 +524,7 @@ function HomePage() {
 
       {/* Hero Section - 1920x1080 con sfondo nero */}
       <section
+        id="hero"
         ref={heroSectionRef}
         className="w-full min-h-screen bg-transparent flex items-center justify-center overflow-hidden relative"
         style={{

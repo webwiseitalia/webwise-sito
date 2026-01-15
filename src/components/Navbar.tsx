@@ -61,35 +61,35 @@ export default function Navbar({ compressionProgress = 0 }: NavbarProps) {
         {/* Menu centrale */}
         <div className="hidden md:flex items-center gap-8">
           <a
-            href="#home"
+            href="/#hero"
             className="text-white/80 hover:text-white transition-colors text-sm font-medium"
             style={getElementStyle(1, 7)}
           >
             Home
           </a>
           <a
-            href="#servizi"
+            href="/#servizi"
             className="text-white/80 hover:text-white transition-colors text-sm font-medium"
             style={getElementStyle(2, 7)}
           >
             Servizi
           </a>
           <a
-            href="#progetti"
+            href="/#portfolio"
             className="text-white/80 hover:text-white transition-colors text-sm font-medium"
             style={getElementStyle(3, 7)}
           >
             Progetti
           </a>
           <a
-            href="#chi-siamo"
+            href="/#software"
             className="text-white/80 hover:text-white transition-colors text-sm font-medium"
             style={getElementStyle(4, 7)}
           >
-            Chi Siamo
+            Software
           </a>
           <a
-            href="#contatti"
+            href="/#contatti"
             className="text-white/80 hover:text-white transition-colors text-sm font-medium"
             style={getElementStyle(5, 7)}
           >
@@ -99,7 +99,7 @@ export default function Navbar({ compressionProgress = 0 }: NavbarProps) {
 
         {/* Contattaci con freccia */}
         <a
-          href="#contattaci"
+          href="/#contatti"
           className="text-white flex items-center gap-1 text-sm font-medium hover:text-white/80 transition-colors"
           style={getElementStyle(6, 7)}
         >

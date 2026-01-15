@@ -11,6 +11,10 @@ import padelHeroDesk from '../assets/3bpadel-casestudy/3bpadel-hero-desktop.webp
 import padelHeroMob from '../assets/3bpadel-casestudy/3bpadel-hero-mob.webp'
 import padelDettaglio1 from '../assets/3bpadel-casestudy/3bpadel-dettaglio-1.webp'
 import padelDettaglio2 from '../assets/3bpadel-casestudy/3bpadel-dettaglio-2.webp'
+import marchetoHeroDesk from '../assets/marcheto-casestudy/marcheto-hero-desktop.webp'
+import marchetoHeroMob from '../assets/marcheto-casestudy/marcheto-hero-mobile.webp'
+import marchetoDettaglio1 from '../assets/marcheto-casestudy/marcheto-dettaglio-1.webp'
+import marchetoDettaglio2 from '../assets/marcheto-casestudy/marcheto-dettaglio-2.webp'
 
 export interface Project {
   id: string
@@ -52,8 +56,10 @@ export const projects: Project[] = [
     tools: ['React', 'Vite', 'JavaScript'],
     description: 'Sito web ufficiale per una delle macellerie-ristoranti più apprezzate della Val Camonica, punto di riferimento per chi cerca vera carne di altissima qualità.',
     fullDescription: 'Macelleria Marcheto rappresenta l\'eccellenza nella lavorazione e nella degustazione della carne a Malonno. La qualità del prodotto, l\'atmosfera autentica del locale e il personale super coinvolgente rendono l\'esperienza unica, tanto da essere diventata anche la sede della nostra cena aziendale.\n\nUn luogo già molto conosciuto e apprezzato offline, capace di sorprendere chiunque vi entri per la prima volta. L\'obiettivo era creare una presenza digitale coerente con la qualità e la notorietà della realtà offline: un punto di riferimento online ufficiale che comunicasse identità, atmosfera e qualità del locale.\n\nAbbiamo progettato e sviluppato un sito web moderno, chiaro e orientato all\'esperienza dell\'utente. La struttura è stata studiata per accompagnare il visitatore dalla scoperta del locale fino al contatto e alla prenotazione, valorizzando ogni aspetto dell\'esperienza offerta.',
-    heroImage: '',
+    heroImage: marchetoHeroDesk,
     galleryImages: [],
+    mobileHeroImage: marchetoHeroMob,
+    desktopDetailImages: [marchetoDettaglio1, marchetoDettaglio2],
     technologies: [
       { name: 'React', icon: '', color: '#61DAFB' },
       { name: 'Vite', icon: '', color: '#646CFF' },
