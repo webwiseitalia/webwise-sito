@@ -25,7 +25,7 @@ export default function ProjectPage() {
     <div className="min-h-screen bg-black">
       <Navbar />
 
-      {/* Hero Section - Full Width Image */}
+      {/* Hero Section - Full Width Image or Placeholder */}
       <section className="relative w-full h-[70vh] bg-black">
         {project.heroImage ? (
           <img
@@ -34,7 +34,9 @@ export default function ProjectPage() {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-[#111]" />
+          <div className="w-full h-full bg-[#111] flex items-center justify-center">
+            <span className="text-gray-600 text-sm tracking-wider">IMMAGINI IN ARRIVO</span>
+          </div>
         )}
         {/* Gradient overlay bottom */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
@@ -115,7 +117,7 @@ export default function ProjectPage() {
         </div>
       </section>
 
-      {/* Gallery Section */}
+      {/* Gallery Section - Layout: 1 vertical mobile + 2 horizontal desktop */}
       <section className="w-full bg-black" style={{ padding: '0 50px 100px 50px' }}>
         <div>
           {project.galleryImages.length > 0 ? (
@@ -131,8 +133,24 @@ export default function ProjectPage() {
               ))}
             </div>
           ) : (
-            <div className="w-full aspect-[16/9] bg-[#111] flex items-center justify-center">
-              <span className="text-gray-600 text-sm tracking-wider">IMMAGINI IN ARRIVO</span>
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+              {/* Rettangolo verticale - Hero Mobile */}
+              <div className="w-full mx-auto lg:mx-0 lg:w-1/3 aspect-[9/16] max-h-[500px] lg:max-h-none bg-[#111] flex items-center justify-center">
+                <span className="text-gray-600 text-xs tracking-wider">HERO MOBILE</span>
+              </div>
+
+              {/* Colonna destra con 2 rettangoli orizzontali */}
+              <div className="w-full lg:w-2/3 flex flex-col gap-4 lg:gap-6">
+                {/* Rettangolo orizzontale 1 - Desktop Detail */}
+                <div className="w-full aspect-[2/1] bg-[#111] flex items-center justify-center">
+                  <span className="text-gray-600 text-xs tracking-wider">DETTAGLIO DESKTOP 1</span>
+                </div>
+
+                {/* Rettangolo orizzontale 2 - Desktop Detail */}
+                <div className="w-full aspect-[2/1] bg-[#111] flex items-center justify-center">
+                  <span className="text-gray-600 text-xs tracking-wider">DETTAGLIO DESKTOP 2</span>
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -61,7 +61,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
       {/* Burger Button - si sposta sotto la navbar quando aperto */}
       <button
         onClick={toggleMenu}
-        className="fixed right-8 z-[70] w-10 h-10 flex flex-col items-center justify-center gap-1.5"
+        className="fixed right-8 z-[70] w-10 h-10 flex flex-col items-center justify-center gap-1.5 border-0 outline-none bg-transparent focus:outline-none focus:ring-0"
         style={{
           top: burgerIsDown ? '72px' : '16px', // Resta in basso durante la chiusura, sale solo dopo
           opacity: isVisible ? 1 : 0,
