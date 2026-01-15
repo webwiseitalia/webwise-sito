@@ -155,9 +155,14 @@ export default function SoftwareSection() {
         </div>
       </div>
 
-      {/* Sezione con software - Full Width */}
+      {/*
+        ╔════════════════════════════════════════════════════════════════════╗
+        ║  SEZIONE SOFTWARE LIST - TEMPORANEAMENTE NASCOSTA                  ║
+        ║  NON ELIMINARE - Verrà riattivata prossimamente.                   ║
+        ║  Data disattivazione: 15 Gennaio 2025                              ║
+        ║  Contiene: Callout text + lista software (STUD, ORDO, TODO, etc.)  ║
+        ╚════════════════════════════════════════════════════════════════════╝
       <div className="w-full">
-        {/* Header con callout text - con bordino superiore come i badge */}
         <div className="w-full border-t border-white/20">
           <div className="w-full px-10 lg:px-24 py-16 lg:py-20">
             <p className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight text-white font-semibold text-center">
@@ -168,7 +173,6 @@ export default function SoftwareSection() {
           </div>
         </div>
 
-        {/* Software List - Full Width */}
         <div className="w-full">
           {softwares.map((software) => (
             <Link
@@ -177,7 +181,6 @@ export default function SoftwareSection() {
               className="group block border-t border-white/20 hover:bg-white/5 transition-all duration-300"
             >
               <div className="w-full px-10 lg:px-24 py-8 lg:py-10 grid grid-cols-12 items-center gap-4">
-                {/* Left: Description + Number - con bordino verticale */}
                 <div className="col-span-12 lg:col-span-2 border-l-2 border-white/30 pl-4">
                   <p className="text-white/60 text-sm leading-relaxed mb-3">
                     {software.description}
@@ -185,7 +188,6 @@ export default function SoftwareSection() {
                   <span className="text-white/30 text-xs font-mono">{software.id}</span>
                 </div>
 
-                {/* Center: Logo */}
                 <div className="col-span-2 lg:col-span-2 flex justify-center pr-4">
                   <img
                     src={software.logo}
@@ -194,12 +196,10 @@ export default function SoftwareSection() {
                   />
                 </div>
 
-                {/* Rettangolo azzurro che appare al hover - proporzioni 16:9 */}
                 <div className="hidden lg:flex col-span-4 justify-start items-center pl-4 pr-12">
                   <div className="w-full aspect-video bg-[#2EBAEB] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-sm" />
                 </div>
 
-                {/* Right: Name (large) */}
                 <div className="col-span-10 lg:col-span-4 flex justify-end">
                   <h3
                     className="text-white text-5xl md:text-7xl lg:text-[120px] xl:text-[150px] leading-none tracking-tight group-hover:translate-x-2 transition-transform duration-300"
@@ -212,10 +212,10 @@ export default function SoftwareSection() {
             </Link>
           ))}
 
-          {/* Bottom border */}
           <div className="border-t border-white/20" />
         </div>
       </div>
+      */}
     </section>
   )
 }

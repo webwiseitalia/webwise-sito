@@ -1357,7 +1357,13 @@ function HomePage() {
       {/* Sezione: Lavora con noi */}
       <CareersSection />
 
-      {/* Sezione Reservly */}
+      {/*
+        ╔════════════════════════════════════════════════════════════════════╗
+        ║  SEZIONE RESERVLY - TEMPORANEAMENTE NASCOSTA                       ║
+        ║  NON ELIMINARE - Verrà riattivata prossimamente.                   ║
+        ║  Data disattivazione: 15 Gennaio 2025                              ║
+        ║  Contiene: Preview Reservly con badge "Coming Soon"                ║
+        ╚════════════════════════════════════════════════════════════════════╝
       <section
         id="reservly"
         className="w-full bg-black relative"
@@ -1365,23 +1371,18 @@ function HomePage() {
           aspectRatio: '1920 / 1080'
         }}
       >
-        {/* Background con noise e griglia interattiva */}
         <NoiseTexture />
 
         <div className="absolute inset-0 flex flex-col px-8 lg:px-24 py-16 lg:py-24 z-10">
-          {/* Badge */}
           <span className="inline-flex items-center px-4 py-1.5 rounded-full border border-[#2EBAEB] text-[#2EBAEB] text-sm w-fit mb-4">
             COMING SOON
           </span>
 
-          {/* Titolo grande */}
           <h2 className="text-white font-medium leading-[1.1] max-w-5xl" style={{ fontSize: 'clamp(36px, 5.5vw, 72px)' }}>
             Reservly è la piattaforma di prenotazione pensata per il business moderno.
           </h2>
 
-          {/* Contenitore per descrizione e bottone - posizionato a destra e più in basso */}
           <div className="mt-auto ml-auto max-w-lg flex flex-col gap-6 pb-16 lg:pb-24">
-            {/* Descrizione */}
             <p className="text-white/70 text-lg lg:text-xl leading-relaxed">
               Una web app veloce e scalabile, affiancata da app mobile Flutter, progettata per semplificare le prenotazioni, automatizzare i flussi e migliorare l'esperienza di clienti e staff.
             </p>
@@ -1389,7 +1390,6 @@ function HomePage() {
               Meno gestione, più controllo. Tutto in un unico sistema.
             </p>
 
-            {/* Bottone */}
             <Link
               to="/reservly"
               className="inline-flex items-center justify-center px-8 py-4 bg-[#2a2a3a] hover:bg-[#3a3a4a] text-white text-sm font-medium rounded-full transition-colors w-fit"
@@ -1399,6 +1399,7 @@ function HomePage() {
           </div>
         </div>
       </section>
+      */}
 
       {/* Footer */}
       <Footer />
