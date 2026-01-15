@@ -41,11 +41,19 @@ export default function ProjectsTable() {
             transition: 'transform 0.2s ease-out'
           }}
         >
-          <div className="w-[250px] h-[250px] bg-gradient-to-br from-[#2EBAEB]/30 to-[#2EBAEB]/10 flex items-center justify-center border border-[#2EBAEB]/20">
-            <span className="text-white font-bold text-sm">
-              {projects.find(p => p.id === hoveredProject)?.name}
-            </span>
-          </div>
+          {projects.find(p => p.id === hoveredProject)?.heroImage ? (
+            <img
+              src={projects.find(p => p.id === hoveredProject)?.heroImage}
+              alt={projects.find(p => p.id === hoveredProject)?.name}
+              className="w-[300px] h-[200px] object-cover object-top"
+            />
+          ) : (
+            <div className="w-[300px] h-[200px] bg-gradient-to-br from-[#2EBAEB]/30 to-[#2EBAEB]/10 flex items-center justify-center border border-[#2EBAEB]/20">
+              <span className="text-white font-bold text-sm">
+                {projects.find(p => p.id === hoveredProject)?.name}
+              </span>
+            </div>
+          )}
         </div>
       )}
 
@@ -82,7 +90,15 @@ export default function ProjectsTable() {
             {/* Nome progetto */}
             <div className="col-span-4 sm:col-span-3 flex items-center gap-4">
               {/* Thumbnail mobile */}
-              <div className="lg:hidden w-[60px] h-[60px] rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-[#2EBAEB]/30 to-[#2EBAEB]/10" />
+              <div className="lg:hidden w-[60px] h-[60px] rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-[#2EBAEB]/30 to-[#2EBAEB]/10">
+                {project.heroImage && (
+                  <img
+                    src={project.heroImage}
+                    alt={project.name}
+                    className="w-full h-full object-cover object-top"
+                  />
+                )}
+              </div>
               <p className="text-white text-lg lg:text-xl font-bold group-hover:text-[#2EBAEB] group-hover:translate-x-2 transition-all">
                 {project.name}
               </p>

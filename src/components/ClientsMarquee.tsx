@@ -1,15 +1,20 @@
+import padelHero from '../assets/3bpadel-casestudy/3bpadel-hero-desktop.webp'
+import auroraHero from '../assets/aurora-casestudy/aurora-hero-desktop.webp'
+import scarpaHero from '../assets/casascarpa-casestudy/scarpa-hero-desk.webp'
+
 interface Client {
   name: string
   href: string
+  image?: string
 }
 
 const clients: Client[] = [
+  { name: '3B Padel', href: 'https://3bpadel.it', image: padelHero },
+  { name: 'Aurora Ristorante', href: 'https://ristoranteaurora.it', image: auroraHero },
+  { name: 'Casa della Scarpa', href: 'https://casadellascarpa.it', image: scarpaHero },
   { name: 'Macelleria Marcheto', href: 'https://macelleriamarcheto.it' },
-  { name: '3B Padel', href: 'https://3bpadel.it' },
-  { name: 'Aurora Ristorante', href: 'https://ristoranteaurora.it' },
   { name: 'Studio Legale Bianchi', href: '#' },
   { name: 'Ottica Visually', href: '#' },
-  { name: 'Pizzeria da Mario', href: '#' },
   { name: 'Fitness Revolution', href: '#' },
 ]
 
@@ -31,16 +36,24 @@ export default function ClientsMarquee() {
               href={client.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center p-6 border border-gray-700/50 rounded-lg bg-gradient-to-b from-gray-800/50 to-gray-900/30 aspect-video group hover:border-gray-600 transition-all"
+              className="flex items-center justify-center border border-gray-700/50 rounded-lg bg-gradient-to-b from-gray-800/50 to-gray-900/30 aspect-video group hover:border-gray-600 transition-all overflow-hidden"
               style={{
                 width: '200px',
                 height: '112px',
                 pointerEvents: client.href === '#' ? 'none' : 'auto'
               }}
             >
-              <span className="text-gray-400 font-semibold text-sm group-hover:text-white transition-colors grayscale group-hover:grayscale-0">
-                {client.name}
-              </span>
+              {client.image ? (
+                <img
+                  src={client.image}
+                  alt={client.name}
+                  className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-300"
+                />
+              ) : (
+                <span className="text-gray-400 font-semibold text-sm group-hover:text-white transition-colors">
+                  {client.name}
+                </span>
+              )}
             </a>
           </div>
         ))}
