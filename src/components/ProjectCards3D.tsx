@@ -16,26 +16,28 @@ export default function ProjectCards3D() {
       const centerX = rect.left + rect.width / 2
       const centerY = rect.top + rect.height / 2
 
-      // Calcola la distanza dal centro normalizzata (-1 a 1)
+      // Posizione mouse normalizzata (-1 a 1)
       const normalizedX = (e.clientX - centerX) / (rect.width / 2)
       const normalizedY = (e.clientY - centerY) / (rect.height / 2)
 
-      // Calcola quanto siamo vicini al centro (0 = bordo, 1 = centro)
-      const distanceFromCenter = 1 - Math.min(1, Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY))
+      // ROTAZIONE Y (orizzontale) - segue il mouse
+      // Mouse a sinistra (-1): ruota a destra (+60°) - vedi le card impilate da destra
+      // Mouse al centro (0): ruota di lato (-90°) - vedi tutte le card affiancate
+      // Mouse a destra (+1): ruota a sinistra (-60°) - vedi le card impilate da sinistra
 
-      // ROTAZIONE Y (orizzontale):
-      // - Ai bordi: inclinato (-35° a sinistra, -15° a destra)
-      // - Al centro: quasi frontale (0°)
-      const edgeRotateY = -25 + normalizedX * 15 // Range da -40 a -10 ai bordi
-      const centerRotateY = normalizedX * 5 // Range da -5 a +5 al centro
-      const newRotateY = edgeRotateY + (centerRotateY - edgeRotateY) * distanceFromCenter
+      // Quando al centro, mostra il "fianco" del mazzo (tutte le card visibili)
+      const distFromCenterX = Math.abs(normalizedX)
 
-      // ROTAZIONE X (verticale):
-      // - Ai bordi: inclinato (-20° in alto, -10° in basso)
-      // - Al centro: quasi piatto (-5°)
-      const edgeRotateX = -15 + normalizedY * 8
-      const centerRotateX = -5 + normalizedY * 3
-      const newRotateX = edgeRotateX + (centerRotateX - edgeRotateX) * distanceFromCenter
+      // Al centro: -90° (vedi di lato), ai bordi: segue il mouse
+      const sideViewAngle = -90 // Angolo per vedere tutte le card di lato
+      const edgeAngle = -normalizedX * 50 // Ai bordi: -50° a +50°
+
+      // Interpola: più sei al centro, più vai verso -90°
+      const centerInfluence = 1 - distFromCenterX
+      const newRotateY = edgeAngle + (sideViewAngle - edgeAngle) * Math.pow(centerInfluence, 2)
+
+      // ROTAZIONE X (verticale) - leggera inclinazione
+      const newRotateX = -10 + normalizedY * 10
 
       setRotation({ x: newRotateX, y: newRotateY })
     }
@@ -47,7 +49,7 @@ export default function ProjectCards3D() {
   const handleMouseEnter = () => setIsHovered(true)
   const handleMouseLeave = () => {
     setIsHovered(false)
-    // Reset graduale alla posizione originale (inclinato)
+    // Reset alla posizione originale (inclinato)
     setRotation({ x: -15, y: -25 })
   }
 
@@ -70,7 +72,7 @@ export default function ProjectCards3D() {
         style={{
           transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
           transformStyle: 'preserve-3d',
-          transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out',
+          transition: isHovered ? 'transform 0.15s ease-out' : 'transform 0.5s ease-out',
           width: '650px',
           height: '380px'
         }}
