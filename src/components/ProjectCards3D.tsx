@@ -7,6 +7,15 @@ export default function ProjectCards3D() {
   const [rotation, setRotation] = useState({ x: -15, y: -25 })
   const [isHovered, setIsHovered] = useState(false)
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -59,32 +68,31 @@ export default function ProjectCards3D() {
   return (
     <div
       ref={containerRef}
-      className="mt-20 w-full flex items-center justify-center"
+      className="mt-8 lg:mt-20 w-full flex items-center justify-center"
       style={{
         perspective: '1500px',
-        height: '700px'
+        height: 'clamp(350px, 50vw, 700px)'
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div
-        className="relative"
+        className="relative w-[280px] h-[180px] lg:w-[650px] lg:h-[380px]"
         style={{
           transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
           transformStyle: 'preserve-3d',
-          transition: isHovered ? 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
-          width: '650px',
-          height: '380px'
+          transition: isHovered ? 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)'
         }}
       >
         {cardProjects.map((project, index) => {
           // Centra le card: metà vanno avanti, metà indietro
           const centerIndex = (cardProjects.length - 1) / 2
-          // Distanza 150px tra le card
-          const baseOffset = (index - centerIndex) * 150
+          // Distanza tra le card - più piccola su mobile
+          const cardSpacing = isMobile ? 60 : 150
+          const baseOffset = (index - centerIndex) * cardSpacing
           const isCardHovered = hoveredCard === index
           // Quando in hover, la card si alza verso l'alto
-          const translateY = isCardHovered ? -80 : 0
+          const translateY = isCardHovered ? (isMobile ? -40 : -80) : 0
 
           return (
             <Link
