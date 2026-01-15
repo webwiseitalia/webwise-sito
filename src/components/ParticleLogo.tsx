@@ -198,6 +198,9 @@ export default function ParticleLogo({
       // Gestione logo hero (quello tra le due scritte)
       const heroLogoImg = heroLogoRef.current?.querySelector('img') as HTMLImageElement | null
 
+      // Su mobile (< 1024px) il logo hero deve restare sempre visibile
+      const isMobile = window.innerWidth < 1024
+
       if (phase1 === 0 && phase2 === 0) {
         // Non si è ancora scrollato: mostra logo hero pulito, nascondi particelle
         if (heroLogoImg) heroLogoImg.style.opacity = '1'
@@ -206,17 +209,18 @@ export default function ParticleLogo({
         animationFrameRef.current = requestAnimationFrame(render)
         return
       } else {
-        // Si sta scrollando: nascondi logo hero, mostra particelle
-        if (heroLogoImg) heroLogoImg.style.opacity = '0'
+        // Si sta scrollando: nascondi logo hero, mostra particelle (SOLO su desktop)
+        if (heroLogoImg && !isMobile) heroLogoImg.style.opacity = '0'
       }
 
       // Logo grande nel midframe (creato dinamicamente se non esiste)
+      // NASCOSTO SU MOBILE - solo visibile su desktop (lg: >= 1024px)
       let midframeLogo = document.getElementById('midframe-static-logo') as HTMLImageElement | null
       if (!midframeLogo) {
         midframeLogo = document.createElement('img')
         midframeLogo.id = 'midframe-static-logo'
         midframeLogo.src = heroLogoImg?.src || ''
-        midframeLogo.className = 'invert pointer-events-none'
+        midframeLogo.className = 'invert pointer-events-none hidden lg:block'
         midframeLogo.style.cssText = `
           position: fixed;
           top: 50%;

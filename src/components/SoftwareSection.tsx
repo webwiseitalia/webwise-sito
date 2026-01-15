@@ -86,10 +86,10 @@ export default function SoftwareSection() {
   return (
     <section id="software" className="w-full">
       {/* Sezione con testo piccolo a destra e render 3D a sinistra */}
-      <div className="w-full py-20">
-        <div className="max-w-6xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          {/* Colonna sinistra - Render 3D */}
-          <div className="h-[400px] lg:h-[500px]">
+      <div className="w-full py-12 lg:py-20">
+        <div className="max-w-6xl mx-auto px-4 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center">
+          {/* Colonna sinistra - Render 3D (più piccolo su mobile) */}
+          <div className="h-[250px] lg:h-[500px] order-2 lg:order-1">
             <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
               <Suspense fallback={null}>
                 <ambientLight intensity={0.5} />
@@ -101,7 +101,7 @@ export default function SoftwareSection() {
           </div>
 
           {/* Colonna destra - Testo */}
-          <div className="max-w-md ml-auto text-right">
+          <div className="max-w-md lg:ml-auto text-center lg:text-right order-1 lg:order-2">
             {/* Badge */}
             <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-6">
               COMING SOON
@@ -127,7 +127,7 @@ export default function SoftwareSection() {
             </p>
 
             {/* Bottoni */}
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-center lg:justify-end gap-3">
               <a
                 href="#"
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all"
