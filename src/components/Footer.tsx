@@ -3,13 +3,13 @@ import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-black relative" style={{ padding: '80px 50px 40px 50px', minHeight: '90vh' }}>
-      {/* Contenitore cerchi - overflow-hidden solo in basso */}
+    <footer className="w-full bg-black relative overflow-hidden" style={{ padding: '80px 50px 40px 50px', minHeight: '90vh' }}>
+      {/* Contenitore cerchi - overflow-hidden */}
       <div
         className="absolute pointer-events-none"
         style={{
           right: 0,
-          top: '-50%',
+          top: 0,
           bottom: 0,
           width: '50%',
           overflow: 'hidden',
