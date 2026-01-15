@@ -275,16 +275,16 @@ export default function ParticleLogo({
         // Applica effetto 3D tilt solo quando il logo è nitido (inCenterZone)
         if (inCenterZone) {
           // Smoothing per movimento fluido
-          const smoothing = 0.08
+          const smoothing = 0.1
           tiltRef.current.x += (mousePosRef.current.x - tiltRef.current.x) * smoothing
           tiltRef.current.y += (mousePosRef.current.y - tiltRef.current.y) * smoothing
 
-          // Calcola rotazione (max ±8 gradi)
-          const maxRotation = 8
+          // Calcola rotazione (max ±20 gradi per effetto più evidente)
+          const maxRotation = 20
           const rotateY = (tiltRef.current.x - 0.5) * maxRotation * 2
           const rotateX = -(tiltRef.current.y - 0.5) * maxRotation * 2
 
-          midframeLogo.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
+          midframeLogo.style.transform = `translate(-50%, -50%) perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
           midframeLogo.style.transition = 'opacity 0s'
         } else {
           // Reset tilt quando esce dalla zona centrale
