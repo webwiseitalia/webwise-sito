@@ -1,6 +1,11 @@
 import padelHero from '../assets/3bpadel-casestudy/3bpadel-hero-desktop.webp'
 import auroraHero from '../assets/aurora-casestudy/aurora-hero-desktop.webp'
 import scarpaHero from '../assets/casascarpa-casestudy/scarpa-hero-desk.webp'
+import marchetoHero from '../assets/marcheto-casestudy/marcheto-hero-desktop.webp'
+import scsburgerHero from '../assets/sliderclienti/scsburger.webp'
+import prozacHero from '../assets/sliderclienti/prozacbodypiercing.webp'
+import daemHero from '../assets/sliderclienti/daemsrl.webp'
+import loschicosHero from '../assets/sliderclienti/loschicosbuenos.webp'
 
 interface Client {
   name: string
@@ -12,10 +17,11 @@ const clients: Client[] = [
   { name: '3B Padel', href: 'https://3bpadel.it', image: padelHero },
   { name: 'Aurora Ristorante', href: 'https://ristoranteaurora.it', image: auroraHero },
   { name: 'Casa della Scarpa', href: 'https://casadellascarpa.it', image: scarpaHero },
-  { name: 'Macelleria Marcheto', href: 'https://macelleriamarcheto.it' },
-  { name: 'Studio Legale Bianchi', href: '#' },
-  { name: 'Ottica Visually', href: '#' },
-  { name: 'Fitness Revolution', href: '#' },
+  { name: 'Macelleria Marcheto', href: 'https://macelleriamarcheto.it', image: marchetoHero },
+  { name: 'SCS Burger', href: '#', image: scsburgerHero },
+  { name: 'Prozac Body Piercing', href: '#', image: prozacHero },
+  { name: 'Daem SRL', href: '#', image: daemHero },
+  { name: 'Los Chicos Buenos', href: '#', image: loschicosHero },
 ]
 
 export default function ClientsMarquee() {
@@ -36,12 +42,12 @@ export default function ClientsMarquee() {
               href={client.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center border border-gray-700/50 rounded-lg bg-gradient-to-b from-gray-800/50 to-gray-900/30 aspect-video group hover:border-gray-600 transition-all overflow-hidden"
+              className="flex items-center justify-center border border-gray-700/50 rounded-lg bg-gradient-to-b from-gray-800/50 to-gray-900/30 aspect-video group hover:border-gray-600 transition-all overflow-hidden cursor-pointer"
               style={{
                 width: '200px',
-                height: '112px',
-                pointerEvents: client.href === '#' ? 'none' : 'auto'
+                height: '112px'
               }}
+              onClick={(e) => { if (client.href === '#') e.preventDefault() }}
             >
               {client.image ? (
                 <img
