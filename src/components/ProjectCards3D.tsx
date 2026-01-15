@@ -4,7 +4,7 @@ import { projects } from '../data/projects'
 
 export default function ProjectCards3D() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [rotation, setRotation] = useState({ x: 0, y: -25 })
+  const [rotation, setRotation] = useState({ x: -15, y: -25 })
   const [isHovered, setIsHovered] = useState(false)
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
 
@@ -20,11 +20,22 @@ export default function ProjectCards3D() {
       const normalizedX = (e.clientX - centerX) / (rect.width / 2)
       const normalizedY = (e.clientY - centerY) / (rect.height / 2)
 
-      // Applica rotazione basata sulla posizione del mouse
-      // rotateX: leggera inclinazione verticale
-      // rotateY: rotazione orizzontale per vedere le card
-      const newRotateX = normalizedY * 10
-      const newRotateY = -25 + normalizedX * 15
+      // Calcola quanto siamo vicini al centro (0 = bordo, 1 = centro)
+      const distanceFromCenter = 1 - Math.min(1, Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY))
+
+      // ROTAZIONE Y (orizzontale):
+      // - Ai bordi: inclinato (-35° a sinistra, -15° a destra)
+      // - Al centro: quasi frontale (0°)
+      const edgeRotateY = -25 + normalizedX * 15 // Range da -40 a -10 ai bordi
+      const centerRotateY = normalizedX * 5 // Range da -5 a +5 al centro
+      const newRotateY = edgeRotateY + (centerRotateY - edgeRotateY) * distanceFromCenter
+
+      // ROTAZIONE X (verticale):
+      // - Ai bordi: inclinato (-20° in alto, -10° in basso)
+      // - Al centro: quasi piatto (-5°)
+      const edgeRotateX = -15 + normalizedY * 8
+      const centerRotateX = -5 + normalizedY * 3
+      const newRotateX = edgeRotateX + (centerRotateX - edgeRotateX) * distanceFromCenter
 
       setRotation({ x: newRotateX, y: newRotateY })
     }
@@ -36,11 +47,11 @@ export default function ProjectCards3D() {
   const handleMouseEnter = () => setIsHovered(true)
   const handleMouseLeave = () => {
     setIsHovered(false)
-    // Reset graduale alla posizione originale
-    setRotation({ x: 0, y: -25 })
+    // Reset graduale alla posizione originale (inclinato)
+    setRotation({ x: -15, y: -25 })
   }
 
-  // Usa i primi 8 progetti (o duplica se sono meno)
+  // Usa i primi 8 progetti
   const cardProjects = projects.slice(0, 8)
 
   return (
@@ -57,7 +68,7 @@ export default function ProjectCards3D() {
       <div
         className="relative"
         style={{
-          transform: `rotateX(${rotation.x - 15}deg) rotateY(${rotation.y}deg)`,
+          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
           transformStyle: 'preserve-3d',
           transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out',
           width: '650px',
@@ -67,10 +78,12 @@ export default function ProjectCards3D() {
         {cardProjects.map((project, index) => {
           // Centra le card: metà vanno avanti, metà indietro
           const centerIndex = (cardProjects.length - 1) / 2
-          const baseOffset = (index - centerIndex) * 100
+          // Distanza 150px tra le card
+          const baseOffset = (index - centerIndex) * 150
           const isCardHovered = hoveredCard === index
-          // Quando in hover, la card si alza verso l'alto (translateY negativo)
+          // Quando in hover, la card si alza verso l'alto
           const translateY = isCardHovered ? -80 : 0
+
           return (
             <Link
               key={project.id}
