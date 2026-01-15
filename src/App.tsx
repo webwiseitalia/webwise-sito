@@ -691,25 +691,51 @@ function HomePage() {
       <section className="lg:hidden w-full bg-transparent py-16 px-6 relative z-10">
         <div className="flex flex-col items-center">
           {/* Descrizioni superiori - sopra al logo */}
-          <div className="grid grid-cols-2 gap-6 w-full max-w-md mb-8">
+          <div className="grid grid-cols-2 gap-6 w-full max-w-md mb-4">
             {/* Soluzioni Digitali */}
-            <div className="text-center">
-              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1">
+            <div className="flex flex-col items-center">
+              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1 text-center">
                 SOLUZIONI DIGITALI
               </p>
-              <p className="text-white/60 text-xs">
+              <p className="text-white/60 text-xs text-center mb-3">
                 Sviluppo web, app e automazioni
               </p>
+              {/* Linea orizzontale + obliqua verso il basso (obliqua parte dal lato destro/interno) */}
+              <div className="relative">
+                <div className="w-12 h-[1px] bg-white/40" />
+                <div
+                  className="absolute h-[1px] w-4 bg-white/40"
+                  style={{
+                    right: 0,
+                    top: 0,
+                    transform: 'rotate(-135deg)',
+                    transformOrigin: 'right top'
+                  }}
+                />
+              </div>
             </div>
 
             {/* Webwise Studio */}
-            <div className="text-center">
-              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1">
+            <div className="flex flex-col items-center">
+              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1 text-center">
                 WEBWISE STUDIO
               </p>
-              <p className="text-white/60 text-xs">
+              <p className="text-white/60 text-xs text-center mb-3">
                 Crea siti web con l'AI
               </p>
+              {/* Linea orizzontale + obliqua verso il basso (obliqua parte dal lato sinistro/interno) */}
+              <div className="relative">
+                <div className="w-12 h-[1px] bg-white/40" />
+                <div
+                  className="absolute h-[1px] w-4 bg-white/40"
+                  style={{
+                    left: 0,
+                    top: 0,
+                    transform: 'rotate(135deg)',
+                    transformOrigin: 'left top'
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -717,27 +743,53 @@ function HomePage() {
           <img
             src={logoWebwiseCenter}
             alt="Webwise Logo"
-            className="invert w-[150px] h-[150px] my-8"
+            className="invert w-[150px] h-[150px] my-6"
           />
 
           {/* Descrizioni inferiori - sotto al logo */}
-          <div className="grid grid-cols-2 gap-6 w-full max-w-md mt-8">
+          <div className="grid grid-cols-2 gap-6 w-full max-w-md mt-4">
             {/* Reservly */}
-            <div className="text-center">
-              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1">
+            <div className="flex flex-col items-center">
+              {/* Linea obliqua + orizzontale verso l'alto (obliqua parte dal lato destro/interno) */}
+              <div className="relative mb-3">
+                <div
+                  className="absolute h-[1px] w-4 bg-white/40"
+                  style={{
+                    right: 0,
+                    bottom: 0,
+                    transform: 'rotate(135deg)',
+                    transformOrigin: 'right bottom'
+                  }}
+                />
+                <div className="w-12 h-[1px] bg-white/40" />
+              </div>
+              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1 text-center">
                 RESERVLY
               </p>
-              <p className="text-white/60 text-xs">
+              <p className="text-white/60 text-xs text-center">
                 Piattaforma prenotazioni
               </p>
             </div>
 
             {/* SCOT */}
-            <div className="text-center">
-              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1">
+            <div className="flex flex-col items-center">
+              {/* Linea obliqua + orizzontale verso l'alto (obliqua parte dal lato sinistro/interno) */}
+              <div className="relative mb-3">
+                <div
+                  className="absolute h-[1px] w-4 bg-white/40"
+                  style={{
+                    left: 0,
+                    bottom: 0,
+                    transform: 'rotate(-135deg)',
+                    transformOrigin: 'left bottom'
+                  }}
+                />
+                <div className="w-12 h-[1px] bg-white/40" />
+              </div>
+              <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-1 text-center">
                 SCOT
               </p>
-              <p className="text-white/60 text-xs">
+              <p className="text-white/60 text-xs text-center">
                 Gestionale intelligente
               </p>
             </div>
@@ -1009,7 +1061,7 @@ function HomePage() {
         className="w-full relative py-12 lg:py-20"
         style={{ minHeight: 'auto' }}
       >
-        {/* CSS per altezza minima e sticky solo su desktop */}
+        {/* CSS per altezza minima e sticky su desktop e mobile */}
         <style>{`
           @media (min-width: 1024px) {
             #servizi { min-height: 250vh !important; }
@@ -1024,7 +1076,15 @@ function HomePage() {
             .service-card:nth-child(7) { top: calc(20vh + 120px) !important; }
           }
           @media (max-width: 1023px) {
-            .service-card { position: relative !important; top: auto !important; margin-bottom: 16px !important; }
+            #servizi { min-height: 600vh !important; }
+            .service-card { position: sticky !important; margin-bottom: 200px !important; }
+            .service-card:nth-child(1) { top: 80px !important; }
+            .service-card:nth-child(2) { top: 95px !important; }
+            .service-card:nth-child(3) { top: 110px !important; }
+            .service-card:nth-child(4) { top: 125px !important; }
+            .service-card:nth-child(5) { top: 140px !important; }
+            .service-card:nth-child(6) { top: 155px !important; }
+            .service-card:nth-child(7) { top: 170px !important; }
           }
         `}</style>
         <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start" style={{ transformOrigin: 'center top' }}>
