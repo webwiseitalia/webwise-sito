@@ -1,6 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
 import { getProjectBySlug, getRelatedProjects } from '../data/projects'
-import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
 export default function ProjectPage() {
@@ -23,10 +22,6 @@ export default function ProjectPage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <Navbar />
-
-      {/* Spacer per la navbar */}
-      <div className="h-16 bg-black" />
 
       {/* Hero Section - Full Width Image or Placeholder */}
       <section className="relative w-full h-[80vh] bg-black">
