@@ -72,7 +72,7 @@ export default function ProjectCards3D() {
         style={{
           transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
           transformStyle: 'preserve-3d',
-          transition: isHovered ? 'transform 0.15s ease-out' : 'transform 0.5s ease-out',
+          transition: isHovered ? 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
           width: '650px',
           height: '380px'
         }}
@@ -99,7 +99,7 @@ export default function ProjectCards3D() {
                 transform: `translateZ(${baseOffset}px) translateY(${translateY}px)`,
                 boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
                 zIndex: isCardHovered ? 100 : index,
-                transition: 'transform 0.3s ease-out'
+                transition: 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)'
               }}
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
