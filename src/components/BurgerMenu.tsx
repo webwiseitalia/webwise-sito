@@ -63,7 +63,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
         onClick={toggleMenu}
         className="fixed right-8 z-[70] w-10 h-10 flex flex-col items-center justify-center gap-1.5 border-0 outline-none bg-transparent focus:outline-none focus:ring-0"
         style={{
-          top: burgerIsDown ? '72px' : '16px', // Resta in basso durante la chiusura, sale solo dopo
+          top: burgerIsDown ? '60px' : '14px', // Resta in basso durante la chiusura, sale solo dopo
           opacity: isVisible ? 1 : 0,
           pointerEvents: isVisible ? 'auto' : 'none',
           transition: burgerIsDown
@@ -113,7 +113,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
           transition: isClosing ? 'opacity 0.4s ease-in 0.05s, backdrop-filter 0.4s ease-in' : 'opacity 0.3s ease-out, backdrop-filter 0.3s ease-out',
         }}
       >
-          <div className="w-full px-8 py-4 flex items-center justify-between">
+          <div className="w-full px-8 py-3 flex items-center justify-between">
             {/* Logo - delay apertura: 0.1s, delay chiusura: 0.35s (ultimo a chiudersi) */}
             <a
               href="/"

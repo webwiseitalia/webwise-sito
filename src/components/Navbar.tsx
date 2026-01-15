@@ -42,7 +42,7 @@ export default function Navbar({ compressionProgress = 0 }: NavbarProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent w-full">
       <div
-        className="w-full px-8 py-4 flex items-center justify-between"
+        className="w-full px-8 py-3 flex items-center justify-between"
         style={containerStyle}
       >
         {/* Logo */}

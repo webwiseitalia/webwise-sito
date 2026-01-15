@@ -25,13 +25,16 @@ export default function ProjectPage() {
     <div className="min-h-screen bg-black">
       <Navbar />
 
+      {/* Spacer per la navbar */}
+      <div className="h-16 bg-black" />
+
       {/* Hero Section - Full Width Image or Placeholder */}
-      <section className="relative w-full h-[70vh] bg-black">
+      <section className="relative w-full h-[80vh] bg-black">
         {project.heroImage ? (
           <img
             src={project.heroImage}
             alt={project.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
           />
         ) : (
           <div className="w-full h-full bg-[#111] flex items-center justify-center">
@@ -135,20 +138,44 @@ export default function ProjectPage() {
           ) : (
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
               {/* Rettangolo verticale - Hero Mobile */}
-              <div className="w-full mx-auto lg:mx-0 lg:w-1/3 aspect-[9/16] max-h-[500px] lg:max-h-none bg-[#111] flex items-center justify-center">
-                <span className="text-gray-600 text-xs tracking-wider">HERO MOBILE</span>
+              <div className="w-full mx-auto lg:mx-0 lg:w-1/3 aspect-[9/16] max-h-[500px] lg:max-h-none bg-[#111] flex items-center justify-center overflow-hidden">
+                {project.mobileHeroImage ? (
+                  <img
+                    src={project.mobileHeroImage}
+                    alt={`${project.name} - Mobile`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-600 text-xs tracking-wider">HERO MOBILE</span>
+                )}
               </div>
 
               {/* Colonna destra con 2 rettangoli orizzontali */}
               <div className="w-full lg:w-2/3 flex flex-col gap-4 lg:gap-6">
                 {/* Rettangolo orizzontale 1 - Desktop Detail */}
-                <div className="w-full aspect-[2/1] bg-[#111] flex items-center justify-center">
-                  <span className="text-gray-600 text-xs tracking-wider">DETTAGLIO DESKTOP 1</span>
+                <div className="w-full aspect-[2/1] bg-[#111] flex items-center justify-center overflow-hidden">
+                  {project.desktopDetailImages && project.desktopDetailImages[0] ? (
+                    <img
+                      src={project.desktopDetailImages[0]}
+                      alt={`${project.name} - Dettaglio 1`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-600 text-xs tracking-wider">DETTAGLIO DESKTOP 1</span>
+                  )}
                 </div>
 
                 {/* Rettangolo orizzontale 2 - Desktop Detail */}
-                <div className="w-full aspect-[2/1] bg-[#111] flex items-center justify-center">
-                  <span className="text-gray-600 text-xs tracking-wider">DETTAGLIO DESKTOP 2</span>
+                <div className="w-full aspect-[2/1] bg-[#111] flex items-center justify-center overflow-hidden">
+                  {project.desktopDetailImages && project.desktopDetailImages[1] ? (
+                    <img
+                      src={project.desktopDetailImages[1]}
+                      alt={`${project.name} - Dettaglio 2`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-600 text-xs tracking-wider">DETTAGLIO DESKTOP 2</span>
+                  )}
                 </div>
               </div>
             </div>
