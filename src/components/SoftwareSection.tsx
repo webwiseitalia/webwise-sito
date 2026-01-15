@@ -56,28 +56,28 @@ const softwares: Software[] = [
     id: '/0.2',
     slug: 'ordo',
     name: 'ORDO',
-    description: 'Analisi avanzata dei dati web con machine learning per insights strategici.',
+    description: 'Gestionale per tenere sotto controllo tutti i tuoi clienti in un unico posto.',
     logo: logoOrdo
   },
   {
     id: '/0.3',
     slug: 'todo',
     name: 'TODO',
-    description: 'Automazione dei processi aziendali con workflow intelligenti e integrati.',
+    description: 'Todo list intelligente per organizzare le attività e aumentare l\'efficienza.',
     logo: logoTodo
   },
   {
     id: '/0.4',
     slug: 'cash',
     name: 'CASH',
-    description: 'Sincronizzazione e gestione centralizzata di dati multi-piattaforma in tempo reale.',
+    description: 'Gestione del flusso di cassa: monitora entrate e uscite in tempo reale.',
     logo: logoCash
   },
   {
     id: '/0.5',
     slug: 'tool',
     name: 'TOOL',
-    description: 'Deploy autonomo, monitoraggio e gestione software su qualsiasi ambiente.',
+    description: 'Asset di strumenti per modifica immagini, fatture, preventivi e molto altro.',
     logo: logoTool
   }
 ]
@@ -117,11 +117,13 @@ export default function SoftwareSection() {
 
             {/* Descrizione */}
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              Capire esattamente quello che ti serve è il nostro pane quotidiano.
-              Sviluppiamo soluzioni software personalizzate che si allineano
-              perfettamente ai tuoi obiettivi. Il nostro approccio è un mix ben
-              rodato di metodo e creatività, garantendo prodotti di qualità superiore
-              e senza compromessi.
+              SCOT è il nostro assistente AI che gestisce e organizza tutto il tuo business,
+              aumentando l'efficienza del tuo lavoro. Cinque strumenti integrati in un unico ecosistema:
+              <strong className="text-white"> STUD</strong> per creare siti web con l'AI,
+              <strong className="text-white"> ORDO</strong> per gestire i clienti,
+              <strong className="text-white"> TODO</strong> per organizzare le attività,
+              <strong className="text-white"> CASH</strong> per il flusso di cassa
+              e <strong className="text-white"> TOOL</strong> per strumenti di supporto.
             </p>
 
             {/* Bottoni */}
