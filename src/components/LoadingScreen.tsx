@@ -109,14 +109,18 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
   const percentageRef = useRef<HTMLDivElement>(null)
   const percentageHighlightRef = useRef<HTMLDivElement>(null)
 
+  // Rileva se siamo su mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
   // Genera i serpenti una sola volta con dimensioni dello schermo
   const snakes = useMemo(() => {
     const centerX = typeof window !== 'undefined' ? window.innerWidth / 2 : 960
     const centerY = typeof window !== 'undefined' ? window.innerHeight / 2 : 540
-    const logoRadius = 175
+    const mobile = typeof window !== 'undefined' && window.innerWidth < 768
+    const logoRadius = mobile ? 75 : 175
     const maxDistance = Math.max(centerX, centerY)
 
-    return generateSnakes(25, centerX, centerY, logoRadius, maxDistance)
+    return generateSnakes(mobile ? 15 : 25, centerX, centerY, logoRadius, maxDistance)
   }, [])
 
   useEffect(() => {
@@ -325,12 +329,13 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
 
         {/* Percentuale di caricamento - Container con due scritte sovrapposte */}
         <div
-          className="absolute bottom-8 left-8"
+          className={isMobile ? "absolute left-1/2 -translate-x-1/2" : "absolute bottom-8 left-8"}
           style={{
-            fontSize: '120px',
+            fontSize: isMobile ? '48px' : '120px',
             fontFamily: 'Moderniz, sans-serif',
             fontWeight: 700,
             letterSpacing: '-2px',
+            ...(isMobile ? { top: 'calc(50% + 100px)' } : {}),
           }}
         >
           {/* Scritta bianca (base) */}
@@ -369,8 +374,8 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%) translateZ(0)',
-          width: '350px',
-          height: '350px',
+          width: isMobile ? '150px' : '350px',
+          height: isMobile ? '150px' : '350px',
           opacity: 0,
           zIndex: 10000,
           backfaceVisibility: 'hidden',

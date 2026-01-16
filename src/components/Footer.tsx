@@ -95,7 +95,7 @@ export default function Footer() {
           </h2>
         </div>
 
-        {/* Colonna destra - 3 colonne di link (nascosta su mobile, mostrata sotto il titolo) */}
+        {/* Colonna destra - 3 colonne di link */}
         <div className="flex flex-wrap gap-8 lg:gap-16 pt-8 lg:pt-4">
           {/* SITEMAP */}
           <div className="flex flex-col gap-3 lg:gap-5">

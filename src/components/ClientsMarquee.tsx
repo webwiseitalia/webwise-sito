@@ -28,12 +28,15 @@ export default function ClientsMarquee() {
   // Triplichiamo i clienti per un loop infinito senza spazi vuoti
   const duplicatedClients = [...clients, ...clients, ...clients]
 
+  // Rileva se siamo su mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
   return (
     <div className="w-full h-full flex items-center overflow-hidden">
       <div
         className="flex animate-marquee"
         style={{
-          animation: 'marquee 30s linear infinite',
+          animation: isMobile ? 'marquee 80s linear infinite' : 'marquee 30s linear infinite',
         }}
       >
         {duplicatedClients.map((client, index) => (
@@ -44,8 +47,8 @@ export default function ClientsMarquee() {
               rel="noopener noreferrer"
               className="flex items-center justify-center border border-gray-700/50 rounded-lg bg-gradient-to-b from-gray-800/50 to-gray-900/30 aspect-video group hover:border-gray-600 transition-all overflow-hidden cursor-pointer"
               style={{
-                width: '200px',
-                height: '112px'
+                width: isMobile ? '288px' : '200px',
+                height: isMobile ? '162px' : '112px'
               }}
               onClick={(e) => { if (client.href === '#') e.preventDefault() }}
             >

@@ -457,6 +457,7 @@ function HomePage() {
     if (!softwareSectionRef.current) return
 
     const softwareSection = softwareSectionRef.current
+    const isMobile = window.innerWidth < 768
 
     // Stato iniziale: più piccola e trasparente
     gsap.set(softwareSection, {
@@ -466,12 +467,13 @@ function HomePage() {
     })
 
     // Animazione: cresce a scala 1 e opacity 1 mentre entra nella viewport
+    // Su mobile l'animazione è più veloce (finisce a metà viewport invece che al top)
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: softwareSection,
         start: 'top bottom', // Inizia quando il top della sezione entra dalla bottom della viewport
-        end: 'top top', // Finisce quando il top raggiunge il top della viewport - animazione più lunga
-        scrub: 1,
+        end: isMobile ? 'top 60%' : 'top top', // Mobile: finisce prima (a 60% della viewport), Desktop: animazione più lunga
+        scrub: isMobile ? 0.5 : 1, // Mobile: scrub più reattivo
       }
     })
 
@@ -1074,6 +1076,7 @@ function HomePage() {
             .service-card:nth-child(5) { top: calc(20vh + 80px) !important; }
             .service-card:nth-child(6) { top: calc(20vh + 100px) !important; }
             .service-card:nth-child(7) { top: calc(20vh + 120px) !important; }
+            .service-card:nth-child(8) { top: calc(20vh + 140px) !important; }
           }
           @media (max-width: 1023px) {
             #servizi { min-height: 600vh !important; }
@@ -1085,6 +1088,7 @@ function HomePage() {
             .service-card:nth-child(5) { top: 140px !important; }
             .service-card:nth-child(6) { top: 155px !important; }
             .service-card:nth-child(7) { top: 170px !important; }
+            .service-card:nth-child(8) { top: 185px !important; }
           }
         `}</style>
         <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start" style={{ transformOrigin: 'center top' }}>
@@ -1301,7 +1305,7 @@ function HomePage() {
             </div>
 
             {/* Card Reservly */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 cursor-pointer group sticky mb-[200px]" style={{ top: 'calc(20vh + 140px)', zIndex: 8 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group lg:mb-[200px]" style={{ zIndex: 8 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1375,12 +1379,7 @@ function HomePage() {
         </div>
 
         {/* Sottosezione 2: Slider - 1920x200 */}
-        <div
-          className="w-full relative bg-black"
-          style={{
-            aspectRatio: '1920 / 200'
-          }}
-        >
+        <div className="w-full relative bg-black h-[220px] lg:aspect-[1920/200] lg:h-auto">
           <ClientsMarquee />
         </div>
 

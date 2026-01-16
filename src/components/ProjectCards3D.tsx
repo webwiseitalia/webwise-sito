@@ -8,6 +8,9 @@ export default function ProjectCards3D() {
   const [isHovered, setIsHovered] = useState(false)
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [isTouching, setIsTouching] = useState(false)
+  const [touchStartX, setTouchStartX] = useState(0)
+  const [swipeRotationY, setSwipeRotationY] = useState(-25) // Rotazione Y controllata dallo swipe
 
   // Detect mobile
   useEffect(() => {
@@ -17,53 +20,97 @@ export default function ProjectCards3D() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
+  // Calcola quale card è in primo piano basandosi sulla rotazione Y
+  const getFrontCardIndex = (rotY: number, totalCards: number) => {
+    // rotY va da circa -90 (tutte visibili di lato) a +50/-50 (vedi il mazzo da un'angolazione)
+    // Mappiamo la rotazione all'indice della card
+    // Rotazione negativa = card con indice alto in primo piano
+    // Rotazione positiva = card con indice basso in primo piano
+    const normalized = (rotY + 90) / 140 // Normalizza da 0 a 1 (circa)
+    const index = Math.round((1 - normalized) * (totalCards - 1))
+    return Math.max(0, Math.min(totalCards - 1, index))
+  }
+
+  // Funzione per calcolare la rotazione basata sulla posizione (desktop)
+  const calculateRotation = (clientX: number, clientY: number) => {
+    if (!containerRef.current) return
+
+    const rect = containerRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    // Posizione normalizzata (-1 a 1)
+    const normalizedX = (clientX - centerX) / (rect.width / 2)
+    const normalizedY = (clientY - centerY) / (rect.height / 2)
+
+    // ROTAZIONE Y (orizzontale)
+    const distFromCenterX = Math.abs(normalizedX)
+    const sideViewAngle = -90
+    const edgeAngle = -normalizedX * 50
+
+    const centerInfluence = 1 - distFromCenterX
+    const newRotateY = edgeAngle + (sideViewAngle - edgeAngle) * Math.pow(centerInfluence, 2)
+
+    // ROTAZIONE X (verticale)
+    const newRotateX = -10 + normalizedY * 10
+
+    setRotation({ x: newRotateX, y: newRotateY })
+  }
+
+  // Mouse events (desktop)
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current || !isHovered) return
-
-      const rect = containerRef.current.getBoundingClientRect()
-      const centerX = rect.left + rect.width / 2
-      const centerY = rect.top + rect.height / 2
-
-      // Posizione mouse normalizzata (-1 a 1)
-      const normalizedX = (e.clientX - centerX) / (rect.width / 2)
-      const normalizedY = (e.clientY - centerY) / (rect.height / 2)
-
-      // ROTAZIONE Y (orizzontale) - segue il mouse
-      // Mouse a sinistra (-1): ruota a destra (+60°) - vedi le card impilate da destra
-      // Mouse al centro (0): ruota di lato (-90°) - vedi tutte le card affiancate
-      // Mouse a destra (+1): ruota a sinistra (-60°) - vedi le card impilate da sinistra
-
-      // Quando al centro, mostra il "fianco" del mazzo (tutte le card visibili)
-      const distFromCenterX = Math.abs(normalizedX)
-
-      // Al centro: -90° (vedi di lato), ai bordi: segue il mouse
-      const sideViewAngle = -90 // Angolo per vedere tutte le card di lato
-      const edgeAngle = -normalizedX * 50 // Ai bordi: -50° a +50°
-
-      // Interpola: più sei al centro, più vai verso -90°
-      const centerInfluence = 1 - distFromCenterX
-      const newRotateY = edgeAngle + (sideViewAngle - edgeAngle) * Math.pow(centerInfluence, 2)
-
-      // ROTAZIONE X (verticale) - leggera inclinazione
-      const newRotateX = -10 + normalizedY * 10
-
-      setRotation({ x: newRotateX, y: newRotateY })
+      if (!containerRef.current || !isHovered || isMobile) return
+      calculateRotation(e.clientX, e.clientY)
     }
 
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [isHovered])
+  }, [isHovered, isMobile])
 
-  const handleMouseEnter = () => setIsHovered(true)
+  // Touch events (mobile) - Swipe orizzontale
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isMobile) return
+    setIsTouching(true)
+    setTouchStartX(e.touches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isTouching || !isMobile) return
+
+    const touchX = e.touches[0].clientX
+    const deltaX = touchX - touchStartX
+
+    // Calcola la nuova rotazione basata sullo swipe
+    // Sensibilità: 0.3 gradi per pixel di movimento (più bassa = più fluido)
+    const newRotY = Math.max(-90, Math.min(50, swipeRotationY + deltaX * 0.3))
+
+    setSwipeRotationY(newRotY)
+    setRotation({ x: -15, y: newRotY })
+    setTouchStartX(touchX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!isMobile) return
+    setIsTouching(false)
+    // Non resettiamo - manteniamo la posizione raggiunta
+  }
+
+  const handleMouseEnter = () => {
+    if (!isMobile) setIsHovered(true)
+  }
   const handleMouseLeave = () => {
-    setIsHovered(false)
-    // Reset alla posizione originale (inclinato)
-    setRotation({ x: -15, y: -25 })
+    if (!isMobile) {
+      setIsHovered(false)
+      setRotation({ x: -15, y: -25 })
+    }
   }
 
   // Usa i primi 8 progetti (meno su mobile)
   const cardProjects = projects.slice(0, isMobile ? 5 : 8)
+
+  // Calcola la card in primo piano per mobile
+  const frontCardIndex = isMobile ? getFrontCardIndex(rotation.y, cardProjects.length) : null
 
   // Dimensioni responsive
   const containerHeight = isMobile ? '350px' : '700px'
@@ -74,20 +121,23 @@ export default function ProjectCards3D() {
   return (
     <div
       ref={containerRef}
-      className="mt-8 lg:mt-20 w-full flex items-center justify-center"
+      className="mt-8 lg:mt-20 w-full flex items-center justify-center touch-none"
       style={{
         perspective: '1500px',
         height: containerHeight
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <div
         className="relative"
         style={{
           transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
           transformStyle: 'preserve-3d',
-          transition: isHovered ? 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
+          transition: isTouching ? 'transform 0.05s linear' : (isHovered ? 'transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)'),
           width: cardWidth,
           height: cardHeight
         }}
@@ -97,8 +147,11 @@ export default function ProjectCards3D() {
           const centerIndex = (cardProjects.length - 1) / 2
           // Distanza tra le card (responsive)
           const baseOffset = (index - centerIndex) * cardSpacing
-          const isCardHovered = hoveredCard === index
-          // Quando in hover, la card si alza verso l'alto (meno su mobile)
+
+          // Su mobile: la card in primo piano si alza automaticamente
+          // Su desktop: la card in hover si alza
+          const isCardHovered = isMobile ? (frontCardIndex === index) : (hoveredCard === index)
+          // Quando in hover/primo piano, la card si alza verso l'alto
           const translateY = isCardHovered ? (isMobile ? -40 : -80) : 0
 
           return (
@@ -116,15 +169,15 @@ export default function ProjectCards3D() {
                 zIndex: isCardHovered ? 100 : index,
                 transition: 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)'
               }}
-              onMouseEnter={() => setHoveredCard(index)}
-              onMouseLeave={() => setHoveredCard(null)}
+              onMouseEnter={() => !isMobile && setHoveredCard(index)}
+              onMouseLeave={() => !isMobile && setHoveredCard(null)}
             >
               {!project.heroImage && (
                 <div className="absolute inset-0 bg-gradient-to-br from-[#2EBAEB] to-[#1a8fb8]" />
               )}
-              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className={`absolute inset-0 bg-black/30 transition-opacity ${isCardHovered ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
               <div
-                className="absolute top-0 left-0 right-0 p-4 text-white font-semibold text-lg opacity-0 group-hover:opacity-100 transition-all transform -translate-y-4 group-hover:translate-y-0"
+                className={`absolute top-0 left-0 right-0 p-4 text-white font-semibold text-lg transition-all transform ${isCardHovered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 group-hover:opacity-100 group-hover:translate-y-0'}`}
                 style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
               >
                 {project.name}
