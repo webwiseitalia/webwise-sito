@@ -3,7 +3,7 @@ import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
 
 export default function Footer() {
   return (
-    <footer id="contatti" className="w-full bg-black relative overflow-hidden px-4 py-12 lg:py-0 lg:px-0 min-h-[auto] lg:min-h-[90vh]" style={{ paddingTop: '40px', paddingBottom: '120px' }}>
+    <footer id="contatti" className="w-full bg-black relative overflow-hidden px-2 py-12 lg:py-0 lg:px-0 min-h-[auto] lg:min-h-[90vh]" style={{ paddingTop: '40px', paddingBottom: '60px' }}>
       {/* CSS responsive per padding */}
       <style>{`
         @media (min-width: 1024px) {
@@ -69,22 +69,28 @@ export default function Footer() {
         }
       `}</style>
       {/* Contenuto principale - flex tra titolo e colonne */}
-      <div className="flex flex-col lg:flex-row lg:justify-between relative" style={{ zIndex: 2 }}>
+      {/* Su mobile: tutto centrato */}
+      <div className="flex flex-col items-center text-center lg:items-start lg:text-left lg:flex-row lg:justify-between relative" style={{ zIndex: 2 }}>
         {/* Colonna sinistra - Titolo ENORME */}
-        <div className="flex flex-col" style={{ maxWidth: '100%' }}>
+        <div className="flex flex-col items-center lg:items-start" style={{ maxWidth: '100%' }}>
           <h2 className="text-white font-extralight tracking-tight leading-none text-[32px] lg:text-[clamp(60px,8vw,140px)]">
             HOW ABOUT
           </h2>
           <h2 className="text-white font-extralight tracking-tight leading-none text-[32px] lg:text-[clamp(60px,8vw,140px)]">
             WE DO A THING
           </h2>
-          <div className="flex flex-col lg:flex-row lg:items-end gap-4 lg:gap-8" style={{ marginTop: '-5px' }}>
-            <h2 className="text-white font-extralight tracking-tight leading-none text-[32px] lg:text-[clamp(60px,8vw,140px)]">
+          {/* Su mobile: OR TWO, senza bottone inline */}
+          <h2 className="text-white font-extralight tracking-tight leading-none text-[32px] lg:hidden">
+            OR TWO,
+          </h2>
+          {/* Su desktop: OR TWO, con bottone inline */}
+          <div className="hidden lg:flex lg:flex-row lg:items-end gap-8" style={{ marginTop: '-5px' }}>
+            <h2 className="text-white font-extralight tracking-tight leading-none lg:text-[clamp(60px,8vw,140px)]">
               OR TWO,
             </h2>
             <a
               href="#contatti"
-              className="inline-flex items-center justify-center border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white font-normal rounded-full transition-colors lg:mb-4 w-fit text-xs lg:text-[15px] px-4 py-2 lg:px-10 lg:py-[18px]"
+              className="inline-flex items-center justify-center border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white font-normal rounded-full transition-colors lg:mb-4 w-fit text-[15px] px-10 py-[18px]"
               style={{ gap: '10px', whiteSpace: 'nowrap' }}
             >
               GET IN TOUCH <span>→</span>
@@ -93,56 +99,69 @@ export default function Footer() {
           <h2 className="text-white font-extralight tracking-tight leading-none text-[32px] lg:text-[clamp(60px,8vw,140px)]">
             TO+GETHER
           </h2>
+          {/* Su mobile: bottone sotto le scritte */}
+          <a
+            href="#contatti"
+            className="lg:hidden inline-flex items-center justify-center border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white font-normal rounded-full transition-colors w-fit text-xs px-4 py-2 mt-6"
+            style={{ gap: '10px', whiteSpace: 'nowrap' }}
+          >
+            GET IN TOUCH <span>→</span>
+          </a>
         </div>
 
         {/* Colonna destra - 3 colonne di link */}
-        <div className="flex flex-wrap gap-8 lg:gap-16 pt-8 lg:pt-4">
-          {/* SITEMAP */}
-          <div className="flex flex-col gap-3 lg:gap-5">
-            <span className="text-gray-500 text-xs font-medium tracking-wider mb-1">SITEMAP</span>
-            <a href="#hero" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
-              HOME
-            </a>
-            <a href="#servizi" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
-              SERVIZI
-            </a>
-            <a href="#portfolio" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
-              PORTFOLIO
-            </a>
-            <a href="#contatti" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
-              CONTATTI
-            </a>
+        {/* Su mobile: SITEMAP e CONNECT affiancate con spazio, SEDE sotto centrata */}
+        <div className="flex flex-col lg:flex-row lg:justify-start gap-8 lg:gap-16 pt-8 lg:pt-4 w-full lg:w-auto">
+          {/* SITEMAP e CONNECT affiancate su mobile */}
+          <div className="flex justify-between px-8 lg:px-0 lg:gap-16">
+            {/* SITEMAP */}
+            <div className="flex flex-col items-center lg:items-start gap-3 lg:gap-5">
+              <span className="text-gray-500 text-xs font-medium tracking-wider mb-1">SITEMAP</span>
+              <a href="#hero" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+                HOME
+              </a>
+              <a href="#servizi" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+                SERVIZI
+              </a>
+              <a href="#portfolio" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+                PORTFOLIO
+              </a>
+              <a href="#contatti" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+                CONTATTI
+              </a>
+            </div>
+
+            {/* CONNECT */}
+            <div className="flex flex-col items-center lg:items-start gap-3 lg:gap-5">
+              <span className="text-gray-500 text-xs font-medium tracking-wider mb-1">CONNECT</span>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+                INSTAGRAM
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+                FACEBOOK
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+                LINKEDIN
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+                TWITTER
+              </a>
+            </div>
           </div>
 
-          {/* CONNECT */}
-          <div className="flex flex-col gap-3 lg:gap-5">
-            <span className="text-gray-500 text-xs font-medium tracking-wider mb-1">CONNECT</span>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
-              INSTAGRAM
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
-              FACEBOOK
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
-              LINKEDIN
-            </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
-              TWITTER
-            </a>
-          </div>
-
-          {/* OFFICES */}
-          <div className="flex flex-col gap-3 lg:gap-5">
+          {/* SEDE - centrata sotto su mobile */}
+          <div className="flex flex-col items-center lg:items-start gap-3 lg:gap-5">
             <span className="text-gray-500 text-xs font-medium tracking-wider mb-1">SEDE</span>
             <span className="text-white text-sm">DARFO BOARIO TERME</span>
           </div>
         </div>
       </div>
 
-      {/* Sezione inferiore - PRIVACY/CAREERS a sinistra, Logo grande a destra */}
-      <div className="relative lg:absolute lg:bottom-0 lg:left-0 lg:right-0 flex flex-col lg:flex-row justify-between items-start lg:items-end mt-12 lg:mt-0 px-0 lg:px-[50px] pb-0 lg:pb-[40px]" style={{ zIndex: 2 }}>
+      {/* Sezione inferiore - PRIVACY/CAREERS e Logo */}
+      {/* Su mobile: tutto centrato in colonna */}
+      <div className="relative lg:absolute lg:bottom-0 lg:left-0 lg:right-0 flex flex-col items-center lg:items-start lg:flex-row justify-between lg:items-end mt-12 lg:mt-0 px-0 lg:px-[50px] pb-0 lg:pb-[40px]" style={{ zIndex: 2 }}>
         {/* PRIVACY e CAREERS */}
-        <div className="flex items-center gap-4 mb-6 lg:mb-0">
+        <div className="flex items-center justify-center gap-4 mb-6 lg:mb-0">
           <div className="w-2 h-2 rounded-full bg-[#2EBAEB]"></div>
           <a href="#" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
             PRIVACY
@@ -154,7 +173,7 @@ export default function Footer() {
         </div>
 
         {/* Logo WEBWISE grande */}
-        <div className="flex items-center gap-3 lg:gap-5">
+        <div className="flex items-center justify-center gap-3 lg:gap-5">
           <img
             src={logoWebwise}
             alt="Webwise Logo"

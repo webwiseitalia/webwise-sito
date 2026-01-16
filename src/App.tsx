@@ -1079,8 +1079,9 @@ function HomePage() {
             .service-card:nth-child(8) { top: calc(20vh + 140px) !important; }
           }
           @media (max-width: 1023px) {
-            #servizi { min-height: 600vh !important; }
-            .service-card { position: sticky !important; margin-bottom: 200px !important; }
+            #servizi { min-height: auto !important; }
+            .service-card { position: sticky !important; margin-bottom: 120px !important; }
+            .service-card:last-child { margin-bottom: 40px !important; }
             .service-card:nth-child(1) { top: 80px !important; }
             .service-card:nth-child(2) { top: 95px !important; }
             .service-card:nth-child(3) { top: 110px !important; }
