@@ -1,13 +1,24 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 
 export default function ScrollToTop() {
   const { pathname, hash } = useLocation()
+  const isFirstLoad = useRef(true)
 
   useEffect(() => {
-    // Se c'è un hash, scrolla all'elemento corrispondente
+    // Al primo caricamento (refresh), vai sempre in cima e rimuovi l'hash
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false
+      window.scrollTo(0, 0)
+      // Rimuovi l'hash dall'URL senza causare scroll
+      if (hash) {
+        window.history.replaceState(null, '', pathname)
+      }
+      return
+    }
+
+    // Navigazione interna: se c'è un hash, scrolla all'elemento
     if (hash) {
-      // Piccolo delay per assicurarsi che la pagina sia renderizzata
       setTimeout(() => {
         const element = document.querySelector(hash)
         if (element) {
@@ -15,7 +26,6 @@ export default function ScrollToTop() {
         }
       }, 100)
     } else {
-      // Altrimenti vai in cima alla pagina
       window.scrollTo(0, 0)
     }
   }, [pathname, hash])

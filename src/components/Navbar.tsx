@@ -97,10 +97,10 @@ export default function Navbar({ compressionProgress = 0 }: NavbarProps) {
           </a>
         </div>
 
-        {/* Contattaci con freccia */}
+        {/* Contattaci con freccia - nascosto su mobile */}
         <a
           href="/#contatti"
-          className="text-white flex items-center gap-1 text-sm font-medium hover:text-white/80 transition-colors"
+          className="hidden md:flex text-white items-center gap-1 text-sm font-medium hover:text-white/80 transition-colors"
           style={getElementStyle(6, 7)}
         >
           Contattaci
