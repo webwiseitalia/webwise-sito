@@ -16,6 +16,7 @@ import CareersPage from './pages/CareersPage'
 import ProjectPage from './pages/ProjectPage'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import CookiePolicyPage from './pages/CookiePolicyPage'
+import ServiziPage from './pages/ServiziPage'
 import ScrollToTop from './components/ScrollToTop'
 import CookieBanner from './components/CookieBanner'
 import ParticleLogo from './components/ParticleLogo'
@@ -1140,8 +1141,8 @@ function HomePage() {
 
             {/* Bottoni */}
             <div className="flex flex-wrap items-center gap-3 mt-6">
-              <a
-                href="#"
+              <Link
+                to="/servizi"
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
               >
                 <span>Leggi di più</span>
@@ -1151,7 +1152,7 @@ function HomePage() {
                     <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
                   </svg>
                 </span>
-              </a>
+              </Link>
               <a
                 href="#contatti"
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
@@ -1582,6 +1583,7 @@ function App() {
         <Route path="/progetti/:projectSlug" element={<ProjectPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+        <Route path="/servizi" element={<ServiziPage />} />
       </Routes>
     </>
   )
