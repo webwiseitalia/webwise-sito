@@ -566,7 +566,7 @@ function HomePage() {
             </p>
             <p>
               <TypewriterText
-                text="TRANSFORMING DIGITAL PRESENCE"
+                text="TRASFORMIAMO LA PRESENZA DIGITALE"
                 isVisible={isTypewriterActive}
                 delay={0.12}
                 speed={0.008}
@@ -574,7 +574,7 @@ function HomePage() {
             </p>
             <p>
               <TypewriterText
-                text="WITH AI-DRIVEN STRATEGIES AND"
+                text="CON STRATEGIE BASATE SU AI E"
                 isVisible={isTypewriterActive}
                 delay={0.35}
                 speed={0.008}
@@ -582,7 +582,7 @@ function HomePage() {
             </p>
             <p>
               <TypewriterText
-                text="SCALABLE TECHNOLOGIES"
+                text="TECNOLOGIE SCALABILI"
                 isVisible={isTypewriterActive}
                 delay={0.55}
                 speed={0.008}
@@ -600,7 +600,7 @@ function HomePage() {
             >
               <p style={{ whiteSpace: 'nowrap' }}>
                 <TypewriterText
-                  text="SMARTER SYSTEMS"
+                  text="SISTEMI INTELLIGENTI"
                   isVisible={isTypewriterActive}
                   delay={0.7}
                   speed={0.012}
@@ -608,14 +608,14 @@ function HomePage() {
               </p>
               <p style={{ whiteSpace: 'nowrap' }}>
                 <TypewriterText
-                  text="BETTER"
+                  text="LAVORO"
                   isVisible={isTypewriterActive}
                   delay={0.85}
                   speed={0.012}
                 />
                 <span className="ml-4 lg:ml-[100px]">
                   <TypewriterText
-                    text="WORK"
+                    text="MIGLIORE"
                     isVisible={isTypewriterActive}
                     delay={0.92}
                     speed={0.012}
@@ -656,7 +656,7 @@ function HomePage() {
               </p>
               <p style={{ whiteSpace: 'nowrap' }} className="pl-2 lg:pl-[60px] flex items-center gap-2">
                 <TypewriterText
-                  text="EFFICENCY"
+                  text="EFFICIENZA"
                   isVisible={isTypewriterActive}
                   delay={0.85}
                   speed={0.012}
@@ -1081,35 +1081,34 @@ function HomePage() {
         {/* CSS per altezza minima e sticky su desktop e mobile */}
         <style>{`
           @media (min-width: 1024px) {
-            #servizi { min-height: 250vh !important; }
+            #servizi { min-height: auto !important; }
             .servizi-left-col { position: sticky !important; top: 20vh !important; }
             .service-card { position: sticky !important; }
             .service-card:nth-child(1) { top: 20vh !important; }
-            .service-card:nth-child(2) { top: calc(20vh + 20px) !important; }
-            .service-card:nth-child(3) { top: calc(20vh + 40px) !important; }
-            .service-card:nth-child(4) { top: calc(20vh + 60px) !important; }
-            .service-card:nth-child(5) { top: calc(20vh + 80px) !important; }
-            .service-card:nth-child(6) { top: calc(20vh + 100px) !important; }
-            .service-card:nth-child(7) { top: calc(20vh + 120px) !important; }
-            .service-card:nth-child(8) { top: calc(20vh + 140px) !important; }
+            .service-card:nth-child(2) { top: calc(20vh + 12px) !important; }
+            .service-card:nth-child(3) { top: calc(20vh + 24px) !important; }
+            .service-card:nth-child(4) { top: calc(20vh + 36px) !important; }
+            .service-card:nth-child(5) { top: calc(20vh + 48px) !important; }
+            .service-card:nth-child(6) { top: calc(20vh + 60px) !important; }
+            .service-card:nth-child(7) { top: calc(20vh + 72px) !important; }
+            .service-card:nth-child(8) { top: calc(20vh + 84px) !important; }
           }
           @media (max-width: 1023px) {
             #servizi { min-height: auto !important; }
-            .service-card { position: sticky !important; margin-bottom: 120px !important; }
-            .service-card:last-child { margin-bottom: 40px !important; }
-            .service-card:nth-child(1) { top: 80px !important; }
-            .service-card:nth-child(2) { top: 95px !important; }
-            .service-card:nth-child(3) { top: 110px !important; }
-            .service-card:nth-child(4) { top: 125px !important; }
-            .service-card:nth-child(5) { top: 140px !important; }
-            .service-card:nth-child(6) { top: 155px !important; }
-            .service-card:nth-child(7) { top: 170px !important; }
-            .service-card:nth-child(8) { top: 185px !important; }
+            .service-card { position: sticky !important; }
+            .service-card:nth-child(1) { top: 70px !important; }
+            .service-card:nth-child(2) { top: 82px !important; }
+            .service-card:nth-child(3) { top: 94px !important; }
+            .service-card:nth-child(4) { top: 106px !important; }
+            .service-card:nth-child(5) { top: 118px !important; }
+            .service-card:nth-child(6) { top: 130px !important; }
+            .service-card:nth-child(7) { top: 142px !important; }
+            .service-card:nth-child(8) { top: 154px !important; }
           }
         `}</style>
-        <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start" style={{ transformOrigin: 'center top' }}>
+        <div ref={serviziContentRef} className="relative max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12 items-start" style={{ transformOrigin: 'center top' }}>
           {/* Colonna sinistra - sticky solo su desktop */}
-          <div className="servizi-left-col flex flex-col gap-4 h-fit relative">
+          <div className="servizi-left-col flex flex-col gap-4 h-fit relative mb-10 lg:mb-0">
             {/* Badge */}
             <span className="text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] w-fit">
               Come possiamo aiutarti
@@ -1159,7 +1158,7 @@ function HomePage() {
           {/* Colonna destra - card servizi con sticky stacking */}
           <div ref={cardsContainerRef} className="flex flex-col pt-0">
             {/* Card SEO */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group lg:mb-[200px]" style={{ zIndex: 1 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group mb-6" style={{ zIndex: 1 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1181,7 +1180,7 @@ function HomePage() {
             </div>
 
             {/* Card Siti Web */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group lg:mb-[200px]" style={{ zIndex: 2 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group mb-6" style={{ zIndex: 2 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1204,7 +1203,7 @@ function HomePage() {
             </div>
 
             {/* Card E-commerce */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group lg:mb-[200px]" style={{ zIndex: 3 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group mb-6" style={{ zIndex: 3 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1227,7 +1226,7 @@ function HomePage() {
             </div>
 
             {/* Card Gestione Social */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group lg:mb-[200px]" style={{ zIndex: 4 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group mb-6" style={{ zIndex: 4 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1248,7 +1247,7 @@ function HomePage() {
             </div>
 
             {/* Card App e Web App */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group lg:mb-[200px]" style={{ zIndex: 5 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group mb-6" style={{ zIndex: 5 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1273,7 +1272,7 @@ function HomePage() {
             </div>
 
             {/* Card Automazioni e AI */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group lg:mb-[200px]" style={{ zIndex: 6 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group mb-6" style={{ zIndex: 6 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1299,7 +1298,7 @@ function HomePage() {
             </div>
 
             {/* Card ADS */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group lg:mb-[200px]" style={{ zIndex: 7 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group mb-6" style={{ zIndex: 7 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1321,7 +1320,7 @@ function HomePage() {
             </div>
 
             {/* Card Reservly */}
-            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group lg:mb-[200px]" style={{ zIndex: 8 }}>
+            <div className="service-card bg-[#2a2a2a] border border-gray-700 rounded-xl p-4 lg:p-6 cursor-pointer group mb-6" style={{ zIndex: 8 }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="bg-[#2EBAEB] rounded-lg w-14 h-14 flex items-center justify-center text-white flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
