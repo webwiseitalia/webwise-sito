@@ -64,56 +64,54 @@ export default function CookiePolicyPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section ref={heroRef} className="w-full bg-black pt-32 pb-16 lg:pt-40 lg:pb-20 px-6 lg:px-12">
-        <div className="max-w-4xl mx-auto">
+      <section ref={heroRef} className="w-full bg-black pt-32 pb-16 lg:pt-40 lg:pb-20" style={{ padding: '160px 50px 60px 50px' }}>
+        <div>
           <Link
             to="/"
-            className="hero-animate inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-8 text-sm"
+            className="hero-animate inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-12 text-sm"
           >
             <span>←</span>
             <span>HOME</span>
           </Link>
 
-          <h1 className="hero-animate text-white font-extralight tracking-tight leading-none mb-6" style={{ fontSize: 'clamp(40px, 6vw, 80px)' }}>
+          <h1 className="hero-animate text-white font-extralight tracking-tight leading-none mb-8" style={{ fontSize: 'clamp(48px, 8vw, 100px)' }}>
             COOKIE POLICY
           </h1>
 
-          <p className="hero-animate text-white/60 text-lg lg:text-xl font-light leading-relaxed max-w-2xl">
+          <p className="hero-animate text-white/60 text-xl lg:text-2xl font-light leading-relaxed max-w-3xl">
             Informativa sull'utilizzo dei cookie su questo sito web
           </p>
 
-          <p className="hero-animate text-white/40 text-sm mt-6">
+          <p className="hero-animate text-white/40 text-sm mt-8">
             Ultimo aggiornamento: {lastUpdate}
           </p>
         </div>
       </section>
 
       {/* Privacy-Friendly Notice */}
-      <section className="w-full bg-black px-6 lg:px-12 pb-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="border border-[#2EBAEB]/30 bg-[#2EBAEB]/5 rounded-lg p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-[#2EBAEB] rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-semibold text-[#2EBAEB] text-lg">Sito Privacy-Friendly</p>
-                <p className="text-white/70 mt-2 leading-relaxed">
-                  Questo sito web utilizza <strong className="text-white">solo cookie tecnici</strong> necessari al funzionamento.
-                  <strong className="text-white"> Non utilizziamo cookie di profilazione, tracciamento o analisi</strong>.
-                  La tua privacy è protetta e non serve il tuo consenso per la navigazione.
-                </p>
-              </div>
+      <section className="w-full bg-black pb-12" style={{ padding: '0 50px 40px 50px' }}>
+        <div className="border border-[#2EBAEB]/30 bg-[#2EBAEB]/5 rounded-lg p-6 lg:p-8">
+          <div className="flex items-start gap-4 lg:gap-6">
+            <div className="w-12 h-12 bg-[#2EBAEB] rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-semibold text-[#2EBAEB] text-xl">Sito Privacy-Friendly</p>
+              <p className="text-white/70 mt-3 leading-relaxed text-lg">
+                Questo sito web utilizza <strong className="text-white">solo cookie tecnici</strong> necessari al funzionamento.
+                <strong className="text-white"> Non utilizziamo cookie di profilazione, tracciamento o analisi</strong>.
+                La tua privacy è protetta e non serve il tuo consenso per la navigazione.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Content */}
-      <section ref={contentRef} className="w-full bg-black px-6 lg:px-12 pb-20">
-        <div className="max-w-4xl mx-auto space-y-16">
+      <section ref={contentRef} className="w-full bg-black pb-20" style={{ padding: '0 50px 80px 50px' }}>
+        <div className="space-y-16">
 
           {/* 1. Cosa sono i Cookie */}
           <div className="content-section border-t border-white/10 pt-10">

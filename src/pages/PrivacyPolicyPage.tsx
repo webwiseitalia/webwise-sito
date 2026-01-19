@@ -64,33 +64,33 @@ export default function PrivacyPolicyPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section ref={heroRef} className="w-full bg-black pt-32 pb-16 lg:pt-40 lg:pb-20 px-6 lg:px-12">
-        <div className="max-w-4xl mx-auto">
+      <section ref={heroRef} className="w-full bg-black pt-32 pb-16 lg:pt-40 lg:pb-20" style={{ padding: '160px 50px 60px 50px' }}>
+        <div>
           <Link
             to="/"
-            className="hero-animate inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-8 text-sm"
+            className="hero-animate inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-12 text-sm"
           >
             <span>←</span>
             <span>HOME</span>
           </Link>
 
-          <h1 className="hero-animate text-white font-extralight tracking-tight leading-none mb-6" style={{ fontSize: 'clamp(40px, 6vw, 80px)' }}>
+          <h1 className="hero-animate text-white font-extralight tracking-tight leading-none mb-8" style={{ fontSize: 'clamp(48px, 8vw, 100px)' }}>
             PRIVACY POLICY
           </h1>
 
-          <p className="hero-animate text-white/60 text-lg lg:text-xl font-light leading-relaxed max-w-2xl">
+          <p className="hero-animate text-white/60 text-xl lg:text-2xl font-light leading-relaxed max-w-3xl">
             Informativa sul trattamento dei dati personali ai sensi del GDPR
           </p>
 
-          <p className="hero-animate text-white/40 text-sm mt-6">
+          <p className="hero-animate text-white/40 text-sm mt-8">
             Ultimo aggiornamento: {lastUpdate}
           </p>
         </div>
       </section>
 
       {/* Content */}
-      <section ref={contentRef} className="w-full bg-black px-6 lg:px-12 pb-20">
-        <div className="max-w-4xl mx-auto space-y-16">
+      <section ref={contentRef} className="w-full bg-black pb-20" style={{ padding: '0 50px 80px 50px' }}>
+        <div className="space-y-16">
 
           {/* 1. Titolare del Trattamento */}
           <div className="content-section border-t border-white/10 pt-10">
