@@ -1,11 +1,35 @@
 import { useParams, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { getProjectBySlug, getRelatedProjects } from '../data/projects'
 import Footer from '../components/Footer'
+import Navbar from '../components/Navbar'
+import BurgerMenu from '../components/BurgerMenu'
 
 export default function ProjectPage() {
   const { projectSlug } = useParams<{ projectSlug: string }>()
   const project = projectSlug ? getProjectBySlug(projectSlug) : undefined
   const relatedProjects = projectSlug ? getRelatedProjects(projectSlug, 2) : []
+  const [showBurger, setShowBurger] = useState(false)
+  const [navbarCompression, setNavbarCompression] = useState(0)
+
+  // Logica scroll per navbar/burger
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const threshold = 100
+
+      if (scrollY > threshold) {
+        setShowBurger(true)
+        setNavbarCompression(Math.min((scrollY - threshold) / 100, 1))
+      } else {
+        setShowBurger(false)
+        setNavbarCompression(0)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   if (!project) {
     return (
@@ -22,6 +46,8 @@ export default function ProjectPage() {
 
   return (
     <div className="min-h-screen bg-black">
+      <Navbar compressionProgress={navbarCompression} />
+      <BurgerMenu isVisible={showBurger} />
 
       {/* Hero Section - Full Width Image or Placeholder */}
       <section className="relative w-full h-[80vh] bg-black">

@@ -119,35 +119,35 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
         >
           <div className="flex flex-col items-center justify-center h-full gap-8">
             <a
-              href="#hero"
+              href="/#hero"
               onClick={closeMenu}
               className="text-white text-3xl font-light hover:text-[#2EBAEB] transition-colors"
             >
               Home
             </a>
             <a
-              href="#servizi"
+              href="/servizi"
               onClick={closeMenu}
               className="text-white text-3xl font-light hover:text-[#2EBAEB] transition-colors"
             >
               Servizi
             </a>
             <a
-              href="#portfolio"
+              href="/#portfolio"
               onClick={closeMenu}
               className="text-white text-3xl font-light hover:text-[#2EBAEB] transition-colors"
             >
               Progetti
             </a>
             <a
-              href="#software"
+              href="/#software"
               onClick={closeMenu}
               className="text-white text-3xl font-light hover:text-[#2EBAEB] transition-colors"
             >
               Software
             </a>
             <a
-              href="#contatti"
+              href="/#contatti"
               onClick={closeMenu}
               className="text-white text-3xl font-light hover:text-[#2EBAEB] transition-colors"
             >
@@ -156,7 +156,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
 
             {/* Bottone CTA */}
             <a
-              href="#contatti"
+              href="/#contatti"
               onClick={closeMenu}
               className="mt-8 px-8 py-3 border border-white/30 rounded-full text-white text-lg font-medium hover:border-[#2EBAEB] hover:text-[#2EBAEB] transition-colors flex items-center gap-2"
             >
@@ -223,7 +223,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
 
               <div className="flex items-center gap-8">
                 <a
-                  href="#hero"
+                  href="/#hero"
                   className="text-white/80 hover:text-white transition-colors text-sm font-medium"
                   style={getElementStyle(0.15, 0.3)}
                   onClick={toggleMenu}
@@ -231,7 +231,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
                   Home
                 </a>
                 <a
-                  href="#servizi"
+                  href="/servizi"
                   className="text-white/80 hover:text-white transition-colors text-sm font-medium"
                   style={getElementStyle(0.2, 0.25)}
                   onClick={toggleMenu}
@@ -239,7 +239,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
                   Servizi
                 </a>
                 <a
-                  href="#portfolio"
+                  href="/#portfolio"
                   className="text-white/80 hover:text-white transition-colors text-sm font-medium"
                   style={getElementStyle(0.25, 0.2)}
                   onClick={toggleMenu}
@@ -247,7 +247,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
                   Progetti
                 </a>
                 <a
-                  href="#software"
+                  href="/#software"
                   className="text-white/80 hover:text-white transition-colors text-sm font-medium"
                   style={getElementStyle(0.3, 0.15)}
                   onClick={toggleMenu}
@@ -255,7 +255,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
                   Software
                 </a>
                 <a
-                  href="#contatti"
+                  href="/#contatti"
                   className="text-white/80 hover:text-white transition-colors text-sm font-medium"
                   style={getElementStyle(0.35, 0.1)}
                   onClick={toggleMenu}
@@ -265,7 +265,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
               </div>
 
               <a
-                href="#contatti"
+                href="/#contatti"
                 className="text-white flex items-center gap-1 text-sm font-medium hover:text-white/80 transition-colors"
                 style={getElementStyle(0.4, 0.05)}
                 onClick={toggleMenu}

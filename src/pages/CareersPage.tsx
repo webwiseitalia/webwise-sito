@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
+import BurgerMenu from '../components/BurgerMenu'
 
 export default function CareersPage() {
   const [formData, setFormData] = useState({
@@ -13,6 +14,27 @@ export default function CareersPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [showBurger, setShowBurger] = useState(false)
+  const [navbarCompression, setNavbarCompression] = useState(0)
+
+  // Logica scroll per navbar/burger
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const threshold = 100
+
+      if (scrollY > threshold) {
+        setShowBurger(true)
+        setNavbarCompression(Math.min((scrollY - threshold) / 100, 1))
+      } else {
+        setShowBurger(false)
+        setNavbarCompression(0)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -28,7 +50,8 @@ export default function CareersPage() {
 
   return (
     <div className="min-h-screen bg-black overflow-hidden">
-      <Navbar />
+      <Navbar compressionProgress={navbarCompression} />
+      <BurgerMenu isVisible={showBurger} />
 
       {/* Hero Section - Full width, titolo a sinistra */}
       <section className="relative w-full min-h-[70vh] bg-black flex items-end" style={{ padding: '0 50px 80px 50px' }}>

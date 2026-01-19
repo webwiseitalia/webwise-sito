@@ -1,16 +1,38 @@
 import { Link } from 'react-router-dom'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SITE_DATA } from '../constants/siteData'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BurgerMenu from '../components/BurgerMenu'
 
 gsap.registerPlugin(ScrollTrigger)
 
 export default function CookiePolicyPage() {
+  const [showBurger, setShowBurger] = useState(false)
+  const [navbarCompression, setNavbarCompression] = useState(0)
   const heroRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+
+  // Logica scroll per navbar/burger
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const threshold = 100
+
+      if (scrollY > threshold) {
+        setShowBurger(true)
+        setNavbarCompression(Math.min((scrollY - threshold) / 100, 1))
+      } else {
+        setShowBurger(false)
+        setNavbarCompression(0)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -61,7 +83,8 @@ export default function CookiePolicyPage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <Navbar />
+      <Navbar compressionProgress={navbarCompression} />
+      <BurgerMenu isVisible={showBurger} />
 
       {/* Hero Section */}
       <section ref={heroRef} className="w-full bg-black pt-32 pb-16 lg:pt-40 lg:pb-20" style={{ padding: '160px 50px 60px 50px' }}>

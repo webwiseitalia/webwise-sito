@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { services } from '../data/services'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
+import BurgerMenu from '../components/BurgerMenu'
 
 // Immagini servizi
 import servizioSeo from '../assets/servizi/servizio-seo.webp'
@@ -20,6 +21,8 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function ServiziPage() {
   const [openAccordions, setOpenAccordions] = useState<Record<string, number | null>>({})
+  const [showBurger, setShowBurger] = useState(false)
+  const [navbarCompression, setNavbarCompression] = useState(0)
   const heroRef = useRef<HTMLDivElement>(null)
   const servicesRef = useRef<HTMLDivElement>(null)
 
@@ -29,6 +32,25 @@ export default function ServiziPage() {
       [serviceId]: prev[serviceId] === index ? null : index
     }))
   }
+
+  // Logica scroll per navbar/burger
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const threshold = 100
+
+      if (scrollY > threshold) {
+        setShowBurger(true)
+        setNavbarCompression(Math.min((scrollY - threshold) / 100, 1))
+      } else {
+        setShowBurger(false)
+        setNavbarCompression(0)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // Animazioni GSAP
   useEffect(() => {
@@ -143,7 +165,8 @@ export default function ServiziPage() {
   return (
     <div className="min-h-screen bg-black">
       {/* Navbar */}
-      <Navbar />
+      <Navbar compressionProgress={navbarCompression} />
+      <BurgerMenu isVisible={showBurger} />
 
       {/* Hero Section */}
       <section ref={heroRef} className="w-full bg-black pt-32 pb-20 lg:pt-40 lg:pb-24" style={{ padding: '160px 50px 80px 50px' }}>

@@ -1,11 +1,33 @@
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
+import BurgerMenu from '../components/BurgerMenu'
 
 export default function ReservlyPage() {
+  const [showBurger, setShowBurger] = useState(false)
+
+  // Logica scroll per navbar/burger
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const threshold = 100
+
+      if (scrollY > threshold) {
+        setShowBurger(true)
+      } else {
+        setShowBurger(false)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#c8c4b8]">
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6 bg-black">
+      <BurgerMenu isVisible={showBurger} />
+      {/* Navbar - si nasconde quando appare il burger */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6 bg-black transition-opacity duration-300 ${showBurger ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <Link to="/" className="flex items-center gap-2">
           <img src={logoWebwise} alt="Webwise" title="Webwise" width={32} height={32} loading="eager" className="w-8 h-8 invert" />
           <span className="text-white font-semibold text-lg">WEBWISE</span>

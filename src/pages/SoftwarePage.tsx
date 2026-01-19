@@ -1,6 +1,8 @@
 import { useParams, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import BurgerMenu from '../components/BurgerMenu'
 
 interface SoftwareData {
   id: string
@@ -254,6 +256,27 @@ const softwareData: Record<string, SoftwareData> = {
 export default function SoftwarePage() {
   const { softwareId } = useParams<{ softwareId: string }>()
   const software = softwareData[softwareId || '']
+  const [showBurger, setShowBurger] = useState(false)
+  const [navbarCompression, setNavbarCompression] = useState(0)
+
+  // Logica scroll per navbar/burger
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const threshold = 100
+
+      if (scrollY > threshold) {
+        setShowBurger(true)
+        setNavbarCompression(Math.min((scrollY - threshold) / 100, 1))
+      } else {
+        setShowBurger(false)
+        setNavbarCompression(0)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   if (!software) {
     return (
@@ -268,7 +291,8 @@ export default function SoftwarePage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <Navbar />
+      <Navbar compressionProgress={navbarCompression} />
+      <BurgerMenu isVisible={showBurger} />
 
       {/* Hero Section */}
       <section className="relative w-full min-h-screen bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f0f23] overflow-hidden">

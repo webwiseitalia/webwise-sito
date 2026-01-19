@@ -1,83 +1,24 @@
-# Piano: Aggiunta sezione "Lavori Custom" nella sottosezione Servizi 1
+# Piano: Burger Menu per tutte le pagine
 
-## Obiettivo
-Aggiungere a destra del logo Webwise (nella sezione servizi1) una linea orizzontale che arriva fino al bordo destro delle card, con sopra una scritta sui lavori custom e un CTA "Contattaci" con freccia a 45°.
+## Problema
+Il burger menu mobile funziona solo sulla homepage perché il componente `BurgerMenu` è incluso direttamente in `HomePage` (App.tsx:531). Le altre pagine (ServiziPage, CookiePolicyPage, PrivacyPolicyPage, CareersPage, etc.) usano solo il componente `Navbar` che NON include il burger menu su mobile.
 
-## Struttura attuale
-- **Sezione servizi1**: contiene solo il logo Webwise (125x125px) posizionato in alto a sinistra con sticky
-- Il logo è dentro un container `max-w-7xl mx-auto px-8`
+## Soluzione
+Aggiungere il componente `BurgerMenu` a tutte le pagine secondarie. Il BurgerMenu è già progettato per funzionare su mobile (linee 90-91 di BurgerMenu.tsx: su mobile è sempre visibile con opacity 1).
 
-## Modifiche da effettuare
+## Pagine da modificare
+1. **ServiziPage.tsx** - Aggiungere import e componente BurgerMenu
+2. **CookiePolicyPage.tsx** - Aggiungere import e componente BurgerMenu
+3. **PrivacyPolicyPage.tsx** - Aggiungere import e componente BurgerMenu
+4. **CareersPage.tsx** - Aggiungere import e componente BurgerMenu
+5. **SoftwarePage.tsx** - Verificare e aggiungere se necessario
+6. **ReservlyPage.tsx** - Verificare e aggiungere se necessario
+7. **ProjectPage.tsx** - Verificare e aggiungere se necessario
 
-### 1. Modificare il layout del container del logo
-Trasformare il div che contiene il logo in un layout flex orizzontale con:
-- Logo a sinistra (come ora)
-- Nuovo contenuto a destra con flex-grow per occupare lo spazio rimanente
+## Modifiche per ogni pagina
+1. Aggiungere import: `import BurgerMenu from '../components/BurgerMenu'`
+2. Aggiungere componente dopo Navbar: `<BurgerMenu isVisible={true} />`
+   - `isVisible={true}` perché su queste pagine non c'è l'effetto scroll della homepage
 
-### 2. Aggiungere il nuovo blocco a destra del logo
-Struttura del nuovo blocco:
-```
-[Logo] -------- [Scritta + CTA] --------
-        linea orizzontale che connette
-```
-
-Elementi:
-- **Linea orizzontale**: `border-t border-white/30` o simile, che si estende da dopo il logo fino alla fine
-- **Scritta**: Testo tipo "Realizziamo anche progetti custom su misura" - posizionato sopra la linea
-- **CTA**: Link "Contattaci" con freccia a 45° (stile navbar: sfondo trasparente, icona arrow-up-right)
-
-### 3. Stile del CTA
-Copiare lo stile dalla navbar:
-- Testo bianco
-- Freccia a 45° (arrow-up-right icon)
-- Hover con cambio colore a cyan
-
-## File da modificare
-- `/src/App.tsx` - sezione servizi1 (righe ~500-519)
-
-## Codice proposto
-
-```jsx
-{/* Logo + Linea con scritta custom */}
-<div ref={serviziBlockRef} className="sticky flex items-center gap-6" style={{ top: '20vh', paddingTop: '20px' }}>
-  {/* Logo */}
-  <img
-    src={logoWebwiseCenter}
-    alt="Webwise Logo"
-    className="invert flex-shrink-0"
-    style={{
-      width: '125px',
-      height: '125px',
-      opacity: 0,
-    }}
-  />
-
-  {/* Blocco destro: scritta + linea + CTA */}
-  <div className="flex-grow flex flex-col justify-center">
-    {/* Riga con scritta e CTA */}
-    <div className="flex items-center justify-between mb-2">
-      <p className="text-white/70 text-sm">
-        Realizziamo anche progetti custom su misura
-      </p>
-      <a
-        href="#contatti"
-        className="flex items-center gap-1.5 text-white text-sm hover:text-[#2EBAEB] transition-colors"
-      >
-        <span>Contattaci</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M7 17L17 7" />
-          <path d="M7 7h10v10" />
-        </svg>
-      </a>
-    </div>
-
-    {/* Linea orizzontale */}
-    <div className="w-full h-px bg-white/30" />
-  </div>
-</div>
-```
-
-## Note
-- La linea si estenderà automaticamente fino al bordo del container (che è allineato con le card)
-- Il CTA usa l'icona `arrow-up-right` (freccia diagonale a 45°)
-- Lo stile è minimalista e coerente con il resto del sito
+## Nota sui link del BurgerMenu
+I link nel BurgerMenu mobile (linee 121-155) usano ancore come `#hero`, `#servizi`, etc. che funzionano solo in homepage. Per le altre pagine, questi link riporteranno alla homepage con l'ancora corretta - modifichiamo i link per usare percorsi assoluti con ancora (`/#hero`, `/#servizi`, etc.).
