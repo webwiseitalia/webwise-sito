@@ -540,7 +540,19 @@ function HomePage() {
       >
         {/* Wrapper per contenere overflow durante lo zoom */}
         <div className="fixed inset-0 z-0 overflow-hidden">
-          {/* Sfondo unico - zoom in/out con flip al centro */}
+          {/* Sfondo a pallini statico per mobile (replica del DotShaderBackground senza effetto cursore) */}
+          <div
+            className="lg:hidden absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(circle at 70% 110%, transparent 30%, rgba(0,0,0,0.7) 70%),
+                radial-gradient(circle, rgba(255,255,255,0.06) 2.5px, transparent 2.5px)
+              `,
+              backgroundSize: '100% 100%, 18px 18px',
+              backgroundPosition: 'center, center',
+            }}
+          />
+          {/* Sfondo unico - zoom in/out con flip al centro (solo desktop) */}
           <div
             ref={heroShaderRef}
             className="hidden lg:block absolute inset-0"
