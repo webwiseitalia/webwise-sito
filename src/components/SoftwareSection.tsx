@@ -194,6 +194,10 @@ export default function SoftwareSection() {
                   <img
                     src={software.logo}
                     alt={`Logo ${software.name}`}
+                    title={software.name}
+                    width={160}
+                    height={160}
+                    loading="lazy"
                     className="w-[100px] h-[100px] lg:w-[160px] lg:h-[160px] object-contain"
                   />
                 </div>

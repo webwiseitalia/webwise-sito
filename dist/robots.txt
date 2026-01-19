@@ -1,0 +1,13 @@
+# Robots.txt per Webwise
+# https://webwise.it
+
+User-agent: *
+Allow: /
+
+# Blocca cartelle di sistema
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://webwise.it/sitemap.xml

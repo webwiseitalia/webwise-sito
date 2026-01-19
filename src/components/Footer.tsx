@@ -160,13 +160,17 @@ export default function Footer() {
       {/* Sezione inferiore - PRIVACY/CAREERS e Logo */}
       {/* Su mobile: tutto centrato in colonna */}
       <div className="relative lg:absolute lg:bottom-0 lg:left-0 lg:right-0 flex flex-col items-center lg:items-start lg:flex-row justify-between lg:items-end mt-12 lg:mt-0 px-0 lg:px-[50px] pb-0 lg:pb-[40px]" style={{ zIndex: 2 }}>
-        {/* PRIVACY e CAREERS */}
+        {/* PRIVACY, COOKIE e CAREERS */}
         <div className="flex items-center justify-center gap-4 mb-6 lg:mb-0">
           <div className="w-2 h-2 rounded-full bg-[#2EBAEB]"></div>
-          <a href="#" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+          <Link to="/privacy-policy" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
             PRIVACY
-          </a>
-          <div className="w-8 lg:w-16"></div>
+          </Link>
+          <div className="w-4 lg:w-8"></div>
+          <Link to="/cookie-policy" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+            COOKIE
+          </Link>
+          <div className="w-4 lg:w-8"></div>
           <Link to="/careers" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
             CAREERS
           </Link>
@@ -177,6 +181,10 @@ export default function Footer() {
           <img
             src={logoWebwise}
             alt="Webwise Logo"
+            title="Webwise"
+            width={80}
+            height={80}
+            loading="lazy"
             className="invert w-[40px] h-[40px] lg:w-[80px] lg:h-[80px]"
           />
           <span className="text-white font-bold text-[32px] lg:text-[70px]" style={{ letterSpacing: '-0.02em' }}>WEBWISE</span>

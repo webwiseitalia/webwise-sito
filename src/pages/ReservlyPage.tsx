@@ -7,7 +7,7 @@ export default function ReservlyPage() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6 bg-black">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logoWebwise} alt="Webwise" className="w-8 h-8 invert" />
+          <img src={logoWebwise} alt="Webwise" title="Webwise" width={32} height={32} loading="eager" className="w-8 h-8 invert" />
           <span className="text-white font-semibold text-lg">WEBWISE</span>
         </Link>
         <div className="flex items-center gap-8">
@@ -225,7 +225,7 @@ export default function ReservlyPage() {
           <div className="flex flex-col lg:flex-row justify-between gap-12 mb-16">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <img src={logoWebwise} alt="Webwise" className="w-10 h-10 invert" />
+              <img src={logoWebwise} alt="Webwise" title="Webwise" width={40} height={40} loading="lazy" className="w-10 h-10 invert" />
               <span className="text-white font-bold text-xl">WEBWISE</span>
             </div>
 

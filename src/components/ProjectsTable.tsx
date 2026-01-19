@@ -44,7 +44,11 @@ export default function ProjectsTable() {
           {projects.find(p => p.id === hoveredProject)?.heroImage ? (
             <img
               src={projects.find(p => p.id === hoveredProject)?.heroImage}
-              alt={projects.find(p => p.id === hoveredProject)?.name}
+              alt={projects.find(p => p.id === hoveredProject)?.name || 'Progetto'}
+              title={projects.find(p => p.id === hoveredProject)?.name || 'Progetto'}
+              width={300}
+              height={200}
+              loading="lazy"
               className="w-[300px] h-[200px] object-cover object-top"
             />
           ) : (
@@ -95,6 +99,10 @@ export default function ProjectsTable() {
                   <img
                     src={project.heroImage}
                     alt={project.name}
+                    title={project.name}
+                    width={60}
+                    height={60}
+                    loading="lazy"
                     className="w-full h-full object-cover object-top"
                   />
                 )}

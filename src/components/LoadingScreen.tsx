@@ -368,6 +368,9 @@ export default function LoadingScreen({ onLogoTransitionComplete, heroLogoRef, o
         ref={logoRef}
         src={logoWebwise}
         alt="Webwise"
+        title="Webwise - Caricamento"
+        width={350}
+        height={350}
         className="invert pointer-events-none"
         style={{
           position: 'fixed',

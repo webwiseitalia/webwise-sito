@@ -14,7 +14,10 @@ import SoftwarePage from './pages/SoftwarePage'
 import ReservlyPage from './pages/ReservlyPage'
 import CareersPage from './pages/CareersPage'
 import ProjectPage from './pages/ProjectPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import CookiePolicyPage from './pages/CookiePolicyPage'
 import ScrollToTop from './components/ScrollToTop'
+import CookieBanner from './components/CookieBanner'
 import ParticleLogo from './components/ParticleLogo'
 import DotShaderBackground, { DotShaderBackgroundRef } from './components/DotShaderBackground'
 import NoiseTexture from './components/NoiseTexture'
@@ -626,6 +629,10 @@ function HomePage() {
               <img
                 src={logoWebwiseCenter}
                 alt="Webwise Logo"
+                title="Webwise - Sviluppo Web e Software"
+                width={125}
+                height={125}
+                loading="eager"
                 className="invert w-[80px] h-[80px] lg:w-[125px] lg:h-[125px]"
                 style={{
                   opacity: hasSeenLoading ? 1 : 0,
@@ -745,6 +752,10 @@ function HomePage() {
           <img
             src={logoWebwiseCenter}
             alt="Webwise Logo"
+            title="Webwise - Sviluppo Web e Software"
+            width={150}
+            height={150}
+            loading="lazy"
             className="invert w-[150px] h-[150px] my-6"
           />
 
@@ -1003,6 +1014,10 @@ function HomePage() {
             <img
               src={logoWebwiseCenter}
               alt="Webwise Logo"
+              title="Webwise - Sviluppo Web e Software"
+              width={125}
+              height={125}
+              loading="lazy"
               className="invert flex-shrink-0"
               style={{
                 width: '125px',
@@ -1547,12 +1562,15 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      <CookieBanner />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/software/:softwareId" element={<SoftwarePage />} />
         <Route path="/reservly" element={<ReservlyPage />} />
         <Route path="/careers" element={<CareersPage />} />
         <Route path="/progetti/:projectSlug" element={<ProjectPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/cookie-policy" element={<CookiePolicyPage />} />
       </Routes>
     </>
   )

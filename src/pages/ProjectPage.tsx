@@ -29,6 +29,10 @@ export default function ProjectPage() {
           <img
             src={project.heroImage}
             alt={project.name}
+            title={project.name}
+            width={1920}
+            height={1080}
+            loading="eager"
             className="w-full h-full object-cover object-top"
           />
         ) : (
@@ -125,6 +129,10 @@ export default function ProjectPage() {
                   <img
                     src={img}
                     alt={`${project.name} - ${index + 1}`}
+                    title={`${project.name} - Immagine ${index + 1}`}
+                    width={1920}
+                    height={1080}
+                    loading="lazy"
                     className="w-full h-auto"
                   />
                 </div>
@@ -138,6 +146,10 @@ export default function ProjectPage() {
                   <img
                     src={project.mobileHeroImage}
                     alt={`${project.name} - Mobile`}
+                    title={`${project.name} - Versione Mobile`}
+                    width={405}
+                    height={720}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -153,6 +165,10 @@ export default function ProjectPage() {
                     <img
                       src={project.desktopDetailImages[0]}
                       alt={`${project.name} - Dettaglio 1`}
+                      title={`${project.name} - Dettaglio Desktop 1`}
+                      width={1200}
+                      height={600}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -166,6 +182,10 @@ export default function ProjectPage() {
                     <img
                       src={project.desktopDetailImages[1]}
                       alt={`${project.name} - Dettaglio 2`}
+                      title={`${project.name} - Dettaglio Desktop 2`}
+                      width={1200}
+                      height={600}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -243,6 +263,10 @@ export default function ProjectPage() {
                       <img
                         src={relatedProject.heroImage}
                         alt={relatedProject.name}
+                        title={relatedProject.name}
+                        width={800}
+                        height={500}
+                        loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (

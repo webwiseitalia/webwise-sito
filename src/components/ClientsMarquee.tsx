@@ -56,6 +56,10 @@ export default function ClientsMarquee() {
                 <img
                   src={client.image}
                   alt={client.name}
+                  title={client.name}
+                  width={288}
+                  height={162}
+                  loading="lazy"
                   className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-300"
                 />
               ) : (

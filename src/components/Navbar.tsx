@@ -54,6 +54,10 @@ export default function Navbar({ compressionProgress = 0 }: NavbarProps) {
           <img
             src={logoWebwise}
             alt="Webwise"
+            title="Webwise - Home"
+            width={120}
+            height={32}
+            loading="eager"
             className="h-8 w-auto"
           />
         </a>

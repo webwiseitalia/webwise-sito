@@ -22,3 +22,6 @@ dist-ssr
 *.sln
 *.sw?
 .claude
+
+# Template temporanei per preparazione produzione
+src/temp/

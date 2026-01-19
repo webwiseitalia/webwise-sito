@@ -213,6 +213,10 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
                 <img
                   src={logoWebwise}
                   alt="Webwise"
+                  title="Webwise - Home"
+                  width={120}
+                  height={32}
+                  loading="lazy"
                   className="h-8 w-auto"
                 />
               </a>
