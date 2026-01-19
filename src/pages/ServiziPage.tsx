@@ -6,6 +6,16 @@ import { services } from '../data/services'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
 
+// Immagini servizi
+import servizioSeo from '../assets/servizi/servizio-seo.webp'
+import servizioSitiweb from '../assets/servizi/servizio-sitiweb.webp'
+import servizioEcommerce from '../assets/servizi/servizio-ecommerce.webp'
+import servizioSocial from '../assets/servizi/servizio-gestionisocial.webp'
+import servizioApp from '../assets/servizi/servizio-appwebapp.webp'
+import servizioAutomazioni from '../assets/servizi/servizio-automazioneai.webp'
+import servizioAds from '../assets/servizi/servizio-ads.webp'
+import servizioReservly from '../assets/servizi/servizio-reservly.webp'
+
 gsap.registerPlugin(ScrollTrigger)
 
 export default function ServiziPage() {
@@ -165,12 +175,12 @@ export default function ServiziPage() {
           <div
             key={service.id}
             id={service.id}
-            className="service-item w-full border-t border-white/10"
+            className="service-item group w-full border-t border-white/10 hover:bg-white/[0.02] transition-colors duration-300"
             style={{ padding: '80px 50px' }}
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-              {/* Colonna sinistra - Label, Icona, Nome */}
-              <div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+              {/* Colonna sinistra - Label, Icona, Nome, Tags, Bottone */}
+              <div className="lg:col-span-2">
                 <div className="flex items-center gap-4 mb-6">
                   <span className="text-gray-500 text-xs tracking-wider">
                     SERVIZIO {index + 1}/{services.length}
@@ -181,7 +191,7 @@ export default function ServiziPage() {
                   <div className="bg-[#2EBAEB] rounded-lg w-12 h-12 flex items-center justify-center text-white flex-shrink-0">
                     {getServiceIcon(service.id)}
                   </div>
-                  <h2 className="text-white text-3xl lg:text-4xl font-light hover:text-[#2EBAEB] transition-colors">
+                  <h2 className="text-white text-3xl lg:text-4xl font-light group-hover:text-[#2EBAEB] transition-colors">
                     {service.name}
                   </h2>
                 </div>
@@ -208,8 +218,35 @@ export default function ServiziPage() {
                 </Link>
               </div>
 
+              {/* Colonna centrale - Immagine servizio o rettangolo cyan hover (solo desktop) */}
+              <div className="hidden lg:flex lg:col-span-5 items-center px-4 max-h-[350px]">
+                {(() => {
+                  const serviceImages: Record<string, { src: string; alt: string }> = {
+                    'seo': { src: servizioSeo, alt: 'SEO' },
+                    'siti-web': { src: servizioSitiweb, alt: 'Siti Web' },
+                    'ecommerce': { src: servizioEcommerce, alt: 'E-commerce' },
+                    'social': { src: servizioSocial, alt: 'Gestione Social' },
+                    'app': { src: servizioApp, alt: 'App e Web App' },
+                    'automazioni': { src: servizioAutomazioni, alt: 'Automazioni AI' },
+                    'ads': { src: servizioAds, alt: 'Advertising' },
+                    'reservly': { src: servizioReservly, alt: 'Reservly' }
+                  }
+                  const imageData = serviceImages[service.id]
+
+                  return imageData ? (
+                    <img
+                      src={imageData.src}
+                      alt={imageData.alt}
+                      className="w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-sm"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#2EBAEB] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-sm" />
+                  )
+                })()}
+              </div>
+
               {/* Colonna destra - Descrizione e Accordion */}
-              <div>
+              <div className="lg:col-span-5">
                 {/* Descrizione */}
                 <p className="text-white text-lg lg:text-xl font-light leading-relaxed mb-10">
                   {service.longDescription}
@@ -224,9 +261,9 @@ export default function ServiziPage() {
                     >
                       <button
                         onClick={() => toggleAccordion(service.id, accordionIndex)}
-                        className="w-full flex items-center justify-between py-5 text-left group"
+                        className="w-full flex items-center justify-between py-5 text-left"
                       >
-                        <span className="text-white/80 font-light group-hover:text-[#2EBAEB] transition-colors">
+                        <span className="text-white/80 font-light hover:text-[#2EBAEB] transition-colors">
                           {item.title}
                         </span>
                         <span className={`text-white/40 transition-transform duration-300 ${openAccordions[service.id] === accordionIndex ? 'rotate-45' : ''}`}>
