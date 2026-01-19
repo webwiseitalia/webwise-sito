@@ -74,30 +74,30 @@ export default function Footer() {
         {/* Colonna sinistra - Titolo ENORME */}
         <div className="flex flex-col items-center lg:items-start" style={{ maxWidth: '100%' }}>
           <h2 className="text-white font-extralight tracking-tight leading-none text-[32px] lg:text-[clamp(60px,8vw,140px)]">
-            HOW ABOUT
+            COSTRUIAMO
           </h2>
           <h2 className="text-white font-extralight tracking-tight leading-none text-[32px] lg:text-[clamp(60px,8vw,140px)]">
-            WE DO A THING
+            QUALCOSA DI
           </h2>
-          {/* Su mobile: OR TWO, senza bottone inline */}
+          {/* Su mobile: GRANDE, senza bottone inline */}
           <h2 className="text-white font-extralight tracking-tight leading-none text-[32px] lg:hidden">
-            OR TWO,
+            GRANDE,
           </h2>
-          {/* Su desktop: OR TWO, con bottone inline */}
+          {/* Su desktop: GRANDE, con bottone inline */}
           <div className="hidden lg:flex lg:flex-row lg:items-end gap-8" style={{ marginTop: '-5px' }}>
             <h2 className="text-white font-extralight tracking-tight leading-none lg:text-[clamp(60px,8vw,140px)]">
-              OR TWO,
+              GRANDE,
             </h2>
             <a
               href="#contatti"
               className="inline-flex items-center justify-center border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white font-normal rounded-full transition-colors lg:mb-4 w-fit text-[15px] px-10 py-[18px]"
               style={{ gap: '10px', whiteSpace: 'nowrap' }}
             >
-              GET IN TOUCH <span>→</span>
+              CONTATTACI <span>→</span>
             </a>
           </div>
           <h2 className="text-white font-extralight tracking-tight leading-none text-[32px] lg:text-[clamp(60px,8vw,140px)]">
-            TO+GETHER
+            INSIEME
           </h2>
           {/* Su mobile: bottone sotto le scritte */}
           <a
@@ -105,7 +105,7 @@ export default function Footer() {
             className="lg:hidden inline-flex items-center justify-center border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white font-normal rounded-full transition-colors w-fit text-xs px-4 py-2 mt-6"
             style={{ gap: '10px', whiteSpace: 'nowrap' }}
           >
-            GET IN TOUCH <span>→</span>
+            CONTATTACI <span>→</span>
           </a>
         </div>
 

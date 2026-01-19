@@ -219,7 +219,7 @@ export default function ServiziPage() {
               </div>
 
               {/* Colonna centrale - Immagine servizio o rettangolo cyan hover (solo desktop) */}
-              <div className="hidden lg:flex lg:col-span-5 items-center px-4 max-h-[350px]">
+              <div className="hidden lg:flex lg:col-span-5 items-start px-4">
                 {(() => {
                   const serviceImages: Record<string, { src: string; alt: string }> = {
                     'seo': { src: servizioSeo, alt: 'SEO' },
@@ -237,10 +237,10 @@ export default function ServiziPage() {
                     <img
                       src={imageData.src}
                       alt={imageData.alt}
-                      className="w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-sm"
+                      className="w-full h-[300px] object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-sm"
                     />
                   ) : (
-                    <div className="w-full h-full bg-[#2EBAEB] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-sm" />
+                    <div className="w-full h-[300px] bg-[#2EBAEB] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-sm" />
                   )
                 })()}
               </div>

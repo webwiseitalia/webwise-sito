@@ -72,7 +72,7 @@ export default function Navbar({ compressionProgress = 0 }: NavbarProps) {
             Home
           </a>
           <a
-            href="/#servizi"
+            href="/servizi"
             className="text-white/80 hover:text-white transition-colors text-sm font-medium"
             style={getElementStyle(2, 7)}
           >

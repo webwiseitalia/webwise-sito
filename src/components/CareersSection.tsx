@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function CareersSection() {
   return (
     <section id="careers" className="w-full relative py-24 lg:py-32 bg-gray-200 overflow-hidden">
@@ -38,8 +40,8 @@ export default function CareersSection() {
           </p>
 
           {/* Bottone Candidati */}
-          <a
-            href="#candidatura"
+          <Link
+            to="/careers"
             className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:rotate-2 transition-all w-fit"
           >
             <span className="text-gray-900 font-medium">Candidati</span>
@@ -77,7 +79,7 @@ export default function CareersSection() {
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
             </div>
-          </a>
+          </Link>
         </div>
       </div>
 
