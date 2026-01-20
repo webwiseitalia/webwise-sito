@@ -18,6 +18,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import CookiePolicyPage from './pages/CookiePolicyPage'
 import ServiziPage from './pages/ServiziPage'
 import ScotPage from './pages/ScotPage'
+import ClientiPage from './pages/ClientiPage'
 import ScrollToTop from './components/ScrollToTop'
 import CookieBanner from './components/CookieBanner'
 import ParticleLogo from './components/ParticleLogo'
@@ -1694,6 +1695,7 @@ function App() {
         <Route path="/cookie-policy" element={<CookiePolicyPage />} />
         <Route path="/servizi" element={<ServiziPage />} />
         <Route path="/scot" element={<ScotPage />} />
+        <Route path="/clienti" element={<ClientiPage />} />
       </Routes>
     </>
   )
