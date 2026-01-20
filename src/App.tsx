@@ -1467,6 +1467,48 @@ function HomePage() {
             esigenze, ma anche l'identità e le aspirazioni di chi ci sceglie come partner.
           </p>
 
+          {/* Bottone CTA */}
+          <Link
+            to="/clienti"
+            className="relative z-10 flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group mt-6"
+          >
+            <span>Scopri tutti</span>
+            <span className="relative bg-black rounded-full p-1.5 group-hover:bg-[#2EBAEB] transition-colors overflow-hidden w-7 h-7 flex items-center justify-center">
+              {/* Prima icona - freccia che esce verso l'alto */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="transition-all duration-300 translate-y-0 group-hover:-translate-y-[200%]"
+              >
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+              {/* Seconda icona - valigetta che entra dal basso */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="absolute transition-all duration-300 translate-y-[200%] group-hover:translate-y-0"
+              >
+                <rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </span>
+          </Link>
+
           {/* Card 3D dei progetti - interattive */}
           <div className="relative z-10">
             <ProjectCards3D />
