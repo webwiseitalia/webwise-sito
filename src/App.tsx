@@ -104,6 +104,8 @@ function HomePage() {
   const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>(
     hasSeenLoading ? 'complete' : 'loading'
   )
+  // Key per forzare il reset delle animazioni CSS del CTA quando si torna alla pagina
+  const [ctaAnimationKey, setCtaAnimationKey] = useState(0)
   const [showLoading, setShowLoading] = useState(!hasSeenLoading)
   const [, setShowHeroLogo] = useState(true)
   // Se abbiamo già visto il loading, mostra subito le particelle
@@ -139,6 +141,11 @@ function HomePage() {
   const cardsContainerRef = useRef<HTMLDivElement>(null)
 
   // L'animazione parte solo la prima volta che si visita la homepage
+
+  // Forza il reset delle animazioni del CTA ogni volta che si torna alla pagina
+  useEffect(() => {
+    setCtaAnimationKey(prev => prev + 1)
+  }, [])
 
   // Callback quando il logo del loading arriva nella posizione della hero
   const handleLogoArrived = useCallback(() => {
@@ -674,6 +681,7 @@ function HomePage() {
               >
                 {/* Glow pulsante dietro al CTA */}
                 <span
+                  key={`cta-glow-${ctaAnimationKey}`}
                   className="absolute -inset-x-6 -inset-y-4 rounded-xl pointer-events-none"
                   style={{
                     background: 'radial-gradient(ellipse at center, rgba(46, 186, 235, 0.5) 0%, rgba(46, 186, 235, 0.2) 40%, transparent 70%)',
@@ -708,6 +716,7 @@ function HomePage() {
                   />
                   {/* Sottolineatura animata - appare con l'animazione di scrittura */}
                   <span
+                    key={`cta-underline-${ctaAnimationKey}`}
                     className="absolute bottom-0 left-0 h-[2px] bg-[#2EBAEB] transition-all duration-500 ease-out"
                     style={{
                       boxShadow: '0 0 8px rgba(46, 186, 235, 0.5)',
@@ -717,6 +726,7 @@ function HomePage() {
                   />
                 </span>
                 <svg
+                  key={`cta-arrow-${ctaAnimationKey}`}
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="none"
