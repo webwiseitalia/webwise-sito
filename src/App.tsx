@@ -473,38 +473,73 @@ function HomePage() {
   }, [])
 
   // Animazione scala + fade per la sezione Software
+  // Animiamo separatamente testo (con scala) e canvas (solo opacity) per evitare lag
   useEffect(() => {
     if (!softwareSectionRef.current) return
 
     const softwareSection = softwareSectionRef.current
+    const softwareText = document.getElementById('software-text')
+    const softwareCanvas = document.getElementById('software-canvas')
     const isMobile = window.innerWidth < 768
 
-    // Stato iniziale: più piccola e trasparente
-    gsap.set(softwareSection, {
-      scale: 0.8,
-      opacity: 0.3,
-      transformOrigin: 'center top'
-    })
+    // Stato iniziale: testo piccolo e trasparente, canvas solo trasparente
+    if (softwareText) {
+      gsap.set(softwareText, {
+        scale: 0.8,
+        opacity: 0.3,
+        transformOrigin: 'center top'
+      })
+    }
+    if (softwareCanvas) {
+      gsap.set(softwareCanvas, {
+        scale: 0.8,
+        opacity: 0.3,
+        transformOrigin: 'center top',
+        force3D: true
+      })
+    }
 
-    // Animazione: cresce a scala 1 e opacity 1 mentre entra nella viewport
-    // Su mobile l'animazione è più veloce (finisce a metà viewport invece che al top)
-    const tl = gsap.timeline({
+    // Timeline per il testo (con scala)
+    const tlText = gsap.timeline({
       scrollTrigger: {
         trigger: softwareSection,
-        start: 'top bottom', // Inizia quando il top della sezione entra dalla bottom della viewport
-        end: isMobile ? 'top 60%' : 'top top', // Mobile: finisce prima (a 60% della viewport), Desktop: animazione più lunga
-        scrub: isMobile ? 0.5 : 1, // Mobile: scrub più reattivo
+        start: 'top bottom',
+        end: isMobile ? 'top 60%' : 'top top',
+        scrub: isMobile ? 0.5 : 1,
       }
     })
 
-    tl.to(softwareSection, {
-      scale: 1,
-      opacity: 1,
-      ease: 'none'
+    if (softwareText) {
+      tlText.to(softwareText, {
+        scale: 1,
+        opacity: 1,
+        ease: 'none',
+        force3D: true
+      })
+    }
+
+    // Timeline per il canvas (con scala GPU-accelerata)
+    const tlCanvas = gsap.timeline({
+      scrollTrigger: {
+        trigger: softwareSection,
+        start: 'top bottom',
+        end: isMobile ? 'top 60%' : 'top top',
+        scrub: isMobile ? 0.5 : 1,
+      }
     })
 
+    if (softwareCanvas) {
+      tlCanvas.to(softwareCanvas, {
+        scale: 1,
+        opacity: 1,
+        ease: 'none',
+        force3D: true
+      })
+    }
+
     return () => {
-      tl.kill()
+      tlText.kill()
+      tlCanvas.kill()
     }
   }, [])
 

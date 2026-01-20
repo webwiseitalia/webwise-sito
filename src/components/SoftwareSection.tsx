@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Suspense, useRef } from 'react'
+import { Suspense, useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, Environment } from '@react-three/drei'
 // OrbitControls rimosso - ora l'icosaedro ruota automaticamente
@@ -34,6 +34,28 @@ function ScotModel() {
   })
 
   return <primitive object={scene} scale={1.7} position={[0, 0.15, 0]} />
+}
+
+// Hook per rilevare quando la sezione è visibile
+function useInView(ref: React.RefObject<HTMLElement>, options?: IntersectionObserverInit) {
+  const [isInView, setIsInView] = useState(false)
+  const [hasBeenInView, setHasBeenInView] = useState(false)
+
+  useEffect(() => {
+    if (!ref.current) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsInView(entry.isIntersecting)
+      if (entry.isIntersecting) {
+        setHasBeenInView(true)
+      }
+    }, { threshold: 0.1, rootMargin: '100px', ...options })
+
+    observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [ref, options])
+
+  return { isInView, hasBeenInView }
 }
 
 interface Software {
@@ -83,25 +105,44 @@ const softwares: Software[] = [
 ]
 
 export default function SoftwareSection() {
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const { isInView, hasBeenInView } = useInView(sectionRef)
+
   return (
-    <section id="software" className="w-full">
+    <section id="software" className="w-full" ref={sectionRef}>
       {/* Sezione con testo piccolo a destra e render 3D a sinistra */}
       <div className="w-full py-12 lg:py-20">
         <div className="max-w-6xl mx-auto px-4 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center">
           {/* Colonna sinistra - Render 3D (più piccolo su mobile) */}
-          <div className="h-[250px] lg:h-[500px] order-2 lg:order-1">
-            <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-              <Suspense fallback={null}>
-                <ambientLight intensity={0.5} />
-                <directionalLight position={[10, 10, 5]} intensity={1} />
-                <ScotModel />
-                <Environment preset="city" />
-              </Suspense>
-            </Canvas>
+          <div
+            id="software-canvas"
+            className="h-[250px] lg:h-[500px] order-2 lg:order-1"
+            style={{
+              willChange: hasBeenInView ? 'auto' : 'transform',
+              transform: 'translateZ(0)',
+              contain: 'layout style paint'
+            }}
+          >
+            {/* Renderizza il Canvas solo dopo che la sezione è stata vista */}
+            {hasBeenInView && (
+              <Canvas
+                camera={{ position: [0, 0, 5], fov: 45 }}
+                frameloop={isInView ? 'always' : 'demand'}
+                dpr={[1, 1.5]}
+                performance={{ min: 0.5 }}
+              >
+                <Suspense fallback={null}>
+                  <ambientLight intensity={0.5} />
+                  <directionalLight position={[10, 10, 5]} intensity={1} />
+                  <ScotModel />
+                  <Environment preset="city" />
+                </Suspense>
+              </Canvas>
+            )}
           </div>
 
           {/* Colonna destra - Testo */}
-          <div className="max-w-md lg:ml-auto text-center lg:text-right order-1 lg:order-2">
+          <div id="software-text" className="max-w-md lg:ml-auto text-center lg:text-right order-1 lg:order-2">
             {/* Badge */}
             <span className="inline-block text-xs px-3 py-1 rounded-full border border-[#2EBAEB]/50 bg-[#2EBAEB]/10 text-[#2EBAEB] mb-6">
               COMING SOON

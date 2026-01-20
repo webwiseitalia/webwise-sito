@@ -163,11 +163,11 @@ export default function Footer() {
         {/* PRIVACY, COOKIE e CAREERS */}
         <div className="flex items-center justify-center gap-4 mb-6 lg:mb-0">
           <div className="w-2 h-2 rounded-full bg-[#2EBAEB]"></div>
-          <Link to="/privacy-policy" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+          <Link to="/privacy-policy" onClick={() => window.scrollTo(0, 0)} className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
             PRIVACY
           </Link>
           <div className="w-4 lg:w-8"></div>
-          <Link to="/cookie-policy" className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
+          <Link to="/cookie-policy" onClick={() => window.scrollTo(0, 0)} className="text-white text-sm hover:text-[#2EBAEB] transition-colors">
             COOKIE
           </Link>
           <div className="w-4 lg:w-8"></div>

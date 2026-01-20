@@ -144,7 +144,11 @@ export default function ClientiPage() {
             {projects.find(p => p.id === hoveredProject)?.heroImage ? (
               <img
                 src={projects.find(p => p.id === hoveredProject)?.heroImage}
-                alt=""
+                alt={projects.find(p => p.id === hoveredProject)?.name || 'Progetto'}
+                title={projects.find(p => p.id === hoveredProject)?.name || 'Progetto'}
+                width={320}
+                height={200}
+                loading="lazy"
                 className="w-[320px] h-[200px] object-cover object-top"
               />
             ) : (
@@ -190,7 +194,11 @@ export default function ClientiPage() {
                 {project.heroImage && (
                   <img
                     src={project.heroImage}
-                    alt=""
+                    alt={project.name}
+                    title={project.name}
+                    width={48}
+                    height={48}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 )}
