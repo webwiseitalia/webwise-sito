@@ -17,6 +17,7 @@ import ProjectPage from './pages/ProjectPage'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import CookiePolicyPage from './pages/CookiePolicyPage'
 import ServiziPage from './pages/ServiziPage'
+import ScotPage from './pages/ScotPage'
 import ScrollToTop from './components/ScrollToTop'
 import CookieBanner from './components/CookieBanner'
 import ParticleLogo from './components/ParticleLogo'
@@ -1211,7 +1212,7 @@ function HomePage() {
                 to="/servizi"
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
               >
-                <span>Leggi di più</span>
+                <span>Scopri di più</span>
                 <span className="bg-black rounded-full p-1.5 group-hover:bg-[#2EBAEB] transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 7v14"></path>
@@ -1650,6 +1651,7 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/cookie-policy" element={<CookiePolicyPage />} />
         <Route path="/servizi" element={<ServiziPage />} />
+        <Route path="/scot" element={<ScotPage />} />
       </Routes>
     </>
   )

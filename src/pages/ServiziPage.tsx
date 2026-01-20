@@ -173,7 +173,7 @@ export default function ServiziPage() {
         <div>
           {/* Back link */}
           <Link
-            to="/"
+            to="/#servizi"
             className="hero-animate inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-12 text-sm"
           >
             <span>←</span>
