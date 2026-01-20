@@ -104,8 +104,8 @@ function HomePage() {
   const [animationPhase, setAnimationPhase] = useState<'loading' | 'typewriter' | 'complete'>(
     hasSeenLoading ? 'complete' : 'loading'
   )
-  // Key per forzare il reset delle animazioni CSS del CTA quando si torna alla pagina
-  const [ctaAnimationKey, setCtaAnimationKey] = useState(0)
+  // Stato separato per l'animazione del CTA - parte sempre da false per permettere la transizione
+  const [ctaAnimationActive, setCtaAnimationActive] = useState(false)
   const [showLoading, setShowLoading] = useState(!hasSeenLoading)
   const [, setShowHeroLogo] = useState(true)
   // Se abbiamo già visto il loading, mostra subito le particelle
@@ -142,10 +142,16 @@ function HomePage() {
 
   // L'animazione parte solo la prima volta che si visita la homepage
 
-  // Forza il reset delle animazioni del CTA ogni volta che si torna alla pagina
+  // Attiva l'animazione del CTA dopo un breve delay (per permettere la transizione CSS)
   useEffect(() => {
-    setCtaAnimationKey(prev => prev + 1)
-  }, [])
+    // Se abbiamo già visto il loading, attiviamo subito dopo un frame
+    if (hasSeenLoading) {
+      const timer = setTimeout(() => {
+        setCtaAnimationActive(true)
+      }, 50) // Piccolo delay per permettere al browser di renderizzare lo stato iniziale
+      return () => clearTimeout(timer)
+    }
+  }, [hasSeenLoading])
 
   // Callback quando il logo del loading arriva nella posizione della hero
   const handleLogoArrived = useCallback(() => {
@@ -153,6 +159,7 @@ function HomePage() {
 
     // Avvia subito il typewriter appena il logo si è rimpicciolito
     setAnimationPhase('typewriter')
+    setCtaAnimationActive(true) // Attiva anche l'animazione del CTA
 
     // Anima la navbar
     if (navbarRef.current) {
@@ -681,13 +688,12 @@ function HomePage() {
               >
                 {/* Glow pulsante dietro al CTA */}
                 <span
-                  key={`cta-glow-${ctaAnimationKey}`}
                   className="absolute -inset-x-6 -inset-y-4 rounded-xl pointer-events-none"
                   style={{
                     background: 'radial-gradient(ellipse at center, rgba(46, 186, 235, 0.5) 0%, rgba(46, 186, 235, 0.2) 40%, transparent 70%)',
-                    opacity: isTypewriterActive ? 1 : 0,
+                    opacity: ctaAnimationActive ? 1 : 0,
                     transition: 'opacity 0.5s ease 1s',
-                    animation: isTypewriterActive ? 'ctaPulse 1.8s ease-in-out infinite 1.2s' : 'none',
+                    animation: ctaAnimationActive ? 'ctaPulse 1.8s ease-in-out infinite 1.2s' : 'none',
                     filter: 'blur(8px)'
                   }}
                 />
@@ -716,17 +722,15 @@ function HomePage() {
                   />
                   {/* Sottolineatura animata - appare con l'animazione di scrittura */}
                   <span
-                    key={`cta-underline-${ctaAnimationKey}`}
                     className="absolute bottom-0 left-0 h-[2px] bg-[#2EBAEB] transition-all duration-500 ease-out"
                     style={{
                       boxShadow: '0 0 8px rgba(46, 186, 235, 0.5)',
-                      width: isTypewriterActive ? '100%' : '0%',
-                      transitionDelay: isTypewriterActive ? '0.95s' : '0s'
+                      width: ctaAnimationActive ? '100%' : '0%',
+                      transitionDelay: ctaAnimationActive ? '0.95s' : '0s'
                     }}
                   />
                 </span>
                 <svg
-                  key={`cta-arrow-${ctaAnimationKey}`}
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="none"
@@ -737,7 +741,7 @@ function HomePage() {
                   className="w-3 h-3 lg:w-[30px] lg:h-[30px] transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
                   style={{
                     transform: 'rotate(-45deg)',
-                    opacity: isTypewriterActive ? 1 : 0,
+                    opacity: ctaAnimationActive ? 1 : 0,
                     transition: 'opacity 0.3s ease 0.96s, transform 0.3s ease, filter 0.3s ease',
                     filter: 'drop-shadow(0 0 6px rgba(46, 186, 235, 0.4))'
                   }}
