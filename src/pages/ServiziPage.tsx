@@ -232,13 +232,13 @@ export default function ServiziPage() {
                 </div>
 
                 {/* CTA Button */}
-                <Link
-                  to="/#contatti"
+                <a
+                  href="tel:+393472509688"
                   className="inline-flex items-center gap-3 border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white rounded-full transition-colors"
                   style={{ padding: '14px 28px', fontSize: '14px' }}
                 >
                   RICHIEDI INFO <span>→</span>
-                </Link>
+                </a>
               </div>
 
               {/* Colonna centrale - Immagine servizio o rettangolo cyan hover (solo desktop) */}
