@@ -667,13 +667,55 @@ function HomePage() {
                   speed={0.012}
                 />
               </p>
-              <p style={{ whiteSpace: 'nowrap' }} className="pl-2 lg:pl-[60px] flex items-center gap-2">
-                <TypewriterText
-                  text="EFFICIENZA"
-                  isVisible={isTypewriterActive}
-                  delay={0.85}
-                  speed={0.012}
+              <a
+                href="#contatti"
+                style={{ whiteSpace: 'nowrap' }}
+                className="pl-2 lg:pl-[60px] flex items-center gap-2 group cursor-pointer relative"
+              >
+                {/* Glow pulsante dietro al CTA */}
+                <span
+                  className="absolute -inset-x-6 -inset-y-4 rounded-xl pointer-events-none"
+                  style={{
+                    background: 'radial-gradient(ellipse at center, rgba(46, 186, 235, 0.5) 0%, rgba(46, 186, 235, 0.2) 40%, transparent 70%)',
+                    opacity: isTypewriterActive ? 1 : 0,
+                    transition: 'opacity 0.5s ease 1s',
+                    animation: isTypewriterActive ? 'ctaPulse 1.8s ease-in-out infinite 1.2s' : 'none',
+                    filter: 'blur(8px)'
+                  }}
                 />
+                <style>
+                  {`
+                    @keyframes ctaPulse {
+                      0%, 100% { opacity: 0.4; transform: scale(1); }
+                      50% { opacity: 1; transform: scale(1.15); }
+                    }
+                  `}
+                </style>
+                <span
+                  className="relative"
+                  style={{
+                    textShadow: '0 0 8px rgba(46, 186, 235, 0.3)',
+                    transition: 'text-shadow 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.textShadow = '0 0 20px rgba(46, 186, 235, 0.7)'}
+                  onMouseLeave={(e) => e.currentTarget.style.textShadow = '0 0 8px rgba(46, 186, 235, 0.3)'}
+                >
+                  <TypewriterText
+                    text="INIZIAMO"
+                    isVisible={isTypewriterActive}
+                    delay={0.85}
+                    speed={0.012}
+                  />
+                  {/* Sottolineatura animata - appare con l'animazione di scrittura */}
+                  <span
+                    className="absolute bottom-0 left-0 h-[2px] bg-[#2EBAEB] transition-all duration-500 ease-out"
+                    style={{
+                      boxShadow: '0 0 8px rgba(46, 186, 235, 0.5)',
+                      width: isTypewriterActive ? '100%' : '0%',
+                      transitionDelay: isTypewriterActive ? '0.95s' : '0s'
+                    }}
+                  />
+                </span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -682,17 +724,18 @@ function HomePage() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="w-3 h-3 lg:w-[30px] lg:h-[30px]"
+                  className="w-3 h-3 lg:w-[30px] lg:h-[30px] transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
                   style={{
                     transform: 'rotate(-45deg)',
                     opacity: isTypewriterActive ? 1 : 0,
-                    transition: 'opacity 0.3s ease 0.96s'
+                    transition: 'opacity 0.3s ease 0.96s, transform 0.3s ease, filter 0.3s ease',
+                    filter: 'drop-shadow(0 0 6px rgba(46, 186, 235, 0.4))'
                   }}
                 >
                   <path d="M5 12h14" />
                   <path d="m12 5 7 7-7 7" />
                 </svg>
-              </p>
+              </a>
             </div>
           </div>
         </div>
