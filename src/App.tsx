@@ -668,7 +668,7 @@ function HomePage() {
                 />
               </p>
               <a
-                href="#contatti"
+                href="tel:+393472509688"
                 style={{ whiteSpace: 'nowrap' }}
                 className="pl-2 lg:pl-[60px] flex items-center gap-2 group cursor-pointer relative"
               >
@@ -1095,7 +1095,7 @@ function HomePage() {
                   />
                 </p>
                 <a
-                  href="#contatti"
+                  href="tel:+393472509688"
                   className="flex items-center gap-1.5 text-white text-sm font-medium uppercase tracking-wide hover:text-[#2EBAEB] transition-colors group"
                 >
                   <span>
@@ -1197,7 +1197,7 @@ function HomePage() {
                 </span>
               </Link>
               <a
-                href="#contatti"
+                href="tel:+393472509688"
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all hover:-rotate-2 group"
               >
                 <span>Contattaci</span>
@@ -1499,7 +1499,7 @@ function HomePage() {
 
               {/* Bottone Contattaci */}
               <a
-                href="#contatti"
+                href="tel:+393472509688"
                 className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:-rotate-2 transition-all w-fit ml-auto"
               >
                 <span className="text-gray-900 font-medium">Contattaci</span>

@@ -141,7 +141,7 @@ export default function SoftwareSection() {
                 </span>
               </a>
               <a
-                href="#contatti"
+                href="tel:+393472509688"
                 className="flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 pl-4 pr-2 py-2 rounded-full text-white text-sm transition-all"
               >
                 <span>Contattaci</span>

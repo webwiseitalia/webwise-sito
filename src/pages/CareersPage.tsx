@@ -262,7 +262,7 @@ export default function CareersPage() {
             <div className="space-y-6">
               <div>
                 <span className="text-gray-500 text-xs tracking-wider block mb-2">DOMANDE?</span>
-                <a href="/#contatti" className="text-white hover:text-[#2EBAEB] transition-colors text-sm flex items-center gap-2">
+                <a href="tel:+393472509688" className="text-white hover:text-[#2EBAEB] transition-colors text-sm flex items-center gap-2">
                   Contattaci <span>→</span>
                 </a>
               </div>

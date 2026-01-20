@@ -103,7 +103,7 @@ export default function Navbar({ compressionProgress = 0 }: NavbarProps) {
 
         {/* Contattaci con freccia - nascosto su mobile */}
         <a
-          href="/#contatti"
+          href="tel:+393472509688"
           className="hidden md:flex text-white items-center gap-1 text-sm font-medium hover:text-white/80 transition-colors"
           style={getElementStyle(6, 7)}
         >

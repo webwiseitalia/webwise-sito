@@ -355,8 +355,8 @@ export default function ServiziPage() {
             </p>
 
             {/* Bottone Contattaci */}
-            <Link
-              to="/#contatti"
+            <a
+              href="tel:+393472509688"
               className="mt-2 border border-gray-400/50 pl-4 pr-1.5 py-1.5 rounded-full bg-gray-100 flex items-center gap-3 group hover:-rotate-2 transition-all w-fit ml-auto"
             >
               <span className="text-gray-900 font-medium">Contattaci</span>
@@ -392,7 +392,7 @@ export default function ServiziPage() {
                   <path d="m21.854 2.147-10.94 10.939" />
                 </svg>
               </div>
-            </Link>
+            </a>
           </div>
         </div>
 

@@ -89,7 +89,7 @@ export default function Footer() {
               GRANDE,
             </h2>
             <a
-              href="#contatti"
+              href="tel:+393472509688"
               className="inline-flex items-center justify-center border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white font-normal rounded-full transition-colors lg:mb-4 w-fit text-[15px] px-10 py-[18px]"
               style={{ gap: '10px', whiteSpace: 'nowrap' }}
             >
@@ -101,7 +101,7 @@ export default function Footer() {
           </h2>
           {/* Su mobile: bottone sotto le scritte */}
           <a
-            href="#contatti"
+            href="tel:+393472509688"
             className="lg:hidden inline-flex items-center justify-center border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white font-normal rounded-full transition-colors w-fit text-xs px-4 py-2 mt-6"
             style={{ gap: '10px', whiteSpace: 'nowrap' }}
           >

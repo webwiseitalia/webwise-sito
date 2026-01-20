@@ -156,7 +156,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
 
             {/* Bottone CTA */}
             <a
-              href="/#contatti"
+              href="tel:+393472509688"
               onClick={closeMenu}
               className="mt-8 px-8 py-3 border border-white/30 rounded-full text-white text-lg font-medium hover:border-[#2EBAEB] hover:text-[#2EBAEB] transition-colors flex items-center gap-2"
             >
@@ -265,7 +265,7 @@ export default function BurgerMenu({ isVisible }: BurgerMenuProps) {
               </div>
 
               <a
-                href="/#contatti"
+                href="tel:+393472509688"
                 className="text-white flex items-center gap-1 text-sm font-medium hover:text-white/80 transition-colors"
                 style={getElementStyle(0.4, 0.05)}
                 onClick={toggleMenu}
