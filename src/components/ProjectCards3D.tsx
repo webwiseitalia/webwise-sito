@@ -1,6 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { projects } from '../data/projects'
+
+// Configurazione smoothness
+const LERP_EASE = 0.08 // Più basso = più smooth (0.05-0.15)
 
 export default function ProjectCards3D() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -10,7 +13,13 @@ export default function ProjectCards3D() {
   const [isMobile, setIsMobile] = useState(false)
   const [isTouching, setIsTouching] = useState(false)
   const [touchStartX, setTouchStartX] = useState(0)
-  const [swipeRotationY, setSwipeRotationY] = useState(-25) // Rotazione Y controllata dallo swipe
+  const [swipeRotationY, setSwipeRotationY] = useState(-25)
+
+  // Refs per il sistema LERP
+  const targetRotationRef = useRef({ x: -15, y: -25 })
+  const currentRotationRef = useRef({ x: -15, y: -25 })
+  const animationFrameRef = useRef<number | null>(null)
+  const hoveredCardRef = useRef<number | null>(null) // Per accedere a hoveredCard nel loop
 
   // Detect mobile
   useEffect(() => {
@@ -20,19 +29,50 @@ export default function ProjectCards3D() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
+  // Loop LERP per movimento smooth
+  useEffect(() => {
+    const animate = () => {
+      // LERP: current "insegue" target con easing
+      const diffX = targetRotationRef.current.x - currentRotationRef.current.x
+      const diffY = targetRotationRef.current.y - currentRotationRef.current.y
+
+      currentRotationRef.current.x += diffX * LERP_EASE
+      currentRotationRef.current.y += diffY * LERP_EASE
+
+      // Aggiorna lo state solo se c'è un cambiamento significativo
+      if (Math.abs(diffX) > 0.01 || Math.abs(diffY) > 0.01) {
+        setRotation({
+          x: currentRotationRef.current.x,
+          y: currentRotationRef.current.y
+        })
+      }
+
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    animationFrameRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [])
+
   // Calcola quale card è in primo piano basandosi sulla rotazione Y
   const getFrontCardIndex = (rotY: number, totalCards: number) => {
-    // rotY va da circa -90 (tutte visibili di lato) a +50/-50 (vedi il mazzo da un'angolazione)
-    // Mappiamo la rotazione all'indice della card
-    // Rotazione negativa = card con indice alto in primo piano
-    // Rotazione positiva = card con indice basso in primo piano
-    const normalized = (rotY + 90) / 140 // Normalizza da 0 a 1 (circa)
+    const normalized = (rotY + 90) / 140
     const index = Math.round((1 - normalized) * (totalCards - 1))
     return Math.max(0, Math.min(totalCards - 1, index))
   }
 
+  // Funzione per aggiornare il TARGET (non direttamente la rotazione)
+  const updateTargetRotation = useCallback((x: number, y: number) => {
+    targetRotationRef.current = { x, y }
+  }, [])
+
   // Funzione per calcolare la rotazione basata sulla posizione (desktop)
-  const calculateRotation = (clientX: number, clientY: number) => {
+  const calculateRotation = useCallback((clientX: number, clientY: number) => {
     if (!containerRef.current) return
 
     const rect = containerRef.current.getBoundingClientRect()
@@ -54,19 +94,23 @@ export default function ProjectCards3D() {
     // ROTAZIONE X (verticale)
     const newRotateX = -10 + normalizedY * 10
 
-    setRotation({ x: newRotateX, y: newRotateY })
-  }
+    // Aggiorna il target, il LERP farà il resto
+    updateTargetRotation(newRotateX, newRotateY)
+  }, [updateTargetRotation])
 
   // Mouse events (desktop)
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current || !isHovered || isMobile) return
+      // Se c'è una card in hover, NON aggiornare la rotazione del mazzo
+      // Questo permette all'alzata della carta di essere l'effetto principale
+      if (hoveredCardRef.current !== null) return
       calculateRotation(e.clientX, e.clientY)
     }
 
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [isHovered, isMobile])
+  }, [isHovered, isMobile, calculateRotation])
 
   // Touch events (mobile) - Swipe orizzontale
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -82,27 +126,28 @@ export default function ProjectCards3D() {
     const deltaX = touchX - touchStartX
 
     // Calcola la nuova rotazione basata sullo swipe
-    // Sensibilità: 0.3 gradi per pixel di movimento (più bassa = più fluido)
     const newRotY = Math.max(-90, Math.min(50, swipeRotationY + deltaX * 0.3))
 
     setSwipeRotationY(newRotY)
-    setRotation({ x: -15, y: newRotY })
+    // Aggiorna il target per il LERP
+    updateTargetRotation(-15, newRotY)
     setTouchStartX(touchX)
   }
 
   const handleTouchEnd = () => {
     if (!isMobile) return
     setIsTouching(false)
-    // Non resettiamo - manteniamo la posizione raggiunta
   }
 
   const handleMouseEnter = () => {
     if (!isMobile) setIsHovered(true)
   }
+
   const handleMouseLeave = () => {
     if (!isMobile) {
       setIsHovered(false)
-      setRotation({ x: -15, y: -25 })
+      // Torna alla posizione di riposo
+      updateTargetRotation(-15, -25)
     }
   }
 
@@ -137,21 +182,16 @@ export default function ProjectCards3D() {
         style={{
           transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
           transformStyle: 'preserve-3d',
-          transition: isTouching ? 'transform 0.05s linear' : (isHovered ? 'transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)'),
+          // Niente transition CSS - il LERP gestisce tutto
           width: cardWidth,
           height: cardHeight
         }}
       >
         {cardProjects.map((project, index) => {
-          // Centra le card: metà vanno avanti, metà indietro
           const centerIndex = (cardProjects.length - 1) / 2
-          // Distanza tra le card (responsive)
           const baseOffset = (index - centerIndex) * cardSpacing
 
-          // Su mobile: la card in primo piano si alza automaticamente
-          // Su desktop: la card in hover si alza
           const isCardHovered = isMobile ? (frontCardIndex === index) : (hoveredCard === index)
-          // Quando in hover/primo piano, la card si alza verso l'alto
           const translateY = isCardHovered ? (isMobile ? -40 : -80) : 0
 
           return (
@@ -169,8 +209,18 @@ export default function ProjectCards3D() {
                 zIndex: isCardHovered ? 100 : index,
                 transition: 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)'
               }}
-              onMouseEnter={() => !isMobile && setHoveredCard(index)}
-              onMouseLeave={() => !isMobile && setHoveredCard(null)}
+              onMouseEnter={() => {
+                if (!isMobile) {
+                  setHoveredCard(index)
+                  hoveredCardRef.current = index
+                }
+              }}
+              onMouseLeave={() => {
+                if (!isMobile) {
+                  setHoveredCard(null)
+                  hoveredCardRef.current = null
+                }
+              }}
             >
               {!project.heroImage && (
                 <div className="absolute inset-0 bg-gradient-to-br from-[#2EBAEB] to-[#1a8fb8]" />

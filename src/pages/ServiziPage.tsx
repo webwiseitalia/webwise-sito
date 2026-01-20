@@ -260,6 +260,10 @@ export default function ServiziPage() {
                     <img
                       src={imageData.src}
                       alt={imageData.alt}
+                      title={imageData.alt}
+                      width={600}
+                      height={300}
+                      loading="lazy"
                       className="w-full h-[300px] object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-sm"
                     />
                   ) : (
