@@ -116,9 +116,9 @@ export default function SoftwareSection() {
           {/* Colonna sinistra - Render 3D (più piccolo su mobile) */}
           <div
             id="software-canvas"
-            className="h-[250px] lg:h-[500px] order-2 lg:order-1"
+            className={`h-[250px] lg:h-[500px] order-2 lg:order-1 transition-opacity duration-1000 ease-out ${hasBeenInView ? 'opacity-100' : 'opacity-0'}`}
             style={{
-              willChange: hasBeenInView ? 'auto' : 'transform',
+              willChange: hasBeenInView ? 'auto' : 'transform, opacity',
               transform: 'translateZ(0)',
               contain: 'layout style paint'
             }}

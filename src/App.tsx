@@ -472,30 +472,20 @@ function HomePage() {
     }
   }, [])
 
-  // Animazione scala + fade per la sezione Software
-  // Animiamo separatamente testo (con scala) e canvas (solo opacity) per evitare lag
+  // Animazione scala + fade per la sezione Software (solo testo, il Canvas non ha animazioni GSAP)
   useEffect(() => {
     if (!softwareSectionRef.current) return
 
     const softwareSection = softwareSectionRef.current
     const softwareText = document.getElementById('software-text')
-    const softwareCanvas = document.getElementById('software-canvas')
     const isMobile = window.innerWidth < 768
 
-    // Stato iniziale: testo piccolo e trasparente, canvas solo trasparente
+    // Stato iniziale: testo piccolo e trasparente
     if (softwareText) {
       gsap.set(softwareText, {
         scale: 0.8,
         opacity: 0.3,
         transformOrigin: 'center top'
-      })
-    }
-    if (softwareCanvas) {
-      gsap.set(softwareCanvas, {
-        scale: 0.8,
-        opacity: 0.3,
-        transformOrigin: 'center top',
-        force3D: true
       })
     }
 
@@ -518,28 +508,8 @@ function HomePage() {
       })
     }
 
-    // Timeline per il canvas (con scala GPU-accelerata)
-    const tlCanvas = gsap.timeline({
-      scrollTrigger: {
-        trigger: softwareSection,
-        start: 'top bottom',
-        end: isMobile ? 'top 60%' : 'top top',
-        scrub: isMobile ? 0.5 : 1,
-      }
-    })
-
-    if (softwareCanvas) {
-      tlCanvas.to(softwareCanvas, {
-        scale: 1,
-        opacity: 1,
-        ease: 'none',
-        force3D: true
-      })
-    }
-
     return () => {
       tlText.kill()
-      tlCanvas.kill()
     }
   }, [])
 
