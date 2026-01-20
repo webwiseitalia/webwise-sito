@@ -618,41 +618,9 @@ function HomePage() {
           </div>
 
           {/* Sezione inferiore con logo al centro */}
-          <div className="flex items-center justify-center gap-2 lg:gap-8 mt-8 lg:mt-12 text-[10px] lg:text-[30px]">
-            {/* Colonna sinistra - visibile anche su mobile con testo più piccolo */}
-            <div
-              ref={leftColumnRef}
-              className="text-white font-semibold text-right tracking-wide flex-shrink-0"
-              style={{ minWidth: 'auto' }}
-            >
-              <p style={{ whiteSpace: 'nowrap' }}>
-                <TypewriterText
-                  text="SISTEMI INTELLIGENTI"
-                  isVisible={isTypewriterActive}
-                  delay={0.7}
-                  speed={0.012}
-                />
-              </p>
-              <p style={{ whiteSpace: 'nowrap' }}>
-                <TypewriterText
-                  text="LAVORO"
-                  isVisible={isTypewriterActive}
-                  delay={0.85}
-                  speed={0.012}
-                />
-                <span className="ml-4 lg:ml-[100px]">
-                  <TypewriterText
-                    text="MIGLIORE"
-                    isVisible={isTypewriterActive}
-                    delay={0.92}
-                    speed={0.012}
-                  />
-                </span>
-              </p>
-            </div>
-
-            {/* Logo centrale - 125x125px desktop, 80x80px mobile */}
-            <div ref={heroLogoRef} className="flex items-center justify-center flex-shrink-0 w-[80px] h-[80px] lg:w-[125px] lg:h-[125px]">
+          <div className="relative flex items-center justify-center mt-8 lg:mt-12 text-[10px] lg:text-[30px] h-[80px] lg:h-[125px]">
+            {/* Logo centrale - posizionato al centro assoluto della sezione */}
+            <div ref={heroLogoRef} className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center w-[80px] h-[80px] lg:w-[125px] lg:h-[125px]">
               <img
                 src={logoWebwiseCenter}
                 alt="Webwise Logo"
@@ -667,13 +635,48 @@ function HomePage() {
               />
             </div>
 
-            {/* Colonna destra - visibile anche su mobile con testo più piccolo */}
+            {/* Colonna sinistra - stile Anduril con sfalsature */}
+            <div
+              ref={leftColumnRef}
+              className="absolute text-white font-semibold tracking-wide right-[calc(50%+60px)] lg:right-[calc(50%+82.5px)] w-[140px] lg:w-[380px]"
+            >
+              {/* Riga 1: SISTEMI INTELLIGENTI (testo unito, allineato a destra) */}
+              <p className="text-right" style={{ whiteSpace: 'nowrap' }}>
+                <TypewriterText
+                  text="SISTEMI INTELLIGENTI"
+                  isVisible={isTypewriterActive}
+                  delay={0.7}
+                  speed={0.012}
+                />
+              </p>
+              {/* Riga 2: LAVORO ... MIGLIORE (LAVORO sfalsato a sinistra, MIGLIORE allineato sotto INTELLIGENTI) */}
+              <div className="flex justify-between items-center" style={{ whiteSpace: 'nowrap' }}>
+                <span>
+                  <TypewriterText
+                    text="LAVORO"
+                    isVisible={isTypewriterActive}
+                    delay={0.85}
+                    speed={0.012}
+                  />
+                </span>
+                <span>
+                  <TypewriterText
+                    text="MIGLIORE"
+                    isVisible={isTypewriterActive}
+                    delay={0.92}
+                    speed={0.012}
+                  />
+                </span>
+              </div>
+            </div>
+
+            {/* Colonna destra - stile Anduril con sfalsature */}
             <div
               ref={rightColumnRef}
-              className="text-white font-semibold text-left tracking-wide flex-shrink-0"
-              style={{ minWidth: 'auto' }}
+              className="absolute text-white font-semibold tracking-wide left-[calc(50%+60px)] lg:left-[calc(50%+82.5px)] w-[100px] lg:w-[280px]"
             >
-              <p>
+              {/* Riga 1: EST. 2022 (testo unito, allineato a sinistra) */}
+              <p className="text-left" style={{ whiteSpace: 'nowrap' }}>
                 <TypewriterText
                   text="EST. 2022"
                   isVisible={isTypewriterActive}
@@ -681,75 +684,81 @@ function HomePage() {
                   speed={0.012}
                 />
               </p>
-              <a
-                href="tel:+393472509688"
-                style={{ whiteSpace: 'nowrap' }}
-                className="pl-2 lg:pl-[60px] flex items-center gap-2 group cursor-pointer relative"
-              >
-                {/* Glow pulsante dietro al CTA */}
-                <span
-                  className="absolute -inset-x-6 -inset-y-4 rounded-xl pointer-events-none"
-                  style={{
-                    background: 'radial-gradient(ellipse at center, rgba(46, 186, 235, 0.5) 0%, rgba(46, 186, 235, 0.2) 40%, transparent 70%)',
-                    opacity: ctaAnimationActive ? 1 : 0,
-                    transition: 'opacity 0.5s ease 1s',
-                    animation: ctaAnimationActive ? 'ctaPulse 1.8s ease-in-out infinite 1.2s' : 'none',
-                    filter: 'blur(8px)'
-                  }}
-                />
-                <style>
-                  {`
-                    @keyframes ctaPulse {
-                      0%, 100% { opacity: 0.4; transform: scale(1); }
-                      50% { opacity: 1; transform: scale(1.15); }
-                    }
-                  `}
-                </style>
-                <span
-                  className="relative"
-                  style={{
-                    textShadow: '0 0 8px rgba(46, 186, 235, 0.3)',
-                    transition: 'text-shadow 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.textShadow = '0 0 20px rgba(46, 186, 235, 0.7)'}
-                  onMouseLeave={(e) => e.currentTarget.style.textShadow = '0 0 8px rgba(46, 186, 235, 0.3)'}
+              {/* Riga 2: sfalsatura ... INIZIAMO ↗ (CTA con freccia obliqua a destra) */}
+              <div className="flex justify-between items-center" style={{ whiteSpace: 'nowrap' }}>
+                {/* Elemento vuoto per creare la sfalsatura a sinistra */}
+                <span></span>
+                {/* CTA: INIZIAMO + freccia obliqua */}
+                <a
+                  href="tel:+393472509688"
+                  className="flex items-center gap-1 lg:gap-2 group cursor-pointer relative"
                 >
-                  <TypewriterText
-                    text="INIZIAMO"
-                    isVisible={isTypewriterActive}
-                    delay={0.85}
-                    speed={0.012}
-                  />
-                  {/* Sottolineatura animata - appare con l'animazione di scrittura */}
+                  {/* Glow pulsante dietro al CTA */}
                   <span
-                    className="absolute bottom-0 left-0 h-[2px] bg-[#2EBAEB] transition-all duration-500 ease-out"
+                    className="absolute -inset-x-4 -inset-y-2 rounded-xl pointer-events-none"
                     style={{
-                      boxShadow: '0 0 8px rgba(46, 186, 235, 0.5)',
-                      width: ctaAnimationActive ? '100%' : '0%',
-                      transitionDelay: ctaAnimationActive ? '0.95s' : '0s'
+                      background: 'radial-gradient(ellipse at center, rgba(46, 186, 235, 0.25) 0%, rgba(46, 186, 235, 0.1) 40%, transparent 70%)',
+                      opacity: ctaAnimationActive ? 1 : 0,
+                      transition: 'opacity 0.5s ease 1s',
+                      animation: ctaAnimationActive ? 'ctaPulse 2s ease-in-out infinite 1.2s' : 'none',
+                      filter: 'blur(6px)'
                     }}
                   />
-                </span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-3 h-3 lg:w-[30px] lg:h-[30px] transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
-                  style={{
-                    transform: 'rotate(-45deg)',
-                    opacity: ctaAnimationActive ? 1 : 0,
-                    transition: 'opacity 0.3s ease 0.96s, transform 0.3s ease, filter 0.3s ease',
-                    filter: 'drop-shadow(0 0 6px rgba(46, 186, 235, 0.4))'
-                  }}
-                >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </a>
+                  <style>
+                    {`
+                      @keyframes ctaPulse {
+                        0%, 100% { opacity: 0.5; transform: scale(1); }
+                        50% { opacity: 0.8; transform: scale(1.08); }
+                      }
+                    `}
+                  </style>
+                  <span
+                    className="relative"
+                    style={{
+                      textShadow: '0 0 8px rgba(46, 186, 235, 0.3)',
+                      transition: 'text-shadow 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.textShadow = '0 0 20px rgba(46, 186, 235, 0.7)'}
+                    onMouseLeave={(e) => e.currentTarget.style.textShadow = '0 0 8px rgba(46, 186, 235, 0.3)'}
+                  >
+                    <TypewriterText
+                      text="INIZIAMO"
+                      isVisible={isTypewriterActive}
+                      delay={0.85}
+                      speed={0.012}
+                    />
+                    {/* Sottolineatura animata - appare con l'animazione di scrittura */}
+                    <span
+                      className="absolute bottom-0 left-0 h-[2px] bg-[#2EBAEB] transition-all duration-500 ease-out"
+                      style={{
+                        boxShadow: '0 0 8px rgba(46, 186, 235, 0.5)',
+                        width: ctaAnimationActive ? '100%' : '0%',
+                        transitionDelay: ctaAnimationActive ? '0.95s' : '0s'
+                      }}
+                    />
+                  </span>
+                  {/* Freccia obliqua a DESTRA di INIZIAMO */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-3 h-3 lg:w-[24px] lg:h-[24px] transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
+                    style={{
+                      transform: 'rotate(-45deg)',
+                      opacity: ctaAnimationActive ? 1 : 0,
+                      transition: 'opacity 0.3s ease 0.96s, transform 0.3s ease, filter 0.3s ease',
+                      filter: 'drop-shadow(0 0 6px rgba(46, 186, 235, 0.4))'
+                    }}
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>
