@@ -71,20 +71,20 @@ export default function ProjectPage() {
       </section>
 
       {/* Project Title Section */}
-      <section className="w-full bg-black" style={{ padding: '80px 50px' }}>
+      <section className="w-full bg-black px-5 py-12 lg:px-12 lg:py-20">
         <div>
           {/* Back link */}
           <Link
             to="/#portfolio"
-            className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-12 text-sm"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-8 lg:mb-12 text-sm"
           >
             <span>←</span>
             <span>TUTTI I PROGETTI</span>
           </Link>
 
           {/* Title and Meta */}
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16">
-            <h1 className="text-white font-extralight tracking-tight leading-none" style={{ fontSize: 'clamp(48px, 8vw, 120px)' }}>
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 lg:gap-8 mb-10 lg:mb-16">
+            <h1 className="text-white font-extralight tracking-tight leading-none" style={{ fontSize: 'clamp(32px, 8vw, 120px)' }}>
               {project.name.toUpperCase()}
             </h1>
 
@@ -93,8 +93,8 @@ export default function ProjectPage() {
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white rounded-full transition-colors shrink-0"
-                style={{ padding: '18px 40px', fontSize: '14px' }}
+                className="inline-flex items-center justify-center gap-3 border border-white/30 hover:border-[#2EBAEB] hover:text-[#2EBAEB] text-white rounded-full transition-colors shrink-0 w-full lg:w-auto"
+                style={{ padding: '14px 28px', fontSize: '14px' }}
               >
                 VISITA IL SITO <span>↗</span>
               </a>
@@ -102,27 +102,27 @@ export default function ProjectPage() {
           </div>
 
           {/* Info Row */}
-          <div className="flex flex-wrap gap-x-16 gap-y-6 border-t border-white/10 pt-8">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-5 lg:flex lg:flex-wrap lg:gap-x-16 lg:gap-y-6 border-t border-white/10 pt-6 lg:pt-8">
             <div>
-              <span className="text-gray-500 text-xs tracking-wider block mb-2">CLIENTE</span>
+              <span className="text-gray-500 text-xs tracking-wider block mb-1 lg:mb-2">CLIENTE</span>
               <span className="text-white text-sm">{project.client}</span>
             </div>
             {project.location && (
               <div>
-                <span className="text-gray-500 text-xs tracking-wider block mb-2">LUOGO</span>
+                <span className="text-gray-500 text-xs tracking-wider block mb-1 lg:mb-2">LUOGO</span>
                 <span className="text-white text-sm">{project.location}</span>
               </div>
             )}
             <div>
-              <span className="text-gray-500 text-xs tracking-wider block mb-2">ANNO</span>
+              <span className="text-gray-500 text-xs tracking-wider block mb-1 lg:mb-2">ANNO</span>
               <span className="text-white text-sm">{project.year}</span>
             </div>
             <div>
-              <span className="text-gray-500 text-xs tracking-wider block mb-2">SERVIZIO</span>
+              <span className="text-gray-500 text-xs tracking-wider block mb-1 lg:mb-2">SERVIZIO</span>
               <span className="text-white text-sm">{project.service}</span>
             </div>
-            <div>
-              <span className="text-gray-500 text-xs tracking-wider block mb-2">SETTORE</span>
+            <div className="col-span-2 lg:col-span-1">
+              <span className="text-gray-500 text-xs tracking-wider block mb-1 lg:mb-2">SETTORE</span>
               <span className="text-white text-sm">{project.industry}</span>
             </div>
           </div>
@@ -130,14 +130,14 @@ export default function ProjectPage() {
       </section>
 
       {/* Description Section */}
-      <section className="w-full bg-black" style={{ padding: '0 50px 100px 50px' }}>
+      <section className="w-full bg-black px-5 pb-12 lg:px-12 lg:pb-24">
         <div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-16">
             <div>
               <span className="text-gray-500 text-xs tracking-wider">IL PROGETTO</span>
             </div>
             <div>
-              <p className="text-white text-xl lg:text-2xl font-light leading-relaxed whitespace-pre-line">
+              <p className="text-white text-lg lg:text-2xl font-light leading-relaxed whitespace-pre-line">
                 {project.fullDescription}
               </p>
             </div>
@@ -146,7 +146,7 @@ export default function ProjectPage() {
       </section>
 
       {/* Gallery Section - Layout: 1 vertical mobile + 2 horizontal desktop */}
-      <section className="w-full bg-black" style={{ padding: '0 50px 100px 50px' }}>
+      <section className="w-full bg-black px-5 pb-12 lg:px-12 lg:pb-24">
         <div>
           {project.galleryImages.length > 0 ? (
             <div className="space-y-6">
@@ -225,17 +225,17 @@ export default function ProjectPage() {
       </section>
 
       {/* Technologies Section */}
-      <section className="w-full bg-black border-t border-white/10" style={{ padding: '80px 50px' }}>
+      <section className="w-full bg-black border-t border-white/10 px-5 py-10 lg:px-12 lg:py-20">
         <div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-16">
             <div>
               <span className="text-gray-500 text-xs tracking-wider">TECNOLOGIE</span>
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3 lg:gap-4">
               {project.technologies.map((tech, index) => (
                 <span
                   key={index}
-                  className="text-white text-sm border border-white/20 rounded-full px-5 py-2"
+                  className="text-white text-sm border border-white/20 rounded-full px-4 py-2 lg:px-5"
                 >
                   {tech.name}
                 </span>
@@ -247,14 +247,14 @@ export default function ProjectPage() {
 
       {/* Results Section */}
       {project.results && (
-        <section className="w-full bg-black border-t border-white/10" style={{ padding: '80px 50px' }}>
+        <section className="w-full bg-black border-t border-white/10 px-5 py-10 lg:px-12 lg:py-20">
           <div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-16">
               <div>
                 <span className="text-gray-500 text-xs tracking-wider">RISULTATI</span>
               </div>
               <div>
-                <p className="text-white text-xl lg:text-2xl font-light leading-relaxed">
+                <p className="text-white text-lg lg:text-2xl font-light leading-relaxed">
                   {project.results}
                 </p>
               </div>
@@ -265,9 +265,9 @@ export default function ProjectPage() {
 
       {/* Next Projects Section */}
       {relatedProjects.length > 0 && (
-        <section className="w-full bg-black border-t border-white/10" style={{ padding: '80px 50px' }}>
+        <section className="w-full bg-black border-t border-white/10 px-5 py-10 lg:px-12 lg:py-20">
           <div>
-            <div className="flex items-center justify-between mb-16">
+            <div className="flex items-center justify-between mb-8 lg:mb-16">
               <span className="text-gray-500 text-xs tracking-wider">ALTRI PROGETTI</span>
               <Link
                 to="/#portfolio"
@@ -277,14 +277,14 @@ export default function ProjectPage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
               {relatedProjects.map((relatedProject) => (
                 <Link
                   key={relatedProject.id}
                   to={`/progetti/${relatedProject.slug}`}
                   className="group block"
                 >
-                  <div className="aspect-[16/10] bg-[#111] mb-6 overflow-hidden">
+                  <div className="aspect-[16/10] bg-[#111] mb-4 lg:mb-6 overflow-hidden">
                     {relatedProject.heroImage ? (
                       <img
                         src={relatedProject.heroImage}
@@ -302,7 +302,7 @@ export default function ProjectPage() {
                     )}
                   </div>
                   <div className="flex items-center justify-between">
-                    <h3 className="text-white text-2xl font-light group-hover:text-[#2EBAEB] transition-colors">
+                    <h3 className="text-white text-xl lg:text-2xl font-light group-hover:text-[#2EBAEB] transition-colors">
                       {relatedProject.name}
                     </h3>
                     <span className="text-gray-500 text-sm">{relatedProject.year}</span>

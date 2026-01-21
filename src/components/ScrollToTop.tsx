@@ -19,12 +19,20 @@ export default function ScrollToTop() {
 
     // Navigazione interna: se c'è un hash, scrolla all'elemento
     if (hash) {
-      setTimeout(() => {
+      // Prima scroll in cima istantaneamente per evitare flash
+      window.scrollTo(0, 0)
+
+      // Poi scrolla alla sezione con un delay per permettere il render
+      const scrollToElement = () => {
         const element = document.querySelector(hash)
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' })
         }
-      }, 100)
+      }
+
+      // Prova subito, poi riprova dopo un delay più lungo per sicurezza
+      setTimeout(scrollToElement, 50)
+      setTimeout(scrollToElement, 300)
     } else {
       window.scrollTo(0, 0)
     }

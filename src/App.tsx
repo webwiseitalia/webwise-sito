@@ -624,10 +624,10 @@ function HomePage() {
             </p>
           </div>
 
-          {/* Sezione inferiore con logo al centro */}
-          <div className="relative flex items-center justify-center mt-8 lg:mt-12 text-[10px] lg:text-[30px] h-[80px] lg:h-[125px]">
+          {/* Sezione inferiore con logo al centro - DESKTOP */}
+          <div className="hidden lg:flex relative items-center justify-center mt-12 text-[30px] h-[125px]">
             {/* Logo centrale - posizionato al centro assoluto della sezione */}
-            <div ref={heroLogoRef} className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center w-[80px] h-[80px] lg:w-[125px] lg:h-[125px]">
+            <div ref={heroLogoRef} className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center w-[125px] h-[125px]">
               <img
                 src={logoWebwiseCenter}
                 alt="Webwise Logo"
@@ -635,7 +635,7 @@ function HomePage() {
                 width={125}
                 height={125}
                 loading="eager"
-                className="invert w-[80px] h-[80px] lg:w-[125px] lg:h-[125px]"
+                className="invert w-[125px] h-[125px]"
                 style={{
                   opacity: hasSeenLoading ? 1 : 0,
                 }}
@@ -645,18 +645,28 @@ function HomePage() {
             {/* Colonna sinistra - stile Anduril con sfalsature */}
             <div
               ref={leftColumnRef}
-              className="absolute text-white font-semibold tracking-wide right-[calc(50%+60px)] lg:right-[calc(50%+82.5px)] w-[140px] lg:w-[380px]"
+              className="absolute text-white font-semibold tracking-wide right-[calc(50%+82.5px)] w-[380px]"
             >
-              {/* Riga 1: SISTEMI INTELLIGENTI (testo unito, allineato a destra) */}
-              <p className="text-right" style={{ whiteSpace: 'nowrap' }}>
-                <TypewriterText
-                  text="SISTEMI INTELLIGENTI"
-                  isVisible={isTypewriterActive}
-                  delay={0.7}
-                  speed={0.012}
-                />
-              </p>
-              {/* Riga 2: LAVORO ... MIGLIORE (LAVORO sfalsato a sinistra, MIGLIORE allineato sotto INTELLIGENTI) */}
+              {/* Riga 1: SISTEMI ... INTELLIGENTI (sfalsatura) */}
+              <div className="flex justify-between items-center" style={{ whiteSpace: 'nowrap' }}>
+                <span>
+                  <TypewriterText
+                    text="SISTEMI"
+                    isVisible={isTypewriterActive}
+                    delay={0.7}
+                    speed={0.012}
+                  />
+                </span>
+                <span>
+                  <TypewriterText
+                    text="INTELLIGENTI"
+                    isVisible={isTypewriterActive}
+                    delay={0.78}
+                    speed={0.012}
+                  />
+                </span>
+              </div>
+              {/* Riga 2: LAVORO ... MIGLIORE (sfalsatura) */}
               <div className="flex justify-between items-center" style={{ whiteSpace: 'nowrap' }}>
                 <span>
                   <TypewriterText
@@ -680,7 +690,7 @@ function HomePage() {
             {/* Colonna destra - stile Anduril con sfalsature */}
             <div
               ref={rightColumnRef}
-              className="absolute text-white font-semibold tracking-wide left-[calc(50%+60px)] lg:left-[calc(50%+82.5px)] w-[100px] lg:w-[280px]"
+              className="absolute text-white font-semibold tracking-wide left-[calc(50%+82.5px)] w-[280px]"
             >
               {/* Riga 1: EST. 2022 (testo unito, allineato a sinistra) */}
               <p className="text-left" style={{ whiteSpace: 'nowrap' }}>
@@ -698,7 +708,7 @@ function HomePage() {
                 {/* CTA: INIZIAMO + freccia obliqua */}
                 <a
                   href="tel:+393472509688"
-                  className="flex items-center gap-1 lg:gap-2 group cursor-pointer relative"
+                  className="flex items-center gap-2 group cursor-pointer relative"
                 >
                   {/* Glow pulsante dietro al CTA */}
                   <span
@@ -753,11 +763,124 @@ function HomePage() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="w-3 h-3 lg:w-[24px] lg:h-[24px] transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
+                    className="w-[24px] h-[24px] transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
                     style={{
                       transform: 'rotate(-45deg)',
                       opacity: ctaAnimationActive ? 1 : 0,
                       transition: 'opacity 0.3s ease 0.96s, transform 0.3s ease, filter 0.3s ease',
+                      filter: 'drop-shadow(0 0 6px rgba(46, 186, 235, 0.4))'
+                    }}
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Sezione inferiore con logo al centro - MOBILE (layout verticale) */}
+          <div className="lg:hidden flex flex-col items-center mt-6">
+            {/* Logo centrale */}
+            <div className="flex items-center justify-center w-[70px] h-[70px] mb-4">
+              <img
+                src={logoWebwiseCenter}
+                alt="Webwise Logo"
+                title="Webwise - Sviluppo Web e Software"
+                width={70}
+                height={70}
+                loading="eager"
+                className="invert w-[70px] h-[70px]"
+                style={{
+                  opacity: hasSeenLoading ? 1 : 0,
+                }}
+              />
+            </div>
+
+            {/* Testi sotto al logo - layout orizzontale con sfalsatura */}
+            <div className="flex items-start justify-center gap-8 text-[11px] text-white font-semibold tracking-wide">
+              {/* Colonna sinistra */}
+              <div className="text-right">
+                <p style={{ whiteSpace: 'nowrap' }}>
+                  <TypewriterText
+                    text="SISTEMI INTELLIGENTI"
+                    isVisible={isTypewriterActive}
+                    delay={0.7}
+                    speed={0.012}
+                  />
+                </p>
+                <p className="mt-1" style={{ whiteSpace: 'nowrap' }}>
+                  <TypewriterText
+                    text="LAVORO MIGLIORE"
+                    isVisible={isTypewriterActive}
+                    delay={0.85}
+                    speed={0.012}
+                  />
+                </p>
+              </div>
+
+              {/* Colonna destra */}
+              <div className="text-left">
+                <p style={{ whiteSpace: 'nowrap' }}>
+                  <TypewriterText
+                    text="EST. 2022"
+                    isVisible={isTypewriterActive}
+                    delay={0.7}
+                    speed={0.012}
+                  />
+                </p>
+                {/* CTA: INIZIAMO + freccia */}
+                <a
+                  href="tel:+393472509688"
+                  className="flex items-center gap-1.5 group cursor-pointer relative mt-1"
+                >
+                  {/* Glow pulsante dietro al CTA */}
+                  <span
+                    className="absolute -inset-x-3 -inset-y-2 rounded-xl pointer-events-none"
+                    style={{
+                      background: 'radial-gradient(ellipse at center, rgba(46, 186, 235, 0.25) 0%, rgba(46, 186, 235, 0.1) 40%, transparent 70%)',
+                      opacity: ctaAnimationActive ? 1 : 0,
+                      transition: 'opacity 0.5s ease 1s',
+                      animation: ctaAnimationActive ? 'ctaPulse 2s ease-in-out infinite 1.2s' : 'none',
+                      filter: 'blur(6px)'
+                    }}
+                  />
+                  <span
+                    className="relative"
+                    style={{
+                      textShadow: '0 0 8px rgba(46, 186, 235, 0.3)',
+                    }}
+                  >
+                    <TypewriterText
+                      text="INIZIAMO"
+                      isVisible={isTypewriterActive}
+                      delay={0.85}
+                      speed={0.012}
+                    />
+                    {/* Sottolineatura animata */}
+                    <span
+                      className="absolute bottom-0 left-0 h-[1.5px] bg-[#2EBAEB] transition-all duration-500 ease-out"
+                      style={{
+                        boxShadow: '0 0 8px rgba(46, 186, 235, 0.5)',
+                        width: ctaAnimationActive ? '100%' : '0%',
+                        transitionDelay: ctaAnimationActive ? '0.95s' : '0s'
+                      }}
+                    />
+                  </span>
+                  {/* Freccia */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-3.5 h-3.5"
+                    style={{
+                      transform: 'rotate(-45deg)',
+                      opacity: ctaAnimationActive ? 1 : 0,
+                      transition: 'opacity 0.3s ease 0.96s',
                       filter: 'drop-shadow(0 0 6px rgba(46, 186, 235, 0.4))'
                     }}
                   >
