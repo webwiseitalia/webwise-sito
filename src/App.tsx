@@ -25,7 +25,7 @@ import ParticleLogo from './components/ParticleLogo'
 import DotShaderBackground, { DotShaderBackgroundRef } from './components/DotShaderBackground'
 import NoiseTexture from './components/NoiseTexture'
 import BurgerMenu from './components/BurgerMenu'
-import logoWebwiseCenter from './assets/logo-webwise-anduril-_1_.svg'
+import logoWebwiseCenter from './assets/brand/logo-webwise.svg'
 
 gsap.registerPlugin(ScrollTrigger)
 

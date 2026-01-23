@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import gsap from 'gsap'
-import logoSrc from '../assets/logo-webwise-anduril-_1_.svg'
+import logoSrc from '../assets/brand/logo-webwise.svg'
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 

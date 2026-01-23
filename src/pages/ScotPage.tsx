@@ -3,7 +3,7 @@ import { Suspense, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, Environment } from '@react-three/drei'
 import * as THREE from 'three'
-import scotModel from '../assets/new-scot-3d.glb'
+import scotModel from '../assets/3d/scot-model.glb'
 import NoiseTexture from '../components/NoiseTexture'
 
 // Componente per il modello 3D di SCOT

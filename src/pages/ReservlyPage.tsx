@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
+import logoWebwise from '../assets/brand/logo-webwise.svg'
 import BurgerMenu from '../components/BurgerMenu'
 
 export default function ReservlyPage() {

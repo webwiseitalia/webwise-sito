@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
+import logoWebwise from '../assets/brand/logo-webwise.svg'
 
 export default function Footer() {
   return (

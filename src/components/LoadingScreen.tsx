@@ -1,6 +1,6 @@
 import { useEffect, useRef, useMemo } from 'react'
 import gsap from 'gsap'
-import logoWebwise from '../assets/logo-webwise-anduril-_1_.svg'
+import logoWebwise from '../assets/brand/logo-webwise.svg'
 
 interface LoadingScreenProps {
   onLogoTransitionComplete: () => void

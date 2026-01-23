@@ -4,12 +4,12 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, Environment } from '@react-three/drei'
 // OrbitControls rimosso - ora l'icosaedro ruota automaticamente
 import * as THREE from 'three'
-import logoStud from '../assets/loghi scot/logo-stud.webp'
-import logoOrdo from '../assets/loghi scot/logo-ordo.webp'
-import logoTodo from '../assets/loghi scot/logo-todo.webp'
-import logoCash from '../assets/loghi scot/logo-cash.webp'
-import logoTool from '../assets/loghi scot/logo-tools.webp'
-import scotModel from '../assets/new-scot-3d.glb'
+import logoStud from '../assets/software-logos/logo-stud.webp'
+import logoOrdo from '../assets/software-logos/logo-ordo.webp'
+import logoTodo from '../assets/software-logos/logo-todo.webp'
+import logoCash from '../assets/software-logos/logo-cash.webp'
+import logoTool from '../assets/software-logos/logo-tools.webp'
+import scotModel from '../assets/3d/scot-model.glb'
 
 function ScotModel() {
   const { scene } = useGLTF(scotModel)

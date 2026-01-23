@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import logoWebwise from '../assets/logo+scritta-webwise-off.webp'
+import logoWebwise from '../assets/brand/logo-webwise-scritta.webp'
 
 interface BurgerMenuProps {
   isVisible: boolean // Usato solo su desktop

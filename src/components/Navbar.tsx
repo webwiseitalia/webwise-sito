@@ -1,4 +1,4 @@
-import logoWebwise from '../assets/logo+scritta-webwise-off.webp'
+import logoWebwise from '../assets/brand/logo-webwise-scritta.webp'
 
 interface NavbarProps {
   compressionProgress?: number // 0 = normale, 1 = compresso nel burger

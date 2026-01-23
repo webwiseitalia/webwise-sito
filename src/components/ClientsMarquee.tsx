@@ -1,11 +1,11 @@
-import padelHero from '../assets/3bpadel-casestudy/3bpadel-hero-desktop.webp'
-import auroraHero from '../assets/aurora-casestudy/aurora-hero-desktop.webp'
-import scarpaHero from '../assets/casascarpa-casestudy/scarpa-hero-desk.webp'
-import marchetoHero from '../assets/marcheto-casestudy/marcheto-hero-desktop.webp'
-import scsburgerHero from '../assets/sliderclienti/scsburger.webp'
-import prozacHero from '../assets/sliderclienti/prozacbodypiercing.webp'
-import daemHero from '../assets/sliderclienti/daemsrl.webp'
-import loschicosHero from '../assets/sliderclienti/loschicosbuenos.webp'
+import padelHero from '../assets/case-studies/3bpadel/3bpadel-hero-desktop.webp'
+import auroraHero from '../assets/case-studies/aurora/aurora-hero-desktop.webp'
+import scarpaHero from '../assets/case-studies/casascarpa/scarpa-hero-desk.webp'
+import marchetoHero from '../assets/case-studies/marcheto/marcheto-hero-desktop.webp'
+import scsburgerHero from '../assets/clienti/scsburger.webp'
+import prozacHero from '../assets/clienti/prozacbodypiercing.webp'
+import daemHero from '../assets/clienti/daemsrl.webp'
+import loschicosHero from '../assets/clienti/loschicosbuenos.webp'
 
 interface Client {
   name: string
